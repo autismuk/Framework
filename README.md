@@ -1,4 +1,4 @@
-Carousel
-========
+Framework
+=========
 
-My spinning/matching game
+Version 3 of the Object Framework System
