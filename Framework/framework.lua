@@ -191,6 +191,42 @@ function Framework:split(string,split)
 	return result
 end
 
+--//	Perform a method call on a table of objects.
+--//	@objectTable 	[table]			table of objects (use value, non consecutive)
+--//	@method 		[string]		method name.
+--//	@p1 			[anything]		parameter
+--//	@p2 			[anything]		parameter
+--//	@p3 			[anything]		parameter
+
+function Framework:perform(objectTable,method,p1,p2,p3)
+	if self.m_stopDispatch == true then return end 												-- if perform has previously crashed, then don't do it.
+	for _,ref in pairs(objectTable) do 															-- scan the object list
+		if ref:isAlive() and self.m_stopDispatch ~= true then  									-- check the object is not dead
+			local ok,message = pcall(function() 												-- call the method, getting an error.
+										ref[method](ref,p1,p2,p3)
+									 end)
+			if not ok then 																		-- if failed
+				self.m_stopDispatch = true 														-- stop any further attempts
+				print("Warning ! Framework:perform() failed")									-- print a warning error.
+				print("    Returned error : "..message)
+			end 
+		end 
+	end
+end 
+
+--//	Handle enterFrame event. If there are any objects tagged enterFrame call their onEnterFrame() method.
+--//	@event 	[table]		Event data.
+
+function Framework:enterFrame(event)
+	if (self.m_indexCount.enterframe or 0) == 0 then return end 								-- nothing to actually handle the frame time.
+	local time = system.getTimer()																-- get current time, in milliseconds
+	local elapsed = math.min(100,time - (self.m_lastFrameTimer or 0)) 							-- work out elapsed time, top out at 100ms.
+	self.m_lastFrameTimer = time 																-- update last time.
+	Framework:perform(self.m_index.enterframe,"onEnterFrame",elapsed/1000,time/1000)			-- call the enterframe method.
+end 
+
+Runtime:addEventListener( "enterFrame",Framework ) 												-- add event listener.
+
 --
 -- 		Mixin methods.
 --
@@ -216,7 +252,10 @@ Framework:addObjectMethod("tag",
 				Framework:tag(self,tag,Framework.ADDTAG)
 			end
 		end
+		return self
 	end)
+
+require("framework.query")
 
 --- ************************************************************************************************************************************************************************
 --[[

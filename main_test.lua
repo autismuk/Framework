@@ -27,10 +27,18 @@ function countTable(table)
 	return n 
 end 
 
+function passesTest(tagList,queryList) 
+	for _,tagID in ipairs(queryList) do 
+		if tagList[tagID] ~= true then return false end 
+	end 
+	return true
+end 
+
 local objectCount = 100 																		-- up to 100 objects.
 local tagCount = 30 																			-- up to 30 tags.
 local objectRefs = {} 																			-- object references.
 local tagLists = {} 																			-- for each object, a list of tags it has (except frameworkObject)
+local querySize = 5 																			-- up to 1 element in a query.
 
 --
 --		Do one set of changes, tests etc.
@@ -86,14 +94,35 @@ function onePass()
 	for tag,_ in pairs(Framework.m_index) do 													-- check all the index counts and numbers of index items match.
 		assert(countTable(Framework.m_index[tag]) == Framework.m_indexCount[tag])
 	end
+
+	local q = math.random(1,querySize) 															-- work out the size of the query.
+	local queryItems = {}
+	local queryString = ""
+	for i = 1,q do 
+		local tagID = math.random(1,tagCount) 													-- tag to test.
+		queryItems[i] = tagID 																	-- save the tag. 
+		if i > 1 then queryString = queryString .. "," end 
+		queryString = queryString .. tagName(tagID) 
+	end 
+	local resultCount,resultHash = Framework:query(queryString) 								-- evaluate the query.
+	assert(countTable(resultHash) == resultCount) 												-- check the result matches up.
+
+	local successList = {} 																		-- calculated result hash
+	for i = 1,objectCount do  																	-- add all passing objects
+		if objectRefs[i] ~= nil then 
+			if passesTest(tagLists[i],queryItems) then 											-- if they pass the query
+				successList[objectRefs[i]] = objectRefs[i] 										-- add to the list
+			end
+		end 
+	end 
+	assert(countTable(successList) == resultCount) 												-- check the query and calculated result match.
+	for _,ref in pairs(successList) do assert(resultHash[ref] ~= nil) end
 end 
 
 math.random(42)
 print("Start.")
-for i = 1,1000 do 
+for i = 1,1000000 do 
 	if i % 5000 == 0 then print("Test",i) end
 	onePass()
 end 
 print("End.")
-print(objectRefs[1])
-objectRefs[1]:tag("+demo,+fred,jim,kate")
