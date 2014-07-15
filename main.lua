@@ -11,26 +11,7 @@
 
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
-local Framework = require("framework.framework") 												-- require the framework library.
-
-
-local nc = Framework:createClass("demo1")
-
-function nc:constructor(initData)
-	print("Constructor")
-	for k,v in pairs(initData) do print(k,v) end 
-end 
-
-function nc:destructor() 
-	print("Destructor")
-end 
-
-Framework:addFrameworkMixinEntity("demofn",function(self,a) print(a,a*a) end)
-
-
-local ob = Framework:createObject("demo1",{ a = 2, b = 3,c = 42})
-ob.fw:demofn(42)
-Framework:deleteObject(ob)
+require("main_test")
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -41,3 +22,9 @@ Framework:deleteObject(ob)
 
 --]]
 --- ************************************************************************************************************************************************************************
+
+-- tags 
+-- enterframe 
+
+-- messages (seperate unit)
+-- timers (seperate unit)

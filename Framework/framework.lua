@@ -2,120 +2,228 @@
 ---
 ---				Name : 		framework.lua
 ---				Purpose :	Framework Object
----				Created:	14 July 2014
----				Updated:	14 July 2014
+---				Created:	15 July 2014
+---				Updated:	15 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
 --- ************************************************************************************************************************************************************************
 
-local Framework = {} 																			-- the framework object.
+Framework = {} 																					-- the framework object.
 
-Framework.m_objectTable = {} 																	-- dictionary of object reference -> framework element.
-Framework.m_classTable = {} 																	-- dictionary of class name -> prototype.
+Framework.m_classes = {} 																		-- class table. Maps class identifier (l/c) to a prototype table.
+Framework.m_index = {} 																			-- tag index - Maps tag (l/c) to a table contain object => object values
+Framework.m_indexCount = {} 																	-- tag index count - Maps tag (l/c) to number of tags in that index.
+Framework.m_objectMembers = {} 																	-- members to decorate new objects.
 
---//	Register a class with the framework.
---//	@className 			[string] 		name of class - alphanumerics and full stops, case insensitive.
---//	@classPrototype 	[table]			class prototype object.
+Framework.m_index["frameworkobject"] = {} 														-- create an empty index and count for the frameworkobject tag, this is 
+Framework.m_indexCount["frameworkobject"] = 0 													-- tagged for every object, so effectively it is a table of the objects.
 
-function Framework:registerClass(className,classPrototype)
-	assert(type(className) == "string","className should be a string") 							-- parameter validation.
-	assert(type(classPrototype) == "table","classPrototype should be a table")
-	className = className:lower() 																-- lower case class name
-	assert(className:match("^[a-z0-9%.]+$"),"Bad className, alphanumerics and full stop only")
-	assert(self.m_classTable[className] == nil,"Class '"..className.."' duplicated") 			-- check class name is unique.
-	self.m_classTable[className] = classPrototype 												-- store the prototype.
+--//	Register a new class in the class list.
+--//	@className 			[string]	Class identifier.
+--//	@classPrototype 	[table]		Class prototype.
+
+function Framework:register(className,classPrototype)
+	className = className:lower() 																-- class name L/C
+	assert(self:validateClassIdentifier(className),className .. " is a bad class identifier") 	-- validate parameters.
+	assert(type(classPrototype) == "table","Bad class prototype")
+	assert(self.m_classes[className] == nil,"Duplicate class " .. className) 					-- check class not already defined.
+	self.m_classes[className] = classPrototype 													-- add the definition.
 end 
 
---//	Create and register a class with the framework.
---//	@className 			[string] 		name of class - alphanumerics and full stops, case insensitive.
---//	@parentClass		[table] 		optional class to use as parent for the new class.
---//	@return 			[table] 		class prototype object.
+--//	Create and register a new class, which may be subclassed from another class.
+--//	@className 			[string]	Class identifier.
+--//	@superClass 		[table]		Superclass, may be nil.
 
-_G.Base =  _G.Base or { new = function(s) local o = {} setmetatable(o,s) s.__index = s o:initialise() return o end, initialise = function() end }
-
-function Framework:createClass(className,parentClass)
-	assert(type(className) == "string","className should be a string") 							-- parameter validation.
-	if parentClass ~= nil then assert(type(parentClass) == "table","parentClass should be a table or nil") end
-	className = className:lower() 																-- lower case class name
-	assert(className:match("^[a-z0-9%.]+$"),"Bad className, alphanumerics and full stop only")
-
-	local newClass = {} 																		-- create a new class.
-	if parentClass ~= nil then  																-- does it have a parent class
-		setmetatable(newClass,parentClass) 														-- set up the metatable etc. appropriately.
-		parentClass.__index = parentClass 
+function Framework:createClass(className,superClass)
+	local newClass = {} 																		-- this is the class
+	if superClass ~= nil then 																	-- if it has a superclass
+		setmetatable(newClass,superClass) 														-- set up the metatable
+		superClass.__index = superClass 
 	end 
-	self:registerClass(className,newClass) 														-- register the new class.
-	return newClass 																			-- return the class prototype.
-end 
+	self:register(className,newClass)															-- register this new class
+	return newClass 																			-- and return it.
+end
 
---//	Create an object of the given class. Call its constructor using the provided data.
---//	@className 			[string] 		name of class - alphanumerics and full stops, case insensitive.
---//	@setupData 			[table] 		optional setup data (passes {} to constructor)
---//	@return 			[table] 		reference to new object.
+--//	Create a new object, given a class name or prototype, and optional initialisation data. Create the object, then set it up
+--//	(add framework stuff, and call constructor)
+--//	@className 	[string/object] 				Name of class to create instance of or prototype object.
+--//	@data 		[table]							Optional instantiation data (is passed to constructor as {} if nil)
 
-function Framework:createObject(className,setupData)
-	assert(type(className) == "string","className should be a string") 							-- parameter validation.
-	setupData = setupData or {} 																-- default set up data parameter
-	assert(type(setupData) == "table","setupData should be a table or nil")
-	className = className:lower() 																-- lower case class name
-	assert(className:match("^[a-z0-9%.]+$"),"Bad className, alphanumerics and full stop only")
-	local classRef = self.m_classTable[className] 												-- get the class reference.
-	assert(classRef ~= nil,"class Name '"..className.."' not known to framework")				-- check the class actually exists.
+function Framework:new(className,data)
+	if type(className) == "string" then 														-- class name is a string 
+		className = className:lower() 															-- class name L/C
+		assert(self:validateClassIdentifier(className),className.." is a bad class identifier") -- validate parameters.
+		assert(self.m_classes[className] ~= nil,className .. " undefined") 						-- check class exists.
+		className = self.m_classes[className]													-- it is now a reference.
+	end 
+	assert(type(className) == "table","className should be a reference") 						-- check we now have a class prototype.
 	local newObject = {} 																		-- create a new object
-	setmetatable(newObject,classRef) 															-- set up the metatable.
-	classRef.__index = classRef 
-	if newObject.constructor ~= nil then  														-- if there is a constructor
-		newObject:constructor(setupData) 														-- call it.
+	setmetatable(newObject,className)															-- set the metatable
+	className.__index = className 
+	self:convert(newObject,data) 																-- use convert code to set it up
+	return newObject 																			-- return object reference.
+end 
+
+--//	Convert a lua object into one useable by the framework and store it in the framework. After validation, add the default
+--//	__frameworkData storage element, add in the mixins, tag it as "frameworkObject", and call the constructor
+--//	@object 	[table]							Object to be converted. Can come from framework or could be a Corona object, say.
+--//	@data 		[table]							Optional instantiation data (is passed to constructor as {} if nil)
+
+function Framework:convert(object,data)
+	data = data or {} 																			-- default data value.
+	assert(type(object) == "table","object should be a prototype")								-- validation
+	assert(type(data) == "table","instantitation data should be nil or a table")
+	object.__frameworkData = { isAlive = true } 												-- initialise the framework data.
+
+	for name,element in pairs(self.m_objectMembers) do 											-- work through the members.
+		object[name] = object[name] or element 
 	end 
-	assert(self.m_objectTable[newObject] == nil,"Internal error")								-- this is a major issue - object already in table ????
-	self.m_objectTable[newObject] = "fw" 														-- set the object framework functions reference.
-	newObject.fw = Framework.MixinObject 														-- framework methods here.
-	return newObject
+
+	self.m_index["frameworkobject"][object] = object 											-- this effectively tags it as 'frameworkobject'
+	self.m_indexCount["frameworkobject"] = self.m_indexCount["frameworkobject"] + 1 			-- this is quicker than calling Framework:tag
+
+	assert(object.constructor ~= nil,"Object is missing a constructor") 						-- check there is a constructor.
+	object:constructor(data) 																	-- call the constructor.
+	if object.destructor == nil then print("Destructor not present, warning") end 				-- only warn if no destructor.
 end 
 
---//	Delete an object of the given class. Call its destructor, if it exists. If it is a mixin object, remove its mixin.
---//	@object 			[table] 		object to delete.
+--//	Delete an object, calling the destructor, then fixing up the indexes so they do not contain this object any more.
+--//	@object 	[object]						Object you want to delete.
 
-function Framework:deleteObject(object)
-	assert(type(object) == "table","object should be a table") 									-- parameter validation
-	assert(self.m_objectTable[object] ~= nil,"Object is not known to framework")				-- do we know about this object ?
-	if object.destructor ~= nil then 															-- destroy the object.
-		object:destructor()
+function Framework:delete(object)
+	if object.destructor ~= nil then object:destructor() end 									-- call destructor if it exists
+	assert(self.m_index["frameworkobject"][object] ~= nil,"Unknown object") 					-- check object is present.
+	for tag,_ in pairs(self.m_index) do 														-- work through all known tags.
+		if self.m_index[tag][object] ~= nil then 												-- is this object in this index ?
+			self.m_index[tag][object] = nil 													-- remove it from the index
+			self.m_indexCount[tag] = self.m_indexCount[tag] - 1 								-- adjust the count.
+		end
+	end
+end 
+
+--//	Validate a class identifier. It should be a sequence of alphanumeric words, beginning with a letter, seperated by
+--//	full stops.
+--//	@identifier 	[string] 		string to validate
+--//	@return 		[boolean]		true if valid.
+
+function Framework:validateClassIdentifier(identifier)
+	if type(identifier) ~= "string" then return false end 										-- must be a string
+	repeat
+		local temp temp,identifier = identifier:match("^([a-z][0-9a-z]*)(.*)$") 				-- split it up.
+		if identifier == nil then return false end 												-- didn't match up.
+		if identifier ~= "" then 																-- something follows ?
+			if identifier:sub(1,1) ~= "." then return false end 								-- must be aaa.bbb etc.
+			identifier = identifier:sub(2)
+		end 
+	until identifier == "" 																		-- processed the entire string.
+	return true 
+end 
+
+--//	Validate a lua identifier. This is defined as a alphabetic character followed by a number alphanumeric characters,
+--//	this number may be zero.
+--//	@identifier 	[string] 		string to validate
+--//	@return 		[boolean]		true if valid.
+
+function Framework:validateLuaIdentifier(identifier)
+	if type(identifier) ~= "string" then return false end 										-- must be a string
+	return identifier:match("^[a-zA-Z][a-zA-Z0-9]*$") ~= nil 
+end 
+
+--//	Add a method to the object method structure
+--//	@methodName 	[string]		Name of method
+--//	@methodEntity 	[anything]		Whatever you want to add, normally a function.
+
+function Framework:addObjectMethod(methodName,methodEntity)
+	assert(type(methodName) == "string","Bad method name")										-- validate.
+	assert(self.m_objectMembers[methodName] == nil,"Duplicate mixin "..methodName) 				-- check not already defined
+	self.m_objectMembers[methodName] = methodEntity  											-- add it to the mixins.
+end 
+
+--//	Add or remove a tag from an object, updating the tag indices as you go. 
+--//	@object 		[table]			Object to tag/detag
+--//	@tagName 		[string]		tag to apply/remove
+--//	@command 		[number] 		Command to do with tag.
+
+function Framework:tag(object,tagName,command)
+	assert(type(object) == "table","Cannot tag a non-object") 									-- verify
+	assert(type(tagName) == "string" and tagName:match("^%w+$") ~= nil ,"Tag must be a string")
+	assert(command == Framework.ADDTAG or command == Framework.REMOVETAG,"Bad tagging command")
+	tagName = tagName:lower() 																	-- tags are case insensitive.
+
+	if command == Framework.ADDTAG then 
+		if self.m_index[tagName] == nil then 													-- does the tag index exist ?
+			self.m_index[tagName] = {} self.m_indexCount[tagName] = 0 							-- if not, create an empty index.
+		end 
+		if self.m_index[tagName][object] == nil then 											-- if it is not in there.
+			self.m_index[tagName][object] = object 												-- put it in the tag index
+			self.m_indexCount[tagName] = self.m_indexCount[tagName] + 1 						-- bump the counter 
+		else
+			print("Warning ! Duplicate tag added "..tagName) 									-- already there, warning !
+		end
+	else 
+		assert(self.m_index[tagName] ~= nil,"Object not tagged with "..tagName.." (index)")		-- no tag index.
+		assert(self.m_index[tagName][object] ~= nil,"Object not tagged with "..tagName)			-- check it is tagged with the tag
+		self.m_index[tagName][object] = nil 													-- remove from tag index
+		self.m_indexCount[tagName] = self.m_indexCount[tagName] - 1 							-- decrement the counter 
+	end
+	--print(object,tagName,command)
+end 
+
+Framework.ADDTAG = 1 																			-- tag commands.
+Framework.REMOVETAG = 2 																	
+
+--//	Convert a string to an array of strings, using the given separator
+--//	@string 	[string]		String to split
+--//	@split 		[string]		Characters to split over.
+--//	@return 	[list]			List of strings.
+
+function Framework:split(string,split)
+	local result = {}
+	while string ~= "" do 																		-- keep going till finished
+		local p = string:find(split) 															-- find split
+		if p == nil then  																		-- no split found
+			result[#result+1] = string string = ""
+		else 
+			result[#result+1] = string:sub(1,p-1) string = string:sub(p+#split)  				-- split found.
+		end 
 	end 
-	self.m_objectTable[object] = nil 															-- remove it from the table. 
-end 
+	return result
+end
 
---//	Given an object, decorate it to be a framework object by adding an entry to its table.
---//	@object 			[table] 		object to decorate
---//	@mixinBase 			[string] 		the element to store the framework data in, by default this is "fw"
+--
+-- 		Mixin methods.
+--
 
-function Framework:decorateObject(object,mixinBase)
-	assert(type(object) == "table","object should be a table")								    -- parameter validation
-	mixinBase = mixinBase or "fw" 																-- default mixin base.
-	assert(type(mixinBase) == "string","mixinBase should be a string or nil")
-end 
+Framework:addObjectMethod("isAlive", 															-- add method to check if alive.
+	function(self) 
+		return self.__frameworkData.isAlive 
+	end)
 
-Framework.MixinObject = {} 																		-- Framework.MixinObject methods are added to new objects.
+Framework:addObjectMethod("delete",																-- add method to delete self.
+	function(self)
+		Framework:delete(self)
+	end)
 
---//	Add items to the mixin used when objects are created.
---//	@entityName  	  [string] 			Name of entity to be added
---//	@entityReference  [object] 			Entity Reference.
-
-function Framework:addFrameworkMixinEntity(entityName,entityReference)
-	assert(type(entityName) == "string") assert(type(entityReference) == "function") 			-- add methods to the object creation mixin.
-	assert(Framework.MixinObject[entityName] == nil)
-	Framework.MixinObject[entityName] = entityReference 
-end 
-
-return Framework 
+Framework:addObjectMethod("tag",
+	function(self,tagString)
+		tagString = Framework:split(tagString,",") 												-- convert tag string into array of substrings.
+		for _,tag in ipairs(tagString) do 														-- work through the tag strings.
+			if tag:sub(1,1) == "+" then tag = tag:sub(2) end 									-- remove leading +
+			if tag:sub(1,1) == "-" then  														-- if -x remove tag
+				Framework:tag(self,tag:sub(2),Framework.REMOVETAG)
+			else 																				-- otherwise add tag.
+				Framework:tag(self,tag,Framework.ADDTAG)
+			end
+		end
+	end)
 
 --- ************************************************************************************************************************************************************************
 --[[
 
 		Date 		Version 	Notes
 		---- 		------- 	-----
-		14-Jul-14	0.1 		Initial version of file
+		15-Jul-14	0.1 		Initial version of file
 
 --]]
 --- ************************************************************************************************************************************************************************
