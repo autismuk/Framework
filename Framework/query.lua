@@ -1,7 +1,7 @@
 --- ************************************************************************************************************************************************************************
 ---
 ---				Name : 		query.lua
----				Purpose :	Querying object (sub part of Framework)
+---				Purpose :	Querying routines (sub part of Framework)
 ---				Created:	15 July 2014
 ---				Updated:	15 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
@@ -52,6 +52,16 @@ function Framework:query(queryString)
 	return resultCount,queryResult																-- return the query result count and entries.
 end
 
-Framework:addObjectMethod("query",function(self,queryString)									-- add query to objects.
+Framework:addObjectMethod("query",function(self,queryString)									-- add query method to object's mixin methods.
 	return Framework:query(queryString)
 end)
+
+--- ************************************************************************************************************************************************************************
+--[[
+
+		Date 		Version 	Notes
+		---- 		------- 	-----
+		15-Jul-14	0.1 		Initial version of file
+
+--]]
+--- ************************************************************************************************************************************************************************

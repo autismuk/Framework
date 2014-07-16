@@ -207,6 +207,7 @@ function Framework:perform(objectTable,method,p1,p2,p3)
 	for _,ref in pairs(objectTable) do 															-- scan the object list
 		if ref:isAlive() and self.m_stopDispatch ~= true then  									-- check the object is not dead
 			local ok,message = pcall(function() 												-- call the method, getting an error.
+										assert(ref[method] ~= nil,"Object does not implement "..method.."()")
 										ref[method](ref,p1,p2,p3)
 									 end)
 			if not ok then 																		-- if failed
@@ -259,7 +260,8 @@ Framework:addObjectMethod("tag",
 		return self
 	end)
 
-require("framework.query")
+require("framework.query") 																		-- query code
+require("framework.messaging") 																	-- messaging code.
 
 --- ************************************************************************************************************************************************************************
 --[[
