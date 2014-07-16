@@ -262,6 +262,7 @@ Framework:addObjectMethod("tag",
 
 require("framework.query") 																		-- query code
 require("framework.messaging") 																	-- messaging code.
+require("framework.timer")																		-- timer code.
 
 --- ************************************************************************************************************************************************************************
 --[[

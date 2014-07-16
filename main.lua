@@ -20,22 +20,13 @@ function CL:constructor(info) self.m_name = info.name end
 
 function CL:destructor() end 
 
-function CL:onMessage(sender,name,body)
-	print(sender,name,"received by",self.m_name)
-	for k,v in pairs(body) do print(k,v) end
+function CL:onTimer(tag)
+	print(tag,"fired by",self.m_name)
 end 
 
 local c1 = Framework:new("query.x", { name = "name c1" }):tag("a,b,c")
-local c2 = Framework:new("query.x", { name = "name c2" }):tag("a,b")
-local c3 = Framework:new("query.x", { name = "name c3" }):tag("a,c")
-local c4 = Framework:new("query.x", { name = "name c4" }):tag("a,b,c")
-local c5 = Framework:new("query.x", { name = "name c6" }):tag("b,d,a")
 
-local count,list = c1:query("a,b")
-print(count," objects")
-for k,v in pairs(list) do print(v.m_name) end
-
-c1:sendMessage("d","hello", { a = 1,b = 2})
+c1:addSingleTimer(2,"fred")
 
 --- ************************************************************************************************************************************************************************
 --[[

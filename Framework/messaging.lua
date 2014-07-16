@@ -18,6 +18,8 @@ function MessagingClass:constructor(info)
 	self.m_messageList = {}  																	-- message list.
 end
 
+function MessagingClass:destructor() end 														-- stops warnings.
+
 --//	Send a message via the queue.
 --//	@target 	[string/object]			query or recipient, can be a single entity or a hash of them.
 --//	@name 		[string]				message name. (optional)
