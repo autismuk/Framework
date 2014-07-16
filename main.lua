@@ -11,9 +11,8 @@
 
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
-require("main_test")
+--require("main_test")
 
---[[
 require("framework.framework")
 
 local CL = Framework:createClass("query.x")
@@ -29,7 +28,10 @@ local c5 = Framework:new("query.x", { name = "name c6" }):tag("b,d,a")
 local count,list = c1:query("a,b")
 print(count," objects")
 for k,v in pairs(list) do print(v.m_name) end
---]]
+
+print(c1:isAlive())
+c1:delete()
+print(c1:isAlive())
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -40,8 +42,3 @@ for k,v in pairs(list) do print(v.m_name) end
 
 --]]
 --- ************************************************************************************************************************************************************************
-
--- messages (seperate unit)
--- timers (seperate unit)
--- collection (group of objects)
--- scene (collection with display group, updating.)

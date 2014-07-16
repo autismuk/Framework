@@ -3,7 +3,7 @@
 ---				Name : 		framework.lua
 ---				Purpose :	Framework Object
 ---				Created:	15 July 2014
----				Updated:	15 July 2014
+---				Updated:	16 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -11,7 +11,7 @@
 
 Framework = {} 																					-- the framework object.
 
-Framework.m_classes = {} 																		-- class table. Maps class identifier (l/c) to a prototype table.
+Framework.m_classes = {} 																		-- class table. Maps class identifier (l/c) to a prototype/factory table.
 Framework.m_index = {} 																			-- tag index - Maps tag (l/c) to a table contain object => object values
 Framework.m_indexCount = {} 																	-- tag index count - Maps tag (l/c) to number of tags in that index.
 Framework.m_objectMembers = {} 																	-- members to decorate new objects.
@@ -28,7 +28,7 @@ function Framework:register(className,classPrototype)
 	assert(self:validateClassIdentifier(className),className .. " is a bad class identifier") 	-- validate parameters.
 	assert(type(classPrototype) == "table","Bad class prototype")
 	assert(self.m_classes[className] == nil,"Duplicate class " .. className) 					-- check class not already defined.
-	self.m_classes[className] = classPrototype 													-- add the definition.
+	self.m_classes[className] = { class = "normal", prototype = classPrototype } 				-- add the definition.
 end 
 
 --//	Create and register a new class, which may be subclassed from another class.
@@ -58,9 +58,11 @@ function Framework:new(className,data)
 		className = self.m_classes[className]													-- it is now a reference.
 	end 
 	assert(type(className) == "table","className should be a reference") 						-- check we now have a class prototype.
+	assert(className.class == "normal","Type not implemented "..className.class)				-- check it is 'normal' e.g. standard type.
+
 	local newObject = {} 																		-- create a new object
-	setmetatable(newObject,className)															-- set the metatable
-	className.__index = className 
+	setmetatable(newObject,className.prototype)													-- set the metatable
+	className.prototype.__index = className.prototype 
 	self:convert(newObject,data) 																-- use convert code to set it up
 	return newObject 																			-- return object reference.
 end 
@@ -92,7 +94,9 @@ end
 --//	@object 	[object]						Object you want to delete.
 
 function Framework:delete(object)
+	if not object:isAlive() then return end 													-- already dead.
 	if object.destructor ~= nil then object:destructor() end 									-- call destructor if it exists
+	object.__frameworkData.isAlive = false 														-- mark as no longer alive.
 	assert(self.m_index["frameworkobject"][object] ~= nil,"Unknown object") 					-- check object is present.
 	for tag,_ in pairs(self.m_index) do 														-- work through all known tags.
 		if self.m_index[tag][object] ~= nil then 												-- is this object in this index ?

@@ -121,7 +121,7 @@ end
 
 math.random(42)
 print("Start.")
-for i = 1,1000000 do 
+for i = 1,1000 do 
 	if i % 5000 == 0 then print("Test",i) end
 	onePass()
 end 
