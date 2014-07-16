@@ -57,20 +57,36 @@ end
 --//	@currentTime [number]				current time in seconds
 
 function TimerClass:onEnterFrame(deltaTime,currentTime) 
-	-- While still timer due.
-	-- Remove from front.
-	-- Fire it
-	-- Reinsert it if some time left.
+	while #self.m_timerList > 0 and currentTime > self.m_timerList[1].fireTime do 				-- is there something to fire ?
+		local timerEvent = self.m_timerList[1] 													-- get the first event
+		table.remove(self.m_timerList,1) 														-- remove it from the timer list.
+		Framework:perform({ soleitem = timerEvent.target },"onTimer",timerEvent.tag)			-- fire the timer event for just that one object.
+		if timerEvent.count ~= 0 and timerEvent.target:isAlive() then 							-- if count is nonzero, e.g. there are more to fire & not dead.
+			timerEvent.count = timerEvent.count - 1 											-- decrement counter, hence use of -1 for forever.
+			assert(timerEvent.period > 0.01,"timer periods cannot be very small") 				-- will just cause endless loop firing.
+			timerEvent.fireTime = timerEvent.fireTime + timerEvent.period 						-- work out next fire time.
+			self.m_timerList[#self.m_timerList+1] = timerEvent 									-- add the timer event back to the queue
+			self:sortTimerList() 																-- make sure it is in order.
+		end
+	end
 end
 
-
---//	Cancel a timer.
+--//	Cancel a timer, using the tag to identify it.
 --//	@target 	[object] 			who the timer event is for
---//	@tag 		[string]			timer identification tag.
+--//	@tag 		[string]			timer identification tag (not optional)
 
 function TimerClass:cancelTimer(target,tag)
-	-- Validate tag
-	-- Look for matching timer(s) and remove them.
+	assert(type(tag) == "string","timer tag should be a string")								-- validate tag.
+	repeat 																						-- keep going until nothing removed.
+		local hasRemoved = false  																-- set to true if something was removed.
+		for index,ref in ipairs(self.m_timerList) do 											-- work through the objects
+			if ref.target == target and ref.tag == tag then 									-- found a match.
+				hasRemoved = true 																-- removed one.
+				table.remove(self.m_timerList,index) 											-- actually remove it.
+				break 																			-- exit the for loop.
+			end 
+		end
+	until not hasRemoved 																		-- until haven't removed something
 end 
 
 local timerInstance = Framework:new("system.timer",{})											-- create an instance of the messaging class.

@@ -17,16 +17,20 @@ require("framework.framework")
 
 local CL = Framework:createClass("query.x")
 function CL:constructor(info) self.m_name = info.name end 
-
 function CL:destructor() end 
 
 function CL:onTimer(tag)
 	print(tag,"fired by",self.m_name)
 end 
 
-local c1 = Framework:new("query.x", { name = "name c1" }):tag("a,b,c")
+local CL2 = Framework:createClass("timer.x",CL)
+function CL2:onTimer(tag) print("CL2 Fired") end
 
-c1:addSingleTimer(2,"fred")
+local c1 = Framework:new("query.x", { name = "name c1" })
+local c2 = Framework:new("timer.x", { name = "name c2" })
+
+c1:addRepeatingTimer(0.3,"four")
+c2:addSingleTimer(1)
 
 --- ************************************************************************************************************************************************************************
 --[[
