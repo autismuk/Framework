@@ -16,21 +16,32 @@ require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")
 
 local CL = Framework:createClass("query.x")
-function CL:constructor(info) self.m_name = info.name end 
+function CL:constructor(info) self.m_name = info.name print("Constructed",info.name) end 
 function CL:destructor() end 
 
 function CL:onTimer(tag)
 	print(tag,"fired by",self.m_name)
 end 
 
-local CL2 = Framework:createClass("timer.x",CL)
-function CL2:onTimer(tag) print("CL2 Fired") end
+local CL2 = Framework:createClass("timer.x","query.x")
+
+function CL2:onTimer(tag) 
+	print("CL2 Fired") 
+	self.super.onTimer(self,tag)
+end
+
+function CL2:onMessage(sender,body,data) 
+	print(sender,body,data)
+end 
 
 local c1 = Framework:new("query.x", { name = "name c1" })
-local c2 = Framework:new("timer.x", { name = "name c2" })
+local c2 = Framework:new("timer.x", { name = "name c2" }):tag("a")
 
-c1:addRepeatingTimer(0.3,"four")
-c2:addSingleTimer(1)
+Framework:setEnterFrameEnabled(false)
+timer.performWithDelay( 2000,function() Framework:setEnterFrameEnabled(true) print("Start") end)
+c1:addMultiTimer(1,4,"four")
+c2:addSingleTimer(1.5,"one")
+c1:sendMessageLater("a","hi !",nil,5)
 
 --- ************************************************************************************************************************************************************************
 --[[

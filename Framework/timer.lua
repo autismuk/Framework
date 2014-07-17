@@ -3,7 +3,7 @@
 ---				Name : 		timer.lua
 ---				Purpose :	timer object (sub part of Framework)
 ---				Created:	16 July 2014
----				Updated:	16 July 2014
+---				Updated:	17 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -37,7 +37,7 @@ function TimerClass:add(target,period, count, tag)
 	assert(type(tag) == "string","Tag should be a string")
 
 	local newTimerItem = { target = target,														-- who gets the message
-						   fireTime = system.getTimer() / 1000 + period, 						-- when it next fires
+						   timeToFire = period, 												-- time till next firing.
 						   period = period, 													-- gaps between firing.
 						   count = count - 1, 													-- how many fires remaining (hence -1)
 						   tag = tag } 															-- tag for timer.
@@ -49,22 +49,23 @@ end
 
 function TimerClass:sortTimerList()
 	table.sort(self.m_timerList, 
-			   function(a,b) return a.fireTime < b.fireTime end)
+			   function(a,b) return a.timeToFire < b.timeToFire end)
 end 
 
 --//	Called every frame. Dispatches messages that are due.
 --//	@deltaTime 	[number]				elapsed time in seconds
---//	@currentTime [number]				current time in seconds
 
-function TimerClass:onEnterFrame(deltaTime,currentTime) 
-	while #self.m_timerList > 0 and currentTime > self.m_timerList[1].fireTime do 				-- is there something to fire ?
+function TimerClass:onEnterFrame(deltaTime) 
+	if #self.m_timerList == 0 then return end 													-- no timers.
+	for _,ref in ipairs(self.m_timerList) do ref.timeToFire = ref.timeToFire - deltaTime end 	-- subtract delta time from all timers.
+	while #self.m_timerList > 0 and self.m_timerList[1].timeToFire < 0 do 						-- is there something to fire ?
 		local timerEvent = self.m_timerList[1] 													-- get the first event
 		table.remove(self.m_timerList,1) 														-- remove it from the timer list.
 		Framework:perform({ soleitem = timerEvent.target },"onTimer",timerEvent.tag)			-- fire the timer event for just that one object.
 		if timerEvent.count ~= 0 and timerEvent.target:isAlive() then 							-- if count is nonzero, e.g. there are more to fire & not dead.
 			timerEvent.count = timerEvent.count - 1 											-- decrement counter, hence use of -1 for forever.
 			assert(timerEvent.period > 0.01,"timer periods cannot be very small") 				-- will just cause endless loop firing.
-			timerEvent.fireTime = timerEvent.fireTime + timerEvent.period 						-- work out next fire time.
+			timerEvent.timeToFire = timerEvent.period 											-- work out next fire time.
 			self.m_timerList[#self.m_timerList+1] = timerEvent 									-- add the timer event back to the queue
 			self:sortTimerList() 																-- make sure it is in order.
 		end

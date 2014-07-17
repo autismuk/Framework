@@ -3,7 +3,7 @@
 ---				Name : 		messaging.lua
 ---				Purpose :	messaging object (sub part of Framework)
 ---				Created:	16 July 2014
----				Updated:	16 July 2014
+---				Updated:	17 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -41,7 +41,7 @@ function MessagingClass:sendMessage(target,name,body,delay)
 						 recipient = target, 													-- to this or them
 						 name = name, 															-- called this
 						 body = body, 															-- with this data
-						 time = system.getTimer() / 1000 + delay 								-- at or after this time.
+						 timeToSend = delay 													-- time left before sending.
 					   }
 	self.m_messageList[#self.m_messageList+1] = newMessage 										-- add to message list.
 end 
@@ -50,12 +50,13 @@ end
 --//	@deltaTime 	[number]				elapsed time in seconds
 --//	@currentTime [number]				current time in seconds
 
-function MessagingClass:onEnterFrame(deltaTime,currentTime) 
+function MessagingClass:onEnterFrame(deltaTime) 
 	if #self.m_messageList == 0 then return end 												-- no messages, do nothing.
 	local toSendList = self.m_messageList 														-- make a copy of the messages
 	self.m_messageList = {} 																	-- clear the list - messages not due will be added back.
 	for _,msg in ipairs(toSendList) do 															-- work through the message list.
-		if msg.time < currentTime then 															-- is it time to send ?
+		msg.timeToSend = msg.timeToSend - deltaTime 											-- subtract time elapsed.
+		if msg.timeToSend <= 0 then 															-- is it time to send ?
 			self:sendSingleMessage(msg)															-- send it.
 		else 																					-- not time to send it, put it in the queue.
 			self.m_messageList[#self.m_messageList+1] = msg

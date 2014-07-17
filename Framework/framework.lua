@@ -3,7 +3,7 @@
 ---				Name : 		framework.lua
 ---				Purpose :	Framework Object
 ---				Created:	15 July 2014
----				Updated:	16 July 2014
+---				Updated:	17 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -19,6 +19,8 @@ Framework.m_objectMembers = {} 																	-- members to decorate new objec
 Framework.m_index["frameworkobject"] = {} 														-- create an empty index and count for the frameworkobject tag, this is 
 Framework.m_indexCount["frameworkobject"] = 0 													-- tagged for every object, so effectively it is a table of the objects.
 
+Framework.m_enterFrameEnabled = true 															-- enter frame enabled.
+
 --//	Register a new class in the class list.
 --//	@className 			[string]	Class identifier.
 --//	@classPrototype 	[table]		Class prototype.
@@ -32,14 +34,23 @@ function Framework:register(className,classPrototype)
 end 
 
 --//	Create and register a new class, which may be subclassed from another class.
---//	@className 			[string]	Class identifier.
---//	@superClass 		[table]		Superclass, may be nil.
+--//	@className 			[string]			Class identifier.
+--//	@superClass 		[string/table]		Superclass, may be nil.
 
 function Framework:createClass(className,superClass)
+	className = className:lower() 																-- class name L/C
+	assert(self:validateClassIdentifier(className),className .. " is a bad class identifier") 	-- validate parameters.
 	local newClass = {} 																		-- this is the class
 	if superClass ~= nil then 																	-- if it has a superclass
+		if type(superClass) == "string" then 													-- is the superclass a name ?
+			superClass = superClass:lower() 													-- validate it.		
+			assert(self:validateClassIdentifier(superClass),superClass .. " is a bad superclass identifier") 	
+			assert(self.m_classes[superClass] ~= nil,superClass .. " undefined") 				-- check class exists.
+			superClass = self.m_classes[superClass].prototype 									-- get its reference.
+		end 
 		setmetatable(newClass,superClass) 														-- set up the metatable
 		superClass.__index = superClass 
+		newClass.super = superClass 															-- save the superclass.
 	end 
 	self:register(className,newClass)															-- register this new class
 	return newClass 																			-- and return it.
@@ -223,11 +234,20 @@ end
 --//	@event 	[table]		Event data.
 
 function Framework:enterFrame(event)
-	if (self.m_indexCount.enterframe or 0) == 0 then return end 								-- nothing to actually handle the frame time.
+	if (self.m_indexCount.enterframe or 0) == 0 or not self.m_enterFrameEnabled then return end -- nothing to actually handle the frame time.
 	local time = system.getTimer()																-- get current time, in milliseconds
 	local elapsed = math.min(100,time - (self.m_lastFrameTimer or 0)) 							-- work out elapsed time, top out at 100ms.
 	self.m_lastFrameTimer = time 																-- update last time.
-	Framework:perform(self.m_index.enterframe,"onEnterFrame",elapsed/1000,time/1000)			-- call the enterframe method.
+	Framework:perform(self.m_index.enterframe,"onEnterFrame",elapsed/1000)						-- call the enterframe method.
+end 
+
+
+--//	Enable or disable the enterFrame event.
+--//	@isEnabled [boolean]	true to enable, false to disable
+
+function Framework:setEnterFrameEnabled(isEnabled)
+	assert(isEnabled == true or isEnabled == false,"setEnterFrameEnabled must have a boolean")
+	self.m_enterFrameEnabled = isEnabled 
 end 
 
 Runtime:addEventListener( "enterFrame",Framework ) 												-- add event listener.
