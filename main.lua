@@ -16,32 +16,33 @@ require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")
 
 local CL = Framework:createClass("query.x")
-function CL:constructor(info) self.m_name = info.name print("Constructed",info.name) end 
-function CL:destructor() end 
 
-function CL:onTimer(tag)
-	print(tag,"fired by",self.m_name)
+function CL:constructor(info) 
+	self.m_name = info.name 
+	print("Constructed",info.name) 
+	self.m_circle = display.newCircle(info.x,info.y,32)
+	self.m_circle:setFillColor(info.red,info.green,info.blue)
 end 
+
+function CL:destructor() 
+	print("Destructed",self.m_name) 
+end 
+
+function CL:getDisplayObjects() return { self.m_circle } end 
 
 local CL2 = Framework:createClass("timer.x","query.x")
 
-function CL2:onTimer(tag) 
-	print("CL2 Fired") 
-	self.super.onTimer(self,tag)
-end
+-- function CL2:onUpdate(dt) print("Updating",self.m_name,dt) end
 
-function CL2:onMessage(sender,body,data) 
-	print(sender,body,data)
-end 
+local sc = Framework:new("game.scene")
 
-local c1 = Framework:new("query.x", { name = "name c1" })
-local c2 = Framework:new("timer.x", { name = "name c2" }):tag("a")
+local c1 = sc:new("query.x", { name = "name c1", x = 64, y = 32, red = 1,green = 0,blue = 0 })
+local c2 = sc:new("timer.x", { name = "name c1", x = 164, y = 32, red = 1,green = 1,blue = 0 })
 
-Framework:setEnterFrameEnabled(false)
-timer.performWithDelay( 2000,function() Framework:setEnterFrameEnabled(true) print("Start") end)
-c1:addMultiTimer(1,4,"four")
-c2:addSingleTimer(1.5,"one")
-c1:sendMessageLater("a","hi !",nil,5)
+print(sc:getCollection())
+
+sc:getContainer().alpha = 0
+transition.to(sc:getContainer(), { time = 1000,alpha = 1 })
 
 --- ************************************************************************************************************************************************************************
 --[[

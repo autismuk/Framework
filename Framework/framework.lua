@@ -162,7 +162,7 @@ end
 
 function Framework:tag(object,tagName,command)
 	assert(type(object) == "table","Cannot tag a non-object") 									-- verify
-	assert(type(tagName) == "string" and tagName:match("^%w+$") ~= nil ,"Tag must be a string")
+	assert(type(tagName) == "string" and tagName:match("^%w+$") ~= nil ,"Tag must be a alphanumeric string")
 	assert(command == Framework.ADDTAG or command == Framework.REMOVETAG,"Bad tagging command")
 	tagName = tagName:lower() 																	-- tags are case insensitive.
 
@@ -283,6 +283,8 @@ Framework:addObjectMethod("tag",
 require("framework.query") 																		-- query code
 require("framework.messaging") 																	-- messaging code.
 require("framework.timer")																		-- timer code.
+require("framework.collection")																	-- collection code.
+require("framework.scene")
 
 --- ************************************************************************************************************************************************************************
 --[[

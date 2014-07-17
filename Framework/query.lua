@@ -11,6 +11,7 @@
 
 --//	Query the Framework object database for all objects with all the named tags.
 --//	@queryString 	[string] 		Comma seperated list of tags (defaults to "", which is the frameworkObject tag)
+--//	@return 		[number,table]	Two elements, number of items and hash of items
 
 function Framework:query(queryString)
 	queryString = queryString or "" 															-- default query, empty string
