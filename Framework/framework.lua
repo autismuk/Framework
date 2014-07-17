@@ -19,6 +19,8 @@ Framework.m_objectMembers = {} 																	-- members to decorate new objec
 Framework.m_index["frameworkobject"] = {} 														-- create an empty index and count for the frameworkobject tag, this is 
 Framework.m_indexCount["frameworkobject"] = 0 													-- tagged for every object, so effectively it is a table of the objects.
 
+Framework.fw = {} 																				-- Framework globals.
+
 Framework.m_enterFrameEnabled = true 															-- enter frame enabled.
 
 --//	Register a new class in the class list.
@@ -69,11 +71,25 @@ function Framework:new(className,data)
 		className = self.m_classes[className]													-- it is now a reference.
 	end 
 	assert(type(className) == "table","className should be a reference") 						-- check we now have a class prototype.
-	assert(className.class == "normal","Type not implemented "..className.class)				-- check it is 'normal' e.g. standard type.
 
-	local newObject = {} 																		-- create a new object
-	setmetatable(newObject,className.prototype)													-- set the metatable
-	className.prototype.__index = className.prototype 
+	assert(className.class == "normal","Type not implemented "..className.class)				-- check it is 'normal' e.g. standard type.
+	local newObject
+	if className.prototype.createMixinObject == nil then 										-- if not a mixin create object
+		newObject = {} 																			-- create a new object
+		setmetatable(newObject,className.prototype)												-- set the metatable
+		className.prototype.__index = className.prototype
+	else 																						-- a mixin object
+		newObject = className.prototype.createMixinObject(nil,data)  							-- get or create the object you are going to use.
+		local protoList = className.prototype  													-- work backwards through the metatable.
+		while protoList ~= nil do
+			for k,v in pairs(protoList) do 														-- work through the metatable contents
+				if type(v) == "function" then 													-- put functions in if they don't already exist.
+					newObject[k] = newObject[k] or v
+				end 
+			end
+			protoList = getmetatable(protoList) 												-- follow the metatable chain.
+		end
+	end  
 	self:convert(newObject,data) 																-- use convert code to set it up
 	return newObject 																			-- return object reference.
 end 
@@ -88,6 +104,7 @@ function Framework:convert(object,data)
 	assert(type(object) == "table","object should be a prototype")								-- validation
 	assert(type(data) == "table","instantitation data should be nil or a table")
 	object.__frameworkData = { isAlive = true } 												-- initialise the framework data.
+	object.fw = Framework.fw 																	-- link to named objects.
 
 	for name,element in pairs(self.m_objectMembers) do 											-- work through the members.
 		object[name] = object[name] or element 
@@ -108,6 +125,9 @@ function Framework:delete(object)
 	if not object:isAlive() then return end 													-- already dead.
 	if object.destructor ~= nil then object:destructor() end 									-- call destructor if it exists
 	object.__frameworkData.isAlive = false 														-- mark as no longer alive.
+	if object.__frameworkData.givenName ~= nil then 											-- did the object have a name ?
+		Framework.fw[object.__frameworkData.givenName] = nil 									-- if so, remove it
+	end
 	assert(self.m_index["frameworkobject"][object] ~= nil,"Unknown object") 					-- check object is present.
 	for tag,_ in pairs(self.m_index) do 														-- work through all known tags.
 		if self.m_index[tag][object] ~= nil then 												-- is this object in this index ?
@@ -252,6 +272,19 @@ end
 
 Runtime:addEventListener( "enterFrame",Framework ) 												-- add event listener.
 
+--//	Name an object
+--//	@object 	[table]		object to name
+--//	@name 		[string]	name to give object.
+
+function Framework:name(object,name)
+	assert(type(object) == "table","Must name an object") 										-- validate
+	assert(type(name) == "string" and #name > 0,"Bad object name")
+	assert(Framework.fw[name] == nil,"Duplicate object name "..name)							-- check not already defined.
+	assert(object.__frameworkData.givenName == nil,"Object already name")						-- object can only have *one* name.
+	Framework.fw[name] = object 																-- store the name.
+	object.__frameworkData.givenName = name 													-- store the record that the object has been given a name.
+end
+
 --
 -- 		Mixin methods.
 --
@@ -266,7 +299,7 @@ Framework:addObjectMethod("delete",																-- add method to delete self.
 		Framework:delete(self)
 	end)
 
-Framework:addObjectMethod("tag",
+Framework:addObjectMethod("tag",																-- add method to tag objects.
 	function(self,tagString)
 		tagString = Framework:split(tagString,",") 												-- convert tag string into array of substrings.
 		for _,tag in ipairs(tagString) do 														-- work through the tag strings.
@@ -278,6 +311,11 @@ Framework:addObjectMethod("tag",
 			end
 		end
 		return self
+	end)
+
+Framework:addObjectMethod("name",																-- add method to name objects
+	function(self,name) 
+		Framework:name(self,name)
 	end)
 
 require("framework.query") 																		-- query code

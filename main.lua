@@ -17,18 +17,19 @@ require("framework.framework")
 
 local CL = Framework:createClass("query.x")
 
+function CL:createMixinObject()
+	return display.newCircle(0,0,2)
+end 
+
 function CL:constructor(info) 
-	self.m_name = info.name 
-	print("Constructed",info.name) 
-	self.m_circle = display.newCircle(info.x,info.y,32)
-	self.m_circle:setFillColor(info.red,info.green,info.blue)
+	self.x = info.x self.y = info.y self.path.radius = 42
+	self:setFillColor(info.red,info.green,info.blue)
 end 
 
 function CL:destructor() 
-	print("Destructed",self.m_name) 
 end 
 
-function CL:getDisplayObjects() return { self.m_circle } end 
+function CL:getDisplayObjects() return { self } end 
 
 local CL2 = Framework:createClass("timer.x","query.x")
 
@@ -37,12 +38,10 @@ local CL2 = Framework:createClass("timer.x","query.x")
 local sc = Framework:new("game.scene")
 
 local c1 = sc:new("query.x", { name = "name c1", x = 64, y = 32, red = 1,green = 0,blue = 0 })
-local c2 = sc:new("timer.x", { name = "name c1", x = 164, y = 32, red = 1,green = 1,blue = 0 })
+local c2 = sc:new("timer.x", { name = "name c2", x = 164, y = 32, red = 1,green = 1,blue = 0 })
 
-print(sc:getCollection())
-
-sc:getContainer().alpha = 0
-transition.to(sc:getContainer(), { time = 1000,alpha = 1 })
+sc:getContainer().alpha = 0.5
+sc:delete()
 
 --- ************************************************************************************************************************************************************************
 --[[
