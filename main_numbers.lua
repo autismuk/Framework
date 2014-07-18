@@ -14,7 +14,8 @@ require("strict")																				-- install strict.lua to track globals etc.
 --require("main_test")
 
 require("utils.controller")																		-- load the controller.
-require("utils.music")
+require("utils.music")																			-- background music player
+require("utils.sound") 																			-- sound manager.
 
 local Score = Framework:createClass("numbers.score")
 
@@ -57,7 +58,11 @@ end
 local sc = Framework:new("game.scene")															-- create a scene
 local cont = sc:new("io.controller.fouraxis", { radius = 40 })									-- add the controller to it.
 local score = sc:new("numbers.score"):tag("timing")
+
 sc:new("audio.music")
+sc:new("audio.sound", { sounds = { "click","complete","score" } })
+
+sc:playSound("complete")
 sc:sendMessage("timing","on")
 
 --- ************************************************************************************************************************************************************************
