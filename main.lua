@@ -12,46 +12,7 @@
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
 --require("main_test")
-
-require("utils.controller")																		-- load the controller.
-
-local sc = Framework:new("game.scene")															-- create a scene
-local cont = sc:new("io.controller.fouraxis")													-- add the controller to it.
-
-sc:getContainer().alpha = 0.7
-
---[[
-require("framework.framework")
-
-local CL = Framework:createClass("query.x")
-
-function CL:createMixinObject()
-	return display.newCircle(0,0,2)
-end 
-
-function CL:constructor(info) 
-	self.x = info.x self.y = info.y self.path.radius = 42
-	self:setFillColor(info.red,info.green,info.blue)
-end 
-
-function CL:destructor() 
-end 
-
-function CL:getDisplayObjects() return { self } end 
-
-local CL2 = Framework:createClass("timer.x","query.x")
-
--- function CL2:onUpdate(dt) print("Updating",self.m_name,dt) end
-
-local sc = Framework:new("game.scene")
-
-local c1 = sc:new("query.x", { name = "name c1", x = 64, y = 32, red = 1,green = 0,blue = 0 })
-local c2 = sc:new("timer.x", { name = "name c2", x = 164, y = 32, red = 1,green = 1,blue = 0 })
-
-sc:getContainer().alpha = 0.5
-sc:delete()
-
---]]
+require("main_numbers")
 
 --- ************************************************************************************************************************************************************************
 --[[

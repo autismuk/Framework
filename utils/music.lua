@@ -1,23 +1,17 @@
-
 --- ************************************************************************************************************************************************************************
 ---
 ---				Name : 		music.lua
----				Purpose :	Simple Background Music Class
----				Created:	5 July 2014
+---				Purpose :	Background Music Class
+---				Created:	18 July 2014
+---				Updated:	18 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
----				License:	MIT
+---				License:	Copyright Paul Robson (c) 2014+
 ---
 --- ************************************************************************************************************************************************************************
 
--- Standard OOP (with Constructor parameters added.)
-_G.Base =  _G.Base or { new = function(s,...) local o = { } setmetatable(o,s) s.__index = s o:initialise(...) return o end, initialise = function() end }
+require("framework.framework")
 
-
---- ************************************************************************************************************************************************************************
---//													Class which plays background music until destroyed
---- ************************************************************************************************************************************************************************
-
-local BackgroundMusicPlayer = Base:new()
+local BackgroundMusicPlayer = Framework:createClass("audio.music")
 
 --//	Constructor. info contains a music entry (defaults to music.mp3) which is in the audio directory, a fadeIn time (defaults to 2s) and 
 --//	a fadeOut time (defaults to fadeIn time)
@@ -43,4 +37,12 @@ function BackgroundMusicPlayer:destructor()
 	end
 end
 
-return BackgroundMusicPlayer
+--- ************************************************************************************************************************************************************************
+--[[
+
+		Date 		Version 	Notes
+		---- 		------- 	-----
+		18-Jul-14	0.1 		Initial version of file
+
+--]]
+--- ************************************************************************************************************************************************************************

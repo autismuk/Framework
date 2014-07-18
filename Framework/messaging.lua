@@ -34,7 +34,7 @@ function MessagingClass:sendMessage(target,name,body,delay)
 	name = name or "" body = body or {} delay = delay or -1 									-- default values.
 	assert(type(target) == "string" or type(target) == "table","Message must be sent to object(s) or a query")
 	assert(type(name) == "string","Message name should be a string")
-	print(type(body),name)
+	--print(type(body),name)
 	assert(type(body) == "table","Message body should be a table")
 	assert(type(delay) == "number","Delay time should be a number")
 	local newMessage = { sender = self,  														-- from me
