@@ -13,6 +13,13 @@ display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
 --require("main_test")
 
+require("utils.controller")																		-- load the controller.
+
+local sc = Framework:new("game.scene")															-- create a scene
+local cont = sc:new("io.controller.fouraxis")													-- add the controller to it.
+
+sc:getContainer().alpha = 0.7
+
 --[[
 require("framework.framework")
 
