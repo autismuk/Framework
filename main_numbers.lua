@@ -108,17 +108,87 @@ function Collectable:getNumber()
 end 
 
 --- ************************************************************************************************************************************************************************
+--																		Player character
+--- ************************************************************************************************************************************************************************
+
+local Player = Framework:createClass("numbers.player")
+
+function Player:constructor(info)
+	self.m_x = display.contentWidth / 2 														-- start position
+	self.m_y = display.contentHeight / 2 
+	self.m_radius = 32 																			-- player size
+	self.m_images = {}
+	self.m_images[1] = display.newImage("images/teeth1.png",self.m_x,self.m_y) 					-- we cheat the animation 
+	self.m_images[2] = display.newImage("images/teeth2.png",self.m_x,self.m_y)
+	self.m_images[1].isVisible = false 
+	self.m_images[2].isVisible = false
+	self.m_controller = info.controller 														-- remember the controller
+	self.m_speed = 115
+end 
+
+function Player:getDisplayObjects()
+	return self.m_images  																		-- get the display objects
+end 
+
+function Player:onUpdate(deltaTime)
+	local image = math.floor(system.getTimer() / 150) % 2 + 1 									-- which of 2 frames
+	self.m_images[image].isVisible = true 														-- hide one, show the other
+	self.m_images[3-image].isVisible = false
+	image = self.m_images[image] 																-- current image
+	image.width,image.height = self.m_radius*2,self.m_radius*2 									-- set it up
+	image.anchorX,image.anchorY = 0.5,0.5
+	local dx,dy  
+	dx = self.m_controller:getX() dy = self.m_controller:getY()									-- get controller positions
+	if dx < 0 then image.xScale = -1 else image.xScale = 1 end 									-- set teeth direction
+	self.m_x = self.m_x + deltaTime * dx * self.m_speed 										-- work out new position
+	self.m_y = self.m_y + deltaTime * dy * self.m_speed
+	self.m_x = math.max(self.m_radius,math.min(display.contentWidth-self.m_radius,self.m_x)) 	-- force in range
+	self.m_y = math.max(self.m_radius,math.min(display.contentHeight-self.m_radius,self.m_y))
+	image.x,image.y = self.m_x,self.m_y 														-- move image
+end 
+
+function Player:destructor()
+	self.m_images[1]:removeSelf() 																-- yes, I know !
+	self.m_images[2]:removeSelf()
+	self.m_images = nil
+	self.m_controller = nil
+end 
+
+--- ************************************************************************************************************************************************************************
+--	 																	Background Object
+--- ************************************************************************************************************************************************************************
+
+local Background = Framework:createClass("numbers.background")
+
+function Background:constructor()
+	self.m_background = display.newRect(0,0,display.contentWidth,display.contentHeight)
+	self.m_background.anchorX,self.m_background.anchorY = 0,0
+	self.m_background:setFillColor(0,0.4,0) self.m_background.strokeWidth = 3
+end 
+
+function Background:destructor()
+	self.m_background:removeSelf()
+	self.m_background = nil 
+end 
+
+function Background:getDisplayObjects()
+	return { self.m_background }
+end 
+
+--- ************************************************************************************************************************************************************************
 --- ************************************************************************************************************************************************************************
 
 local sc = Framework:new("game.scene")															-- create a scene
 
-sc:new("audio.music")
+--sc:new("audio.music")
 sc:new("audio.sound", { sounds = { "click","complete","score" } })
 
+sc:new("numbers.background")
 local cont = sc:new("io.controller.fouraxis", { radius = 40 })									-- add the controller to it.
 for i = 1,9 do sc:new("numbers.collectable", { number = i }) end
 
 local score = sc:new("numbers.score"):tag("timing")
+local player = sc:new("numbers.player",{ controller = cont })
 
 --sc:delete()
 --- ************************************************************************************************************************************************************************
