@@ -13,6 +13,7 @@ display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
 --require("main_test")
 
+--[[
 require("framework.framework")
 
 local CL = Framework:createClass("query.x")
@@ -42,6 +43,8 @@ local c2 = sc:new("timer.x", { name = "name c2", x = 164, y = 32, red = 1,green 
 
 sc:getContainer().alpha = 0.5
 sc:delete()
+
+--]]
 
 --- ************************************************************************************************************************************************************************
 --[[

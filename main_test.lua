@@ -3,7 +3,7 @@
 ---				Name : 		main.lua
 ---				Purpose :	Top level code for Framework library.
 ---				Created:	14 July 2014
----				Updated:	14 July 2014
+---				Updated:	17 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -40,10 +40,12 @@ local objectRefs = {} 																			-- object references.
 local tagLists = {} 																			-- for each object, a list of tags it has (except frameworkObject)
 local querySize = 5 																			-- up to 1 element in a query.
 
---
---		Do one set of changes, tests etc.
+local initialCount = countTable(Framework.m_index.frameworkobject)								-- Objects defined by the framework.
 
 --
+--		Do one set of changes, tests etc.
+--
+
 function onePass()
 
 	--
@@ -61,7 +63,7 @@ function onePass()
 		end
 	end 
 
-	assert(countTable(objectRefs) == countTable(Framework.m_index.frameworkobject)) 			-- check the frameworkObject tag index is right.
+	assert(countTable(objectRefs) == countTable(Framework.m_index.frameworkobject) - initialCount) 			-- check the frameworkObject tag index is right.
 	for k,v in pairs(objectRefs) do assert(Framework.m_index.frameworkobject[v] ~= nil) end 	-- compare table counts and check reference presence.
 
 
