@@ -1,0 +1,378 @@
+<!DOCTYPE html><html><head><style>body { background:#333; color:#0F0; font-family:Arial,Verdana;} a { color:#0AA } h1 { color:#FF0; } h2 { color:#0FF } table,tr,td { color: #CCC; padding:4px;border:1px solid white; border-collapse:collapse; }</style></head><body>
+<a name="audio.music"></a>
+<hr><h1>audio.music</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#BackgroundMusicPlayer_constructor"/>constructor</a>,<a href="#BackgroundMusicPlayer_destructor"/>destructor</a>,<a href="#BackgroundMusicPlayer_onMessage"/>onMessage</a></p><hr><a name="BackgroundMusicPlayer_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td></td><td></td></tr>
+</table>
+<p>Constructor. info contains a music entry (defaults to music.mp3) which is in the audio directory, a fadeIn time (defaults to 2s) and a fadeOut time (defaults to fadeIn time)</p>
+<a name="BackgroundMusicPlayer_destructor"></a>
+<h2>destructor()</h2>
+<p>Destructor</p>
+<a name="BackgroundMusicPlayer_onMessage"></a>
+<h2>onMessage(sender,name,body)</h2>
+<table>
+<tr><td>sender</td><td></td><td></td></tr>
+<tr><td>name</td><td></td><td></td></tr>
+<tr><td>body</td><td></td><td></td></tr>
+</table>
+<p></p>
+<a name="audio.sound"></a>
+<hr><h1>audio.sound</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#AudioCache_constructor"/>constructor</a>,<a href="#AudioCache_destructor"/>destructor</a>,<a href="#AudioCache_getFileName"/>getFileName</a>,<a href="#AudioCache_isSoundPresent"/>isSoundPresent</a>,<a href="#AudioCache_onMessage"/>onMessage</a>,<a href="#AudioCache_play"/>play</a></p><hr><a name="AudioCache_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>Constructor parameters</td></tr>
+</table>
+<p>Constructor - info.sounds is a list of samples, default is mp3.</p>
+<a name="AudioCache_destructor"></a>
+<h2>destructor()</h2>
+<p>Destructor</p>
+<a name="AudioCache_getFileName"></a>
+<h2>getFileName(name)</h2>
+<table>
+<tr><td>name</td><td>string</td><td>short file name</td></tr>
+<tr><td>return</td><td>string</td><td>reference to file, in audio subdirectory.</td></tr>
+</table>
+<p>Given a stub file, get the full file name</p>
+<a name="AudioCache_isSoundPresent"></a>
+<h2>isSoundPresent(name)</h2>
+<table>
+<tr><td>name</td><td>string</td><td>short name of sound</td></tr>
+<tr><td>return</td><td>boolean</td><td>true if present.</td></tr>
+</table>
+<p>Check if sound present.</p>
+<a name="AudioCache_onMessage"></a>
+<h2>onMessage(sender,name,body)</h2>
+<table>
+<tr><td>sender</td><td>object</td><td>Who sent the message</td></tr>
+<tr><td>name</td><td>string</td><td>Should be 'play'</td></tr>
+<tr><td>body</td><td>table</td><td>sound and options members for the play call</td></tr>
+</table>
+<p>Handle the message which instructs a sfx to play.</p>
+<a name="AudioCache_play"></a>
+<h2>play(name,options)</h2>
+<table>
+<tr><td>name</td><td>string</td><td>stub name, case insensitive</td></tr>
+<tr><td>options</td><td>table</td><td>options for play, see audio.play() documents</td></tr>
+</table>
+<p>Play a sound effect from the cache.</p>
+<a name="game.scene"></a>
+<hr><h1>game.scene</h1>
+<p><h3>Extends system.collection</h3></p>
+<p></p>
+<p>Methods : <a href="#Scene_constructor"/>constructor</a>,<a href="#Scene_destructor"/>destructor</a>,<a href="#Scene_getContainer"/>getContainer</a>,<a href="#Scene_new"/>new</a>,<a href="#Scene_onEnterFrame"/>onEnterFrame</a></p><hr><a name="Scene_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>Initialisation info (ignored)</td></tr>
+</table>
+<p>Construct a scene, which is a collection with updating and a possible global container.</p>
+<a name="Scene_destructor"></a>
+<h2>destructor()</h2>
+<p>Delete collection ; deletes objects in the collection too.</p>
+<a name="Scene_getContainer"></a>
+<h2>getContainer()</h2>
+<table>
+<tr><td>return</td><td>container</td><td>Corona container clipped to display limits.</td></tr>
+</table>
+<p>Get the container, creating it if necessary.</p>
+<a name="Scene_new"></a>
+<h2>new(className,data)</h2>
+<table>
+<tr><td>className</td><td>string/object</td><td>Name of class to create instance of or prototype object.</td></tr>
+<tr><td>data</td><td>table</td><td>Optional instantiation data (is passed to constructor as {} if nil)</td></tr>
+</table>
+<p>Create a new object, add to the collection, and check for a getDisplayObjects() method.</p>
+<a name="Scene_onEnterFrame"></a>
+<h2>onEnterFrame(deltaTime)</h2>
+<table>
+<tr><td>deltaTime</td><td>number</td><td>elapsed time in seconds</td></tr>
+</table>
+<p>Handle enterFrame message, dispatch to all collection objects which implement onUpdate()</p>
+<a name="io.controller.fouraxis"></a>
+<hr><h1>io.controller.fouraxis</h1>
+<p><h3>Extends </h3></p>
+<p>Four way controller class</p>
+<p>Methods : <a href="#Controller_constructor"/>constructor</a>,<a href="#Controller_destructor"/>destructor</a>,<a href="#Controller_getDisplayObjects"/>getDisplayObjects</a>,<a href="#Controller_getX"/>getX</a>,<a href="#Controller_getY"/>getY</a></p><hr><a name="Controller_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>contains (optionally x,y and radius)</td></tr>
+</table>
+<p>Create a new controller.</p>
+<a name="Controller_createDisplay"></a>
+<a name="Controller_destructor"></a>
+<h2>destructor()</h2>
+<p>Remove a controller.</p>
+<a name="Controller_getDisplayObjects"></a>
+<h2>getDisplayObjects()</h2>
+<table>
+<tr><td>return</td><td>list</td><td>List of display objects</td></tr>
+</table>
+<p>Get display objects for Scenes</p>
+<a name="Controller_getX"></a>
+<h2>getX()</h2>
+<table>
+<tr><td>return</td><td>number</td><td>value from -1 to 1</td></tr>
+</table>
+<p>Get current stick position horizontal</p>
+<a name="Controller_getY"></a>
+<h2>getY()</h2>
+<table>
+<tr><td>return</td><td>number</td><td>value from -1 to 1</td></tr>
+</table>
+<p>Get current stick position vertical</p>
+<a name="Controller_minimax"></a>
+<a name="Controller_touch"></a>
+<a name="system.collection"></a>
+<hr><h1>system.collection</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#Collection_constructor"/>constructor</a>,<a href="#Collection_destructor"/>destructor</a>,<a href="#Collection_getCollection"/>getCollection</a>,<a href="#Collection_makeTag"/>makeTag</a>,<a href="#Collection_new"/>new</a></p><hr><a name="Collection_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>Initialisation info (ignored)</td></tr>
+</table>
+<p>Construct a collection of objects</p>
+<a name="Collection_destructor"></a>
+<h2>destructor()</h2>
+<p>Delete collection ; deletes objects in the collection too.</p>
+<a name="Collection_getCollection"></a>
+<h2>getCollection()</h2>
+<table>
+<tr><td>return</td><td>number,table</td><td>Two elements, number of items and hash of items</td></tr>
+</table>
+<p>Get all objects in the collection</p>
+<a name="Collection_makeTag"></a>
+<h2>makeTag(base)</h2>
+<table>
+<tr><td>base</td><td>string</td><td>tag to use to make a unique one.</td></tr>
+<tr><td>return</td><td>string</td><td>tag unique to this</td></tr>
+</table>
+<p>Create a unique tag for this collection, useful for multiple instances.</p>
+<a name="Collection_new"></a>
+<h2>new(className,data)</h2>
+<table>
+<tr><td>className</td><td>string/object</td><td>Name of class to create instance of or prototype object.</td></tr>
+<tr><td>data</td><td>table</td><td>Optional instantiation data (is passed to constructor as {} if nil)</td></tr>
+</table>
+<p>Create a new object and attach it to this collection using a tag.</p>
+<a name="system.framework"></a>
+<hr><h1>system.framework</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#Framework_addObjectMethod"/>addObjectMethod</a>,<a href="#Framework_convert"/>convert</a>,<a href="#Framework_createClass"/>createClass</a>,<a href="#Framework_delete"/>delete</a>,<a href="#Framework_enterFrame"/>enterFrame</a>,<a href="#Framework_name"/>name</a>,<a href="#Framework_new"/>new</a>,<a href="#Framework_perform"/>perform</a>,<a href="#Framework_query"/>query</a>,<a href="#Framework_register"/>register</a>,<a href="#Framework_setEnterFrameEnabled"/>setEnterFrameEnabled</a>,<a href="#Framework_split"/>split</a>,<a href="#Framework_tag"/>tag</a>,<a href="#Framework_validateClassIdentifier"/>validateClassIdentifier</a>,<a href="#Framework_validateLuaIdentifier"/>validateLuaIdentifier</a></p><hr><a name="Framework_addObjectMethod"></a>
+<h2>addObjectMethod(methodName,methodEntity)</h2>
+<table>
+<tr><td>methodName</td><td>string</td><td>Name of method</td></tr>
+<tr><td>methodEntity</td><td>anything</td><td>Whatever you want to add, normally a function.</td></tr>
+</table>
+<p>Add a method to the object method structure</p>
+<a name="Framework_convert"></a>
+<h2>convert(object,data)</h2>
+<table>
+<tr><td>object</td><td>table</td><td>Object to be converted. Can come from framework or could be a Corona object, say.</td></tr>
+<tr><td>data</td><td>table</td><td>Optional instantiation data (is passed to constructor as {} if nil)</td></tr>
+</table>
+<p>Convert a lua object into one useable by the framework and store it in the framework. After validation, add the default __frameworkData storage element, add in the mixins, tag it as "frameworkObject", and call the constructor</p>
+<a name="Framework_createClass"></a>
+<h2>createClass(className,superClass)</h2>
+<table>
+<tr><td>className</td><td>string</td><td>Class identifier.</td></tr>
+<tr><td>superClass</td><td>string/table</td><td>Superclass, may be nil.</td></tr>
+</table>
+<p>Create and register a new class, which may be subclassed from another class.</p>
+<a name="Framework_delete"></a>
+<h2>delete(object)</h2>
+<table>
+<tr><td>object</td><td>object</td><td>Object you want to delete.</td></tr>
+</table>
+<p>Delete an object, calling the destructor, then fixing up the indexes so they do not contain this object any more.</p>
+<a name="Framework_enterFrame"></a>
+<h2>enterFrame(event)</h2>
+<table>
+<tr><td>event</td><td>table</td><td>Event data.</td></tr>
+</table>
+<p>Handle enterFrame event. If there are any objects tagged enterFrame call their onEnterFrame() method.</p>
+<a name="Framework_name"></a>
+<h2>name(object,name)</h2>
+<table>
+<tr><td>object</td><td>table</td><td>object to name</td></tr>
+<tr><td>name</td><td>string</td><td>name to give object.</td></tr>
+</table>
+<p>Name an object</p>
+<a name="Framework_new"></a>
+<h2>new(className,data)</h2>
+<table>
+<tr><td>className</td><td>string/object</td><td>Name of class to create instance of or prototype object.</td></tr>
+<tr><td>data</td><td>table</td><td>Optional instantiation data (is passed to constructor as {} if nil)</td></tr>
+</table>
+<p>Create a new object, given a class name or prototype, and optional initialisation data. Create the object, then set it up (add framework stuff, and call constructor)</p>
+<a name="Framework_perform"></a>
+<h2>perform(objectTable,method,p1,p2,p3)</h2>
+<table>
+<tr><td>objectTable</td><td>table</td><td>table of objects (use value, non consecutive)</td></tr>
+<tr><td>method</td><td>string</td><td>method name.</td></tr>
+<tr><td>p1</td><td>anything</td><td>parameter</td></tr>
+<tr><td>p2</td><td>anything</td><td>parameter</td></tr>
+<tr><td>p3</td><td>anything</td><td>parameter</td></tr>
+</table>
+<p>Perform a method call on a table of objects.</p>
+<a name="Framework_query"></a>
+<h2>query(queryString)</h2>
+<table>
+<tr><td>queryString</td><td>string</td><td>Comma seperated list of tags (defaults to "", which is the frameworkObject tag)</td></tr>
+<tr><td>return</td><td>number,table</td><td>Two elements, number of items and hash of items</td></tr>
+</table>
+<p>Query the Framework object database for all objects with all the named tags.</p>
+<a name="Framework_register"></a>
+<h2>register(className,classPrototype)</h2>
+<table>
+<tr><td>className</td><td>string</td><td>Class identifier.</td></tr>
+<tr><td>classPrototype</td><td>table</td><td>Class prototype.</td></tr>
+</table>
+<p>Register a new class in the class list.</p>
+<a name="Framework_setEnterFrameEnabled"></a>
+<h2>setEnterFrameEnabled(isEnabled)</h2>
+<table>
+<tr><td>isEnabled</td><td>boolean</td><td>true to enable, false to disable</td></tr>
+</table>
+<p>Enable or disable the enterFrame event.</p>
+<a name="Framework_split"></a>
+<h2>split(string,split)</h2>
+<table>
+<tr><td>string</td><td>string</td><td>String to split</td></tr>
+<tr><td>split</td><td>string</td><td>Characters to split over.</td></tr>
+<tr><td>return</td><td>list</td><td>List of strings.</td></tr>
+</table>
+<p>Convert a string to an array of strings, using the given separator</p>
+<a name="Framework_tag"></a>
+<h2>tag(object,tagName,command)</h2>
+<table>
+<tr><td>object</td><td>table</td><td>Object to tag/detag</td></tr>
+<tr><td>tagName</td><td>string</td><td>tag to apply/remove</td></tr>
+<tr><td>command</td><td>number</td><td>Command to do with tag.</td></tr>
+</table>
+<p>Add or remove a tag from an object, updating the tag indices as you go.</p>
+<a name="Framework_validateClassIdentifier"></a>
+<h2>validateClassIdentifier(identifier)</h2>
+<table>
+<tr><td>identifier</td><td>string</td><td>string to validate</td></tr>
+<tr><td>return</td><td>boolean</td><td>true if valid.</td></tr>
+</table>
+<p>Validate a class identifier. It should be a sequence of alphanumeric words, beginning with a letter, seperated by full stops.</p>
+<a name="Framework_validateLuaIdentifier"></a>
+<h2>validateLuaIdentifier(identifier)</h2>
+<table>
+<tr><td>identifier</td><td>string</td><td>string to validate</td></tr>
+<tr><td>return</td><td>boolean</td><td>true if valid.</td></tr>
+</table>
+<p>Validate a lua identifier. This is defined as a alphabetic character followed by a number alphanumeric characters, this number may be zero.</p>
+<a name="system.fsm"></a>
+<hr><h1>system.fsm</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#FSMachine_addState"/>addState</a>,<a href="#FSMachine_constructor"/>constructor</a>,<a href="#FSMachine_destructor"/>destructor</a>,<a href="#FSMachine_event"/>event</a>,<a href="#FSMachine_setBroadcastTag"/>setBroadcastTag</a>,<a href="#FSMachine_start"/>start</a></p><hr><a name="FSMachine_addState"></a>
+<h2>addState(stateName,eventTable)</h2>
+<table>
+<tr><td>stateName</td><td>string</td><td>new state name</td></tr>
+<tr><td>eventTable</td><td>table</td><td>pairs of event / new state</td></tr>
+<tr><td>return</td><td>object</td><td>self,chainable</td></tr>
+</table>
+<p>Add a state and its event/new state pairs.</p>
+<a name="FSMachine_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>Unused</td></tr>
+</table>
+<p>Create a new FSM</p>
+<a name="FSMachine_destructor"></a>
+<h2>destructor()</h2>
+<p>Tidy up.</p>
+<a name="FSMachine_event"></a>
+<h2>event(event)</h2>
+<table>
+<tr><td>event</td><td>string</td><td>FSM event to cause a state transition.</td></tr>
+</table>
+<p>Process an FSM event - find the new state and send the asynchronous messages.</p>
+<a name="FSMachine_setBroadcastTag"></a>
+<h2>setBroadcastTag(tagName)</h2>
+<table>
+<tr><td>tagName</td><td>string</td><td>New broadcast tag, defaults to fsmListener</td></tr>
+<tr><td>return</td><td>object</td><td>self,chainable</td></tr>
+</table>
+<p>Set broadcast tag</p>
+<a name="FSMachine_start"></a>
+<h2>start(startState)</h2>
+<table>
+<tr><td>startState</td><td>string</td><td>State to start from, defaults to 'start'.</td></tr>
+</table>
+<p>Start the FSM</p>
+<a name="system.messaging"></a>
+<hr><h1>system.messaging</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#MessagingClass_constructor"/>constructor</a>,<a href="#MessagingClass_destructor"/>destructor</a>,<a href="#MessagingClass_onEnterFrame"/>onEnterFrame</a>,<a href="#MessagingClass_sendMessage"/>sendMessage</a>,<a href="#MessagingClass_sendSingleMessage"/>sendSingleMessage</a></p><hr><a name="MessagingClass_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td></td><td></td></tr>
+</table>
+<p>Construct the messaging object.</p>
+<a name="MessagingClass_destructor"></a>
+<h2>destructor()</h2>
+<p>Destroy the messaging object.</p>
+<a name="MessagingClass_onEnterFrame"></a>
+<h2>onEnterFrame(deltaTime)</h2>
+<table>
+<tr><td>deltaTime</td><td>number</td><td>elapsed time in seconds</td></tr>
+</table>
+<p>Called every frame. Dispatches messages that are due.</p>
+<a name="MessagingClass_sendMessage"></a>
+<h2>sendMessage(target,name,body,delay)</h2>
+<table>
+<tr><td>target</td><td>string/object</td><td>query or recipient, can be a single entity or a hash of them.</td></tr>
+<tr><td>name</td><td>string</td><td>message name. (optional)</td></tr>
+<tr><td>body</td><td>table</td><td>anything else you want to send other than the name  (optional)</td></tr>
+<tr><td>delay</td><td>number</td><td>delay sending the message this many seconds.</td></tr>
+</table>
+<p>Send a message via the queue.</p>
+<a name="MessagingClass_sendSingleMessage"></a>
+<h2>sendSingleMessage(message)</h2>
+<table>
+<tr><td>message</td><td>table</td><td>message structure.</td></tr>
+</table>
+<p>Send a single message</p>
+<a name="system.timer"></a>
+<hr><h1>system.timer</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#TimerClass_cancelTimer"/>cancelTimer</a>,<a href="#TimerClass_constructor"/>constructor</a>,<a href="#TimerClass_destructor"/>destructor</a>,<a href="#TimerClass_onEnterFrame"/>onEnterFrame</a>,<a href="#TimerClass_sortTimerList"/>sortTimerList</a></p><hr><a name="TimerClass_cancelTimer"></a>
+<h2>cancelTimer(target,tag)</h2>
+<table>
+<tr><td>target</td><td>object</td><td>who the timer event is for</td></tr>
+<tr><td>tag</td><td>string</td><td>timer identification tag (not optional)</td></tr>
+</table>
+<p>Cancel a timer, using the tag to identify it.</p>
+<a name="TimerClass_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td></td><td></td></tr>
+</table>
+<p>Construct the timer object.</p>
+<a name="TimerClass_destructor"></a>
+<h2>destructor()</h2>
+<p>Destroy the timer object.</p>
+<a name="TimerClass_onEnterFrame"></a>
+<h2>onEnterFrame(deltaTime)</h2>
+<table>
+<tr><td>deltaTime</td><td>number</td><td>elapsed time in seconds</td></tr>
+</table>
+<p>Called every frame. Dispatches messages that are due.</p>
+<a name="TimerClass_sortTimerList"></a>
+<h2>sortTimerList()</h2>
+<p>Add a new timer event Sort the timer items so the next triggered ones (e.g. earliest fire time) are up front.</p>
+<hr><p><i>LUA Autodoc by Paul Robson 2014</i></p><hr></body></html>

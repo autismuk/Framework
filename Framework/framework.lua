@@ -9,6 +9,10 @@
 ---
 --- ************************************************************************************************************************************************************************
 
+--[[
+local Framework = Framework:createClass("system.framework")								-- keeps documenter happy :)
+--]]
+
 Framework = {} 																					-- the framework object.
 Framework.copyright = "Framework (C) Paul Robson 2014"											-- copyright message
 
