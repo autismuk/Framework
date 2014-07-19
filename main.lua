@@ -11,8 +11,29 @@
 
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
+require("framework.framework")																	-- framework.
 --require("main_test")
-require("main_numbers")
+--require("main_numbers")
+
+local FSMListener = Framework:createClass("demo.listener")
+function FSMListener:constructor(info) self:tag("fsmListener") end 
+function FSMListener:destructor() end 
+function FSMListener:onMessage(sender,name,body)
+	print(sender,name,body.currentState,body.triggerEvent,body.newState)
+end
+
+Framework:new("demo.listener")
+
+local fsm = Framework:new("system.fsm")
+print(fsm)
+
+fsm:addState("state1", {  go2 = "state2" , go1 = "state1"})
+fsm:addState("state2", {  next = "state1" })
+fsm:start("state1")
+fsm:event("go1")
+fsm:event("go2")
+fsm:event("next")
+fsm:event("go1")
 
 --- ************************************************************************************************************************************************************************
 --[[

@@ -10,6 +10,7 @@
 --- ************************************************************************************************************************************************************************
 
 Framework = {} 																					-- the framework object.
+Framework.copyright = "Framework (C) Paul Robson 2014"											-- copyright message
 
 Framework.m_classes = {} 																		-- class table. Maps class identifier (l/c) to a prototype/factory table.
 Framework.m_index = {} 																			-- tag index - Maps tag (l/c) to a table contain object => object values
@@ -323,7 +324,8 @@ require("framework.query") 																		-- query code
 require("framework.messaging") 																	-- messaging code.
 require("framework.timer")																		-- timer code.
 require("framework.collection")																	-- collection code.
-require("framework.scene")
+require("framework.scene") 																		-- game scene code.
+require("framework.fsm")																		-- finite state machine code.
 
 --- ************************************************************************************************************************************************************************
 --[[
