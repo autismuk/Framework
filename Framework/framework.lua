@@ -3,7 +3,7 @@
 ---				Name : 		framework.lua
 ---				Purpose :	Framework Object
 ---				Created:	15 July 2014
----				Updated:	17 July 2014
+---				Updated:	19 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -316,6 +316,7 @@ Framework:addObjectMethod("tag",																-- add method to tag objects.
 Framework:addObjectMethod("name",																-- add method to name objects
 	function(self,name) 
 		Framework:name(self,name)
+		return self
 	end)
 
 require("framework.query") 																		-- query code

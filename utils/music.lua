@@ -25,6 +25,10 @@ function BackgroundMusicPlayer:constructor(info)
 	end
 end 
 
+function BackgroundMusicPlayer:onMessage(sender,name,body) 
+	if name == "stop" then self:delete() end 
+end 
+
 --//	Destructor
 function BackgroundMusicPlayer:destructor()
 	if self.m_stream ~= nil then 																-- if stream present

@@ -3,7 +3,7 @@
 ---				Name : 		main_numbers.lua
 ---				Purpose :	Simple 'collect the numbers' game.
 ---				Created:	18 July 2014
----				Updated:	18 July 2014
+---				Updated:	19 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -11,17 +11,15 @@
 
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 require("strict")																				-- install strict.lua to track globals etc.
---require("main_test")
-
 require("utils.controller")																		-- load the controller.
 require("utils.music")																			-- background music player
 require("utils.sound") 																			-- sound manager.
 
-local Score = Framework:createClass("numbers.score")
-
 --- ************************************************************************************************************************************************************************
 --																				Score Object
 --- ************************************************************************************************************************************************************************
+
+local Score = Framework:createClass("numbers.score")
 
 function Score:createMixinObject()
 	return display.newText("xxxx",100,100,system.nativeFont,40) 								-- demonstrates a mixin object
@@ -105,7 +103,13 @@ end
 
 function Collectable:getNumber()
 	return self.m_number 
-end 
+end
+
+function Collectable:destroy()
+	self:playSound("score")
+	transition.to(self.m_object, { time = 1000, alpha = 0})
+	transition.to(self.m_text, { time = 1000, alpha = 0,onComplete = function() self:delete() end })
+end
 
 --- ************************************************************************************************************************************************************************
 --																		Player character
@@ -124,6 +128,8 @@ function Player:constructor(info)
 	self.m_images[2].isVisible = false
 	self.m_controller = info.controller 														-- remember the controller
 	self.m_speed = 115
+	self.m_current = 1 																			-- want number 1
+	self.m_last = info.last 																	-- get this one and it is game over.
 end 
 
 function Player:getDisplayObjects()
@@ -145,6 +151,25 @@ function Player:onUpdate(deltaTime)
 	self.m_x = math.max(self.m_radius,math.min(display.contentWidth-self.m_radius,self.m_x)) 	-- force in range
 	self.m_y = math.max(self.m_radius,math.min(display.contentHeight-self.m_radius,self.m_y))
 	image.x,image.y = self.m_x,self.m_y 														-- move image
+	local count,collectables = self:query("collectable")										-- get all the collectables.
+	for _,ref in pairs(collectables) do 														-- scan through tme
+		if ref:collides(self.m_x,self.m_y,self.m_radius) and 									-- if collision, and the correct number
+												ref:getNumber() == self.m_current then 
+			self.m_current = self.m_current + 1 												-- look for the next number
+			ref:destroy()																		-- ask it to self destruct
+			if self.m_current > self.m_last then  												-- complete ?
+				self:sendMessage("timing","off") 												-- timer counter off
+				self:sendMessage("backgroundmusic","stop") 										-- background music off
+				self:playSound("complete") 														-- play completely original ending fanfare.
+				self:addSingleTimer(10)															-- fire timer after ten seconds.
+			end
+			break
+		end 
+	end
+end 
+
+function Player:onTimer(tag)
+	self.fw.owner:delete()																		-- on timer, delete the owning object.
 end 
 
 function Player:destructor()
@@ -176,21 +201,23 @@ function Background:getDisplayObjects()
 end 
 
 --- ************************************************************************************************************************************************************************
+--																			Main Game
 --- ************************************************************************************************************************************************************************
 
-local sc = Framework:new("game.scene")															-- create a scene
+local sc = Framework:new("game.scene"):name("owner")											-- create a scene
 
---sc:new("audio.music")
-sc:new("audio.sound", { sounds = { "click","complete","score" } })
+sc:new("audio.music"):tag("backgroundmusic") 													-- add original background tune
+sc:new("audio.sound", { sounds = { "click","complete","score" } }) 								-- add sfx
 
-sc:new("numbers.background")
+sc:new("numbers.background") 																	-- background
 local cont = sc:new("io.controller.fouraxis", { radius = 40 })									-- add the controller to it.
-for i = 1,9 do sc:new("numbers.collectable", { number = i }) end
+local numberCount = 9
+for i = 1,numberCount do sc:new("numbers.collectable", { number = i }) end 						-- add the collectable numbers
 
-local score = sc:new("numbers.score"):tag("timing")
-local player = sc:new("numbers.player",{ controller = cont })
+local score = sc:new("numbers.score"):tag("timing") 											-- add the score
+score:sendMessage("timing","on")																-- start the score turning
+local player = sc:new("numbers.player",{ controller = cont, last = numberCount }) 				-- create the player.
 
---sc:delete()
 --- ************************************************************************************************************************************************************************
 --[[
 
