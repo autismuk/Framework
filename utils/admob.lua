@@ -1,25 +1,24 @@
 --- ************************************************************************************************************************************************************************
 ---
 ---				Name : 		admob.lua
----				Purpose :	Simple Admob Wrapper Class
----				Created:	11 July 2014
+---				Purpose :	Admob v2 Object for Framework
+---				Created:	20 July 2014
+---				Updated:	20 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
----				License:	MIT
+---				License:	Copyright Paul Robson (c) 2014+
 ---
 --- ************************************************************************************************************************************************************************
 
-local Executive = require("system.executive")													-- get the executive and ad libraries
 local Ads = require("ads")
 
--- Standard OOP (with Constructor parameters added.)
-_G.Base =  _G.Base or { new = function(s,...) local o = { } setmetatable(o,s) s.__index = s o:initialise(...) return o end, initialise = function() end }
-
+local buildsettings = dofile("build.settings")
+print(buildsettings)
 
 --- ************************************************************************************************************************************************************************
 --//									Advert object. admob for iOS and Android, provides a fake if running in simulator.
 --- ************************************************************************************************************************************************************************
 
-local Advert = Base:new()
+local Advert = Framework:createClass("ads.admob")
 
 --//	Create an advert. Parameters passed are android/ios/universal (Admob AppIDs), advertType, defaults to banner. Must provide the admob app-IDs
 --//	@info 	[table]		Constructor information.
@@ -45,14 +44,17 @@ function Advert:constructor(info)
 		Ads.show(info.advertType or "banner")
 	else 																						-- otherwise, fake one.
 		self.m_fakeAdGroup = display.newGroup()
-		self:insert(self.m_fakeAdGroup)
 		local r = display.newRect(self.m_fakeAdGroup,0,0,display.contentWidth,Advert.simulatorHeight)
 		r:setFillColor(0,0,0) r.strokeWidth = 2	r.anchorX = 0 r.anchorY = 0 
 		local t = display.newText(self.m_fakeAdGroup,"Your ad goes here ....",2,2,native.systemFont,15)
 		t.anchorX,t.anchorY = 0,0 t:setFillColor(0,1,0) self.m_fakeAdGroup.alpha = 0
-		self:addSingleTimer(math.random(1000,2500))												-- make it appear, pretty much randomly after a second or two
+		self:addSingleTimer(math.random(1000,2500)/1000)										-- make it appear, pretty much randomly after a second or two
 	end
 	Advert.isSuccessfullyShown = true 															-- setting this flag means we can now legally call getHeight()
+end 
+
+function Advert:getDisplayObjects()
+	return { self.m_fakeAdGroup }
 end 
 
 --//	This fakes the 'late' arrival of the actual advert, rather than it being put up straight away.
@@ -85,4 +87,12 @@ function Advert:getHeight()
 	return Ads.height() 																		-- otherwise use the actual height.
 end 
 
-return Advert
+--- ************************************************************************************************************************************************************************
+--[[
+
+		Date 		Version 	Notes
+		---- 		------- 	-----
+		20-Jul-14	0.1 		Initial version of file
+
+--]]
+--- ************************************************************************************************************************************************************************

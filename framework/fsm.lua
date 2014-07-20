@@ -3,7 +3,7 @@
 ---				Name : 		fsm.lua
 ---				Purpose :	Basic Finite State Machine Object
 ---				Created:	19 July 2014
----				Updated:	19 July 2014
+---				Updated:	20 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -29,7 +29,7 @@ end
 
 --//	Add a state and its event/new state pairs.
 --//	@stateName 	[string]		new state name
---//	@eventTable [table] 		pairs of event / new state
+--//	@eventTable [table] 		pairs of event / new state info
 --//	@return 	[object] 		self,chainable
 
 function FSMachine:addState(stateName,eventTable)
@@ -39,11 +39,12 @@ function FSMachine:addState(stateName,eventTable)
 	stateName = stateName:lower() 							 									-- caps do not matter.
 	assert(self.m_states[stateName] == nil,"Duplicate state name "..stateName) 					-- check for duplication.
 	self.m_states[stateName] = {} 																-- no events defined yet.
-	for event,state in pairs(eventTable) do 													-- work through the event/state pairs.
-		assert(type(event) == "string" and type(state) == "string")
-		event = event:lower() state = state:lower() 											-- decapitalise.
+	for event,stateInfo in pairs(eventTable) do 													-- work through the event/state pairs.
+		assert(type(event) == "string")
+		assert(type(stateInfo) == "table" and type(stateInfo.target) == "string")
+		event = event:lower() stateInfo.target = stateInfo.target:lower() 						-- decapitalise.
 		assert(self.m_states[stateName][event] == nil,"Duplicate event "..event)				-- check doesn't already exist.
-		self.m_states[stateName][event] = state 												-- put in table.
+		self.m_states[stateName][event] = stateInfo 											-- put in table.
 	end
 	return self
 end 
@@ -67,13 +68,13 @@ function FSMachine:start(startState)
 	assert(self.m_currentState == nil,"FSM Already started")									-- check not started already.
 	assert(self.m_states[startState] ~= nil,"Unknown state "..startState)						-- check it exists
 	for _,state in pairs(self.m_states) do 														-- work through all states
-		for _,target in pairs(state) do 	 													-- work through all event/state pairs
-			assert(self.m_states[target] ~= nil,"State does not exist "..target)				-- checking the target state exists
+		for _,targetInfo in pairs(state) do 	 													-- work through all event/state pairs
+			assert(self.m_states[targetInfo.target] ~= nil,"State does not exist "..targetInfo.target)			-- checking the target state exists
 		end 
 	end
 	self.m_currentState = startState 															-- set current state
 	self:sendMessage(self.m_broadcastTag,"enterState", 											-- send first enter state message.
-								{ currentState = startState, newState = startState })
+								{ currentState = startState, newState = startState, stateData = self.m_states[self.m_currentState] })
 end 
 
 --//	Process an FSM event - find the new state and send the asynchronous messages.
@@ -84,12 +85,12 @@ function FSMachine:event(event)
 	event = event : lower() 																	-- not interested in case.
 	assert(self.m_states[self.m_currentState][event] ~= nil,									-- check it actually exists as a transition
 									"Unknown event "..event.." for state "..self.m_currentState)
-	local newState = self.m_states[self.m_currentState][event] 									-- the next state
+	local newState = self.m_states[self.m_currentState][event].target 							-- the next state
 	self:sendMessage(self.m_broadcastTag,"leaveState",
-							{ currentState = self.m_currentState, newState = newState, triggerEvent = event })
+				{ currentState = self.m_currentState, newState = newState, triggerEvent = event, stateData = self.m_states[self.m_currentState] })
 	self.m_currentState = newState 																-- set up new state.
 	self:sendMessage(self.m_broadcastTag,"enterState",
-							{ currentState = self.m_currentState, newState = self.m_currentState, triggerEvent = event })
+				{ currentState = self.m_currentState, newState = self.m_currentState, triggerEvent = event, stateData = self.m_states[self.m_currentState] })
 end 
 
 --- ************************************************************************************************************************************************************************

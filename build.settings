@@ -6,6 +6,14 @@ settings =
         supported = { "landscapeLeft","landscapeRight" }
     },
 
+    plugins =
+        {
+            ["plugin.google.play.services"] =
+            {
+                publisherId = "com.coronalabs"
+            },
+        },      
+
    	iphone =
     {
         plist =

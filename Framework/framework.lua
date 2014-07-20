@@ -10,7 +10,7 @@
 --- ************************************************************************************************************************************************************************
 
 --[[
-local Framework = Framework:createClass("system.framework")								-- keeps documenter happy :)
+local Framework = Framework:createClass("system.framework")										-- keeps documenter happy :)
 --]]
 
 Framework = {} 																					-- the framework object.

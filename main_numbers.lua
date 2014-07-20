@@ -14,6 +14,7 @@ require("strict")																				-- install strict.lua to track globals etc.
 require("utils.controller")																		-- load the controller.
 require("utils.music")																			-- background music player
 require("utils.sound") 																			-- sound manager.
+require("utils.admob")																			-- admob class
 
 --- ************************************************************************************************************************************************************************
 --																				Score Object
@@ -210,6 +211,10 @@ sc:new("audio.music"):tag("backgroundmusic") 													-- add original backgr
 sc:new("audio.sound", { sounds = { "click","complete","score" } }) 								-- add sfx
 
 sc:new("numbers.background") 																	-- background
+
+local adIDs = { ios = "ca-app-pub-8354094658055499/9860763610", android = "ca-app-pub-8354094658055499/9860763610" }
+sc:new("ads.admob",adIDs)
+
 local cont = sc:new("io.controller.fouraxis", { radius = 40 })									-- add the controller to it.
 local numberCount = 9
 for i = 1,numberCount do sc:new("numbers.collectable", { number = i }) end 						-- add the collectable numbers
