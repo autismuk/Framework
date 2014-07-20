@@ -330,6 +330,7 @@ require("framework.timer")																		-- timer code.
 require("framework.collection")																	-- collection code.
 require("framework.scene") 																		-- game scene code.
 require("framework.fsm")																		-- finite state machine code.
+require("framework.scenemgr")																	-- game management code.
 
 --- ************************************************************************************************************************************************************************
 --[[
