@@ -41,8 +41,8 @@ function FSMachine:addState(stateName,eventTable)
 	self.m_states[stateName] = {} 																-- no events defined yet.
 	for event,state in pairs(eventTable) do 													-- work through the event/state pairs.
 		assert(type(event) == "string")
-		assert(type(state) == "string")
-		event = event:lower() state = state:lower() 											-- decapitalise.
+		if type(state) == "string" then state = { target = state:lower() } end 					-- convert string target to table
+		event = event:lower() 																	-- make event lower case.
 		assert(self.m_states[stateName][event] == nil,"Duplicate event "..event)				-- check doesn't already exist.
 		self.m_states[stateName][event] = state 												-- put in table.
 	end
@@ -69,12 +69,12 @@ function FSMachine:start(startState)
 	assert(self.m_states[startState] ~= nil,"Unknown state "..startState)						-- check it exists
 	for _,state in pairs(self.m_states) do 														-- work through all states
 		for _,target in pairs(state) do 	 													-- work through all event/state pairs
-			assert(self.m_states[target] ~= nil,"State does not exist "..target)				-- checking the target state exists
+			assert(self.m_states[target.target] ~= nil,"State does not exist "..target.target)	-- checking the target state exists
 		end 
 	end
 	self.m_currentState = startState 															-- set current state
 	self:sendMessage(self.m_broadcastTag,"enterState", 											-- send first enter state message.
-						{ currentState = startState, newState = startState })
+						{ currentState = startState, newState = startState, eventData = {} }) 	-- there is no data, no leaving state.
 end 
 
 --//	Process an FSM event - find the new state and send the asynchronous messages.
@@ -85,12 +85,13 @@ function FSMachine:event(event)
 	event = event : lower() 																	-- not interested in case.
 	assert(self.m_states[self.m_currentState][event] ~= nil,									-- check it actually exists as a transition
 									"Unknown event "..event.." for state "..self.m_currentState)
-	local newState = self.m_states[self.m_currentState][event] 									-- the next state
+	local eventData = self.m_states[self.m_currentState][event] 								-- data associated with this event.
+	local newState = self.m_states[self.m_currentState][event].target 							-- the next state
 	self:sendMessage(self.m_broadcastTag,"leaveState",
-						{ currentState = self.m_currentState, newState = newState, triggerEvent = event })
+						{ currentState = self.m_currentState, newState = newState, triggerEvent = event, eventData = eventData })
 	self.m_currentState = newState 																-- set up new state.
 	self:sendMessage(self.m_broadcastTag,"enterState",
-						{ currentState = self.m_currentState, newState = self.m_currentState, triggerEvent = event })
+						{ currentState = self.m_currentState, newState = self.m_currentState, triggerEvent = event, eventData = eventData })
 end 
 
 --- ************************************************************************************************************************************************************************

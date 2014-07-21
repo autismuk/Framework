@@ -18,38 +18,26 @@ require("framework.framework")																	-- framework.
 
 
 local FSMListener = Framework:createClass("demo.listener")
-function FSMListener:constructor(info) self:tag("ctoListener") end 
+
+function FSMListener:constructor(info) self:tag("fsmListener") end 
 function FSMListener:destructor() end 
 function FSMListener:onMessage(sender,name,body)
-	print("MSG",name)
-	print(body.sceneIdentifier,body.sceneInstance,body.transitionType,body.transitionTime,body.sceneData.x)
+	print("MSG",name,body.triggerEvent,body.currentState,body.newState,body.eventData,body.eventData.target,body.eventData.x)
 end
 
-local SomeSM = Framework:createClass("game.smclass1","game.scenemanager")
-local SomeSM2 = Framework:createClass("game.smclass2","game.scenemanager")
-local listen = Framework:new("demo.listener")
+Framework:new("demo.listener")
 
-local cto = Framework:new("game.controlObject")
+local cto = Framework:new("system.fsm")
 print(cto)
 
-cto:addState("start", "game.smclass1", {  go2 = { target = "state2", transitionType = "type"} , go1 = { target = "start" , transitionType = "fade", transitionTime = 0.7 } })
-cto:addState("state2", "game.smclass2", {  next = { target = "start" } })
+cto:addState("state1",  {  go2 = "state2" , go1 = { target  = "state1" , x = 42 }})
+cto:addState("state2", { next = { target = "state1", x = "back to state1" }})
 
-cto:sendMessage(cto,"event",{ name = nil, data = { x = 9 }, notify = listen })
-timer.performWithDelay(100,function() cto:sendMessage(cto,"event",{ name = "go1", data = { x = 32 }, notify = listen }) end)
-timer.performWithDelay(200,function() cto:sendMessage(cto,"event",{ name = "go2", data = { x = 132 }, notify = listen }) end)
---cto:sendMessage(cto,"event",{ name = "go1", data = { x = 32 }, notify = listen })
-
--- fix this problem. is it fixable with asynchronous messaging ? Queue up performGameEvents ?
--- not required. The synchronising / pass on is handled as part of game.manager.
-
---[[
 cto:start("state1")
 cto:event("go1")
 cto:event("go2")
 cto:event("next")
 cto:event("go1")
---]]
 
 --- ************************************************************************************************************************************************************************
 --[[
