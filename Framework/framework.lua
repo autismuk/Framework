@@ -3,7 +3,7 @@
 ---				Name : 		framework.lua
 ---				Purpose :	Framework Object
 ---				Created:	15 July 2014
----				Updated:	19 July 2014
+---				Updated:	21 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -330,7 +330,8 @@ require("framework.timer")																		-- timer code.
 require("framework.collection")																	-- collection code.
 require("framework.scene") 																		-- game scene code.
 require("framework.fsm")																		-- finite state machine code.
-require("framework.scenemgr")																	-- game management code.
+require("framework.scenemgr")																	-- game scene management code.
+require("framework.controlobject")																-- adapted FSM for game management code.
 
 --- ************************************************************************************************************************************************************************
 --[[
