@@ -16,7 +16,6 @@ require("framework.framework")																	-- framework.
 --require("main_numbers")
 
 
-local sm = Framework:new("game.sceneManager")
 
 local FSMListener = Framework:createClass("demo.listener")
 function FSMListener:constructor(info) self:tag("fsmListener") end 
