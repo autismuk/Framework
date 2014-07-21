@@ -3,7 +3,7 @@
 ---				Name : 		scenemgr.lua
 ---				Purpose :	Scene Manager class, used as a base class for Scene Manager instances.
 ---				Created:	20 July 2014
----				Updated:	20 July 2014
+---				Updated:	21 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -34,9 +34,9 @@ end
 --//	@data 	[table]		event provided data.
 
 function SceneManager:setEventData(data)
-	self.m_data = data 																			-- set data from data.
-	setmetatable(self.m_data,self.m_info) 														-- use the base info passed in as a metatable
-	self.m_info.__index = self.m_info 															-- so you can access both information, event data overrides
+	self.m_data = {}
+	for k,v in pairs(self.m_info) do self.m_data[k] = v end 									-- copy the constructor data in first
+	for k,v in pairs(data) do self.m_data[k] = v end 											-- then any data passed as part of the event.
 end 
 
 --//%	Pre-Open code
