@@ -3,7 +3,7 @@
 ---				Name : 		scenemgr.lua
 ---				Purpose :	Scene Manager class, used as a base class for Scene Manager instances.
 ---				Created:	20 July 2014
----				Updated:	21 July 2014
+---				Updated:	22 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -39,18 +39,24 @@ function SceneManager:setEventData(data)
 	for k,v in pairs(data) do self.m_data[k] = v end 											-- then any data passed as part of the event.
 end 
 
+--//	Get the scene associated with the scene manager instance
+--//	@return 	[object]		Scene object
+
+function SceneManager:getScene()
+	return self.m_scene 
+end 
+
 --//%	Pre-Open code
 
 function SceneManager:doPreOpen()
-	self.m_scene = Framework:new("game.scene")													-- create a new game scene
 	Framework:setEnterFrameEnabled(false) 														-- stop enter frame, effectively pausing everything.
-	self:preOpen(self.m_scene,self,self.m_data) 												-- call pre-open to create scene.
+	self.m_scene = self:preOpen(self,self.m_data,self.m_resources) 								-- call pre-open to create scene.
 end 
 
 --//%	Post-Open code
 
 function SceneManager:doPostOpen() 
-	self:postOpen(self.m_scene,self,self.m_data) 												-- call post open, which usually does nothing.
+	self:postOpen(self.m_scene,self,self.m_data,self.m_resources) 								-- call post open, which usually does nothing.
 	Framework:setEnterFrameEnabled(true) 														-- start everything off.
 end 
 
@@ -58,13 +64,13 @@ end
 
 function SceneManager:doPreClose()
 	Framework:setEnterFrameEnabled(false) 														-- stop enter frame, effectively pausing everything.
-	self:preClose(self.m_scene,self,self.m_data) 												-- call pre-close, which usually does nothing.
+	self:preClose(self.m_scene,self,self.m_data,self.m_resources) 								-- call pre-close, which usually does nothing.
 end 
 
 --//%	Post-Close Code 
 
 function SceneManager:doPostClose()
-	self:postClose(self.m_scene,self,self.m_data) 												-- call post-close, which usually does nothing.
+	self:postClose(self.m_scene,self,self.m_data,self.m_resources) 								-- call post-close, which usually does nothing.
 	self.m_scene:delete() 																		-- delete the scene, which is no longer required.
 	self.m_scene = nil 																			-- nil the reference.
 	Framework:setEnterFrameEnabled(true) 														-- turn enterFrame back on.
@@ -81,12 +87,14 @@ function SceneManager:resourceConstructor(rt) end
 function SceneManager:resourceDestructor(rt) end 												
 
 --//	Handler for preOpen event, creates a new scene, before starting to transition it on.
---//	@scene 		[object]		game.scene object being worked on
 --//	@manager 	[object]		manager controlling it.
 --//	@data 		[table]			control data passed by event
 --//	@resources 	[table]			Resource table
+--//	@return 	[object]		game.scene object
 
-function SceneManager:preOpen(scene,manager,data,resources) end 											
+function SceneManager:preOpen(manager,data,resources) 
+	error("SceneManager is an abstract class. preOpen() must be implemented.")
+end 											
 
 --//	Handler for preOpen event, called when scene displayed on stage but has not been started
 --//	@scene 		[object]		game.scene object being worked on
