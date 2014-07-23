@@ -15,18 +15,18 @@ local SceneManager = Framework:createClass("game.scenemanager")
 --//	@info 	[table] 	Unused
 
 function SceneManager:constructor(info)
-	self.m_resources = {} 																		-- resources associated with this.
-	self:resourceConstructor(self.m_resources) 													-- construct the resources.
-	self.m_info = info or {}																	-- save the base information passed in.
+	self.msm_resources = {} 																	-- resources associated with this.
+	self:resourceConstructor(self.msm_resources) 												-- construct the resources.
+	self.msm_info = info or {}																	-- save the base information passed in.
 	self:setEventData({})																		-- event data is initially empty.
 end
 
 --//	Tidy up.
 
 function SceneManager:destructor()
-	self:resourceDestructor(self.m_resources) 													-- destruct resources
-	self.m_resources = nil 																		-- clear references.
-	self.m_scene = nil self.m_data = nil self.m_info = nil 
+	self:resourceDestructor(self.msm_resources) 												-- destruct resources
+	self.msm_resources = nil 																	-- clear references.
+	self.msms_scene = nil self.msm_data = nil self.msm_info = nil 
 end 
 
 
@@ -34,29 +34,29 @@ end
 --//	@data 	[table]		event provided data.
 
 function SceneManager:setEventData(data)
-	self.m_data = {}
-	for k,v in pairs(self.m_info) do self.m_data[k] = v end 									-- copy the constructor data in first
-	for k,v in pairs(data) do self.m_data[k] = v end 											-- then any data passed as part of the event.
+	self.msm_data = {}
+	for k,v in pairs(self.msm_info) do self.msm_data[k] = v end 								-- copy the constructor data in first
+	for k,v in pairs(data) do self.msm_data[k] = v end 											-- then any data passed as part of the event.
 end 
 
 --//	Get the scene associated with the scene manager instance
 --//	@return 	[object]		Scene object
 
 function SceneManager:getScene()
-	return self.m_scene 
+	return self.msm_scene 
 end 
 
 --//%	Pre-Open code
 
 function SceneManager:doPreOpen()
 	Framework:setEnterFrameEnabled(false) 														-- stop enter frame, effectively pausing everything.
-	self.m_scene = self:preOpen(self,self.m_data,self.m_resources) 								-- call pre-open to create scene.
+	self.msm_scene = self:preOpen(self,self.msm_data,self.msm_resources) 						-- call pre-open to create scene.
 end 
 
 --//%	Post-Open code
 
 function SceneManager:doPostOpen() 
-	self:postOpen(self.m_scene,self,self.m_data,self.m_resources) 								-- call post open, which usually does nothing.
+	self:postOpen(self.msm_scene,self,self.msm_data,self.msm_resources) 						-- call post open, which usually does nothing.
 	Framework:setEnterFrameEnabled(true) 														-- start everything off.
 end 
 
@@ -64,15 +64,15 @@ end
 
 function SceneManager:doPreClose()
 	Framework:setEnterFrameEnabled(false) 														-- stop enter frame, effectively pausing everything.
-	self:preClose(self.m_scene,self,self.m_data,self.m_resources) 								-- call pre-close, which usually does nothing.
+	self:preClose(self.msm_scene,self,self.msm_data,self.msm_resources) 						-- call pre-close, which usually does nothing.
 end 
 
 --//%	Post-Close Code 
 
 function SceneManager:doPostClose()
-	self:postClose(self.m_scene,self,self.m_data,self.m_resources) 								-- call post-close, which usually does nothing.
-	self.m_scene:delete() 																		-- delete the scene, which is no longer required.
-	self.m_scene = nil 																			-- nil the reference.
+	self:postClose(self.msm_scene,self,self.msm_data,self.msm_resources) 						-- call post-close, which usually does nothing.
+	self.msm_scene:delete() 																	-- delete the scene, which is no longer required.
+	self.msm_scene = nil 																		-- nil the reference.
 	Framework:setEnterFrameEnabled(true) 														-- turn enterFrame back on.
 end
 
