@@ -306,6 +306,7 @@ Framework:addObjectMethod("delete",																-- add method to delete self.
 
 Framework:addObjectMethod("tag",																-- add method to tag objects.
 	function(self,tagString)
+		assert(type(tagString) == "string","Bad tag parameter") 								-- check parameter is a string.
 		tagString = Framework:split(tagString,",") 												-- convert tag string into array of substrings.
 		for _,tag in ipairs(tagString) do 														-- work through the tag strings.
 			if tag:sub(1,1) == "+" then tag = tag:sub(2) end 									-- remove leading +
@@ -330,7 +331,8 @@ require("framework.timer")																		-- timer code.
 require("framework.collection")																	-- collection code.
 require("framework.scene") 																		-- game scene code.
 require("framework.fsm")																		-- finite state machine code.
-require("framework.scenemgr")																	-- game scene management code.
+require("framework.scenemanager")																-- game scene management code.
+require("framework.gamemanager")																-- game management code.
 
 --- ************************************************************************************************************************************************************************
 --[[

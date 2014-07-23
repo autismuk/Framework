@@ -46,19 +46,14 @@ end
 local scm1 = Framework:new("test.sceneManager",{ br = 1,name = "One", rate = 200 })
 local scm2 = Framework:new("test.sceneManager",{ bb = 1,name = "Two", rate = 400 })
 
---[[
-local FSMListener = Framework:createClass("demo.listener")
-function FSMListener:constructor(info) self:tag("fsmListener") end 
-function FSMListener:destructor() end 
-function FSMListener:onMessage(sender,name,body)print("MSG",name,body.triggerEvent,body.currentState,body.newState,body.eventData,body.eventData.target,body.eventData.x) end
-Framework:new("demo.listener")
---]]
-
 local manager = Framework:new("game.manager")
 manager:addManagedState("start",scm1,{ same = "start", change = "state2"})
 manager:addManagedState("state2",scm2, { back = "start" })
-manager:start()
+manager:start()   
+manager:performGameEvent("same", { someData = 142 })
 manager:performGameEvent("change", { someData = 42 })
+manager:performGameEvent("back", { someData = 242 })
+
 --- ************************************************************************************************************************************************************************
 --[[
 

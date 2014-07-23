@@ -1,6 +1,6 @@
 --- ************************************************************************************************************************************************************************
 ---
----				Name : 		scenemgr.lua
+---				Name : 		scenemanager.lua
 ---				Purpose :	Scene Manager class, used as a base class for Scene Manager instances.
 ---				Created:	20 July 2014
 ---				Updated:	22 July 2014
