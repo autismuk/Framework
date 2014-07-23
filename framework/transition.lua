@@ -1,7 +1,7 @@
 --- ************************************************************************************************************************************************************************
 ---
 ---				Name : 		transition.lua
----				Purpose :	Object which transitions between two scenes (independent of Framework)
+---				Purpose :	Object which transitions between two displays (independent of Framework)
 ---				Created:	23 July 2014
 ---				Updated:	23 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
@@ -20,9 +20,35 @@ function Transitioner:destructor()
 	self.m_transitionLibrary = nil
 end 
 
-function Transitioner:execute(scene1,scene2,transitionType,transitionTime,notifier,notifyMethod)
-	print("Executing transition",scene1,scene2,transitionType,transitionTime)
-	notifier[notifyMethod](notifier)
+function Transitioner:execute(display1,display2,transitionType,transitionTime,notifier,notifyMethod)
+	self.m_fromDisplay = display1 self.m_toDisplay = display2 
+	self.m_transition = self.m_transitionLibrary[transitionType:lower()]
+	self.m_time = transitionTime 
+	self.m_notifier = notifier
+	self.m_method = notifyMethod
+	print("Executing transition",display1,display2,transitionType,transitionTime)
+	self:exitTransition()
+end 
+
+function Transitioner:exitTransition()
+	if self.m_fromDisplay ~= nil then self:resetScene(self.m_fromDisplay) end 
+	self:resetScene(self.m_toDisplay)
+	self.m_toDisplay:toFront()
+	self.m_notifier[self.m_method](self.m_notifier)
+end 
+
+Transitioner.defaults = { 	alphaStart = 1.0, alphaEnd = 1.0,									-- List of transition default values
+					   	  	xScaleStart = 1.0,xScaleEnd = 1.0,yScaleStart = 1.0,yScaleEnd = 1.0,
+					  	 	xStart = 0,yStart = 0,xEnd = 0,yEnd = 0, 
+					   		rotationStart = 0,rotationEnd = 0}
+
+function Transitioner:resetScene(display)
+	if display == nil then return end
+	local def = Transitioner.defaults
+	display.alpha = def.alphaEnd
+	display.xScale,display.yScale = def.xScaleEnd,def.yScaleEnd
+	display.x,display.y = def.xEnd,def.yEnd 
+	display.rotaition = def.rotationEnd 
 end 
 
 --//	Support function for transition creations.
@@ -93,43 +119,43 @@ function Transitioner:setupStandardTransitions()
 	self:define("fromright",
  		{ xStart = 0, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
  		{ xStart = displayW, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
- 		{ concurrent = true, sceneAbove = true })
+ 		{ concurrent = true, displayAbove = true })
 	
 
 	self:define("fromleft",
 		{ xStart = 0, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
 		{ xStart = -displayW, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
-		{ concurrent = true, sceneAbove = true })
+		{ concurrent = true, displayAbove = true })
 
 	self:define("fromtop",
 		{ xStart = 0, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
 		{ xStart = 0, yStart = -displayH, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
-		{ concurrent = true, sceneAbove = true })
+		{ concurrent = true, displayAbove = true })
 
 	self:define("frombottom",
 		{ xStart = 0, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
 		{ xStart = 0, yStart = displayH, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
-		{ concurrent = true, sceneAbove = true })
+		{ concurrent = true, displayAbove = true })
 
 	self:define("slideleft",
 		{ xStart = 0, yStart = 0, xEnd = -displayW, yEnd = 0, transition = easing.outQuad }, 
 		{ xStart = displayW, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
-		{ concurrent = true, sceneAbove = true })
+		{ concurrent = true, displayAbove = true })
 
 	self:define("slideright",
  		{ xStart = 0, yStart = 0, xEnd = displayW, yEnd = 0, transition = easing.outQuad }, 
  		{ xStart = -displayW, yStart = 0, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
- 		{ concurrent = true, sceneAbove = true })
+ 		{ concurrent = true, displayAbove = true })
 
 	self:define("slidedown",
  		{ xStart = 0, yStart = 0, xEnd = 0, yEnd = displayH, transition = easing.outQuad }, 
  		{ xStart = 0, yStart = -displayH, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
- 		{ concurrent = true, sceneAbove = true })
+ 		{ concurrent = true, displayAbove = true })
 
 	self:define("slideup",		
 		{ xStart = 0, yStart = 0, xEnd = 0, yEnd = -displayH, transition = easing.outQuad }, 
 		{ xStart = 0, yStart = displayH, xEnd = 0, yEnd = 0, transition = easing.outQuad }, 
-		{ concurrent = true, sceneAbove = true })
+		{ concurrent = true, displayAbove = true })
 
 	self:define("crossfade",		
 		{ alphaStart = 1.0, alphaEnd = 0, }, 

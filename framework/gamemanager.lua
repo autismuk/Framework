@@ -93,7 +93,10 @@ function GameManager:startSceneTransition(newState,transitionType,transitionTime
 	self.m_newScene:setEventData(self.m_associatedEventData or {})								-- tell it about the associated data.
 	self.m_newScene:doPreOpen() 																-- do the pre-open on the new scene.
 	if self.m_currentSceneInstance ~= nil then self.m_currentSceneInstance:doPreClose() end 	-- do the pre-close on the current scene if there was one.
-	self.m_transitioner:execute(self.m_currentSceneInstance,self.m_newScene,					-- run transitioner between these two scenes
+	local fromContainer = self.m_currentSceneInstance 											-- get current scene
+	if fromContainer ~= nil then fromContainer = fromContainer:getScene():getContainer() end 	-- if there is one, access its container
+	self.m_transitioner:execute(fromContainer, 													-- run transitioner between these two scenes
+								self.m_newScene:getScene():getContainer(),				
 								transitionType,transitionTime, 									-- doing this
 								self,"endSceneTransition") 										-- calling this afterwards.
 end 
