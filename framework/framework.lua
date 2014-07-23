@@ -333,6 +333,7 @@ require("framework.scene") 																		-- game scene code.
 require("framework.fsm")																		-- finite state machine code.
 require("framework.scenemanager")																-- game scene management code.
 require("framework.gamemanager")																-- game management code.
+require("framework.transition") 																-- transitioning object.
 
 --- ************************************************************************************************************************************************************************
 --[[
