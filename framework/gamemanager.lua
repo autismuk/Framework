@@ -3,7 +3,7 @@
 ---				Name : 		gamemanager.lua
 ---				Purpose :	Object which controls the game state and scenes.
 ---				Created:	23 July 2014
----				Updated:	23 July 2014
+---				Updated:	24 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -89,7 +89,7 @@ function GameManager:startSceneTransition(newState,transitionType,transitionTime
 	transitionType = transitionType or "fade" transitionTime = transitionTime or 0.75 			-- default transition stuff.
 	self.m_newScene = self.m_sceneInstances[newState] 											-- get the new scene instance.
 	assert(self.m_newScene ~= nil,"Scene "..newState.." does not have associated sceneManager")	-- check it has a scene manager instance.
-	print("Transition to "..newState,transitionType,transitionTime,self.m_newScene,self.m_currentSceneInstance)
+	--print("Transition to "..newState,transitionType,transitionTime,self.m_newScene,self.m_currentSceneInstance)
 	self.m_newScene:setEventData(self.m_associatedEventData or {})								-- tell it about the associated data.
 	self.m_newScene:doPreOpen() 																-- do the pre-open on the new scene.
 	if self.m_currentSceneInstance ~= nil then self.m_currentSceneInstance:doPreClose() end 	-- do the pre-close on the current scene if there was one.

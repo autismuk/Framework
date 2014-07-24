@@ -18,7 +18,7 @@ function DisplayObject:constructor(info)
 	self.m_background.strokeWidth = 20 self.m_background:setStrokeColor(0,1,1)
 	self.m_text = display.newText("Scene "..(info.name or "?"),display.contentWidth/2,display.contentHeight/2,system.nativeFont,64)
 	self.m_text:setFillColor(1,1,0)
-		self.m_rate = info.rate or 300
+	self.m_rate = info.rate or 300
 end 
 
 function DisplayObject:destructor()
@@ -48,11 +48,11 @@ local scm2 = Framework:new("test.sceneManager",{ bb = 1,name = "Two", rate = 400
 
 local manager = Framework:new("game.manager")
 manager:addManagedState("start",scm1,{ same = "start", 
-									   change = { target = "state2", transitionType = "slideUp", transitionTime = 1 }})
+									   change = { target = "state2", transitionType = "crossfade", transitionTime = 2 }})
 manager:addManagedState("state2",scm2, { back = "start" })
 manager:start()   
-timer.performWithDelay(2000,function() manager:performGameEvent("change", { someData = 142 }) end)
-timer.performWithDelay(4000,function() manager:performGameEvent("back", { someData = 42 }) end)
+timer.performWithDelay(1000,function() manager:performGameEvent("change", { someData = 142 }) end)
+--timer.performWithDelay(10000,function() manager:performGameEvent("back", { someData = 42 }) end)
 
 --- ************************************************************************************************************************************************************************
 --[[

@@ -3,7 +3,7 @@
 ---				Name : 		transition.lua
 ---				Purpose :	Object which transitions between two displays (independent of Framework)
 ---				Created:	23 July 2014
----				Updated:	23 July 2014
+---				Updated:	24 July 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -51,7 +51,9 @@ end
 function Transitioner:executePhase()
 	local phase = self.m_nextPhase 																-- get phase
 	self.m_nextPhase = self.m_nextPhase + 1 													-- next time, do the next phase.
-
+	self.m_toDisplay.isVisible = false 															-- hide both of them originally
+	if self.m_fromDisplay ~= nil then self.m_fromDisplay.isVisible = false  end
+	--print("Phase",phase)
 	if phase == 1 then 																			-- phase 1.
 		if self.m_fromDisplay ~= nil and not self.m_transition.concurrent then  				-- if there is a from, and it is not concurrent run it first.
 			self:setupTransform(self.m_fromDisplay,self.m_transition.from,true)
@@ -74,8 +76,33 @@ end
 --//	@executeOnCompletion	[boolean]			If true, then when the transform is finished, call executePhase() to do the next phase.
 
 function Transitioner:setupTransform(displayObject,transformDefinition,executeOnCompletion)
-	print(self.m_nextPhase-1,displayObject,transformDefinition,executeOnCompletion)
-	if executeOnCompletion then self:executePhase() end  -- TODO: Fudge, will be done by oncomplete()
+	local def = Transitioner.defaults 															-- saves a lot of typing :)
+	displayObject.x = transformDefinition.xStart or def.xStart 									-- set display object to start point.
+	displayObject.y = transformDefinition.yStart or def.yStart 									-- using transition definitions or default values.
+	displayObject.xScale = transformDefinition.xScaleStart or def.xScaleStart
+	displayObject.yScale = transformDefinition.yScaleStart or def.yScaleStart
+	displayObject.alpha = transformDefinition.alphaStart or def.alphaStart
+	displayObject.rotation = transformDefinition.rotationStart or def.rotationStart
+
+	local transform = {} 																		-- now work out the finishing point.
+	transform.x = transformDefinition.xEnd or def.xEnd 									
+	transform.y = transformDefinition.yEnd or def.yEnd 									
+	transform.xScale = transformDefinition.xScaleEnd or def.xScaleEnd
+	transform.yScale = transformDefinition.yScaleEnd or def.yScaleEnd
+	transform.alpha = transformDefinition.alphaEnd or def.alphaEnd
+	transform.rotation = transformDefinition.rotationEnd or def.rotationEnd
+
+	if executeOnCompletion then 																-- execute when phase ends.
+		transform.onComplete = function(obj) self:executePhase() end 
+	end 
+
+	transform.time = self.m_time * 1000 														-- time in milliseconds, not seconds
+	displayObject.isVisible = true 																-- make it visible.
+	displayObject:toFront() 																	-- bring it to the front.
+	transition.to(displayObject,transform)														-- and do it.
+
+	--print(self.m_nextPhase-1,displayObject,transformDefinition,executeOnCompletion)
+
 end 
 
 --//	Transition is complete - tidy everything up and reset things back for continuation, notify the listener
@@ -104,7 +131,8 @@ function Transitioner:resetScene(display)
 	display.alpha = def.alphaEnd
 	display.xScale,display.yScale = def.xScaleEnd,def.yScaleEnd
 	display.x,display.y = def.xEnd,def.yEnd 
-	display.rotaition = def.rotationEnd 
+	display.rotation = def.rotationEnd 
+	display.isVisible = true
 end 
 
 --//	Support function for transition creations. It's purpose is to get the transition date (below) into the m_transitionLibrary table.
