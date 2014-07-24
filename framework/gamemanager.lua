@@ -15,6 +15,8 @@ local GameManager = Framework:createClass("game.manager")
 --//	@info [table] 	constructor information.
 
 function GameManager:constructor(info)
+	assert(GameManager.s_instance == nil)														-- only one of these.
+	GameManager.s_instance = self
 	self.m_controller = info.controller 														-- get controller.
 	self.m_ownsController = false 																-- did we create it.
 	if self.m_controller == nil then 															-- if no controller, create an FSM.
@@ -35,6 +37,7 @@ end
 
 function GameManager:destructor()
 	if self.m_ownsController then self.m_controller:delete() end 								-- delete controller if we made it.
+	GameManager.s_instance = nil 																-- instance no longer exists.
 	self.m_controller = nil self.m_sceneInstances = nil self.m_associatedEventData = nil		-- nil references
 	self.m_currentSceneInstance = nil
 end 
@@ -112,10 +115,11 @@ function GameManager:endSceneTransition()
 end
 
 Framework:addObjectMethod("performGameEvent", function(self,eventName,eventData)
-	assert(not self.m_isLocked,"performGameEvent() called before transition completed.") 		-- check a state transition is not in progress,
-	self.m_isLocked = true 																		-- now locked, a transition is in progress.
-	self.m_associatedEventData = eventData or {} 												-- save the data associated with the call.
-	self.m_controller:event(eventName) 															-- trigger an event, which should fire onMessage()
+	if GameManager.s_instance.m_isLocked then return false end 									-- cannot transition, as a transition is in progress.
+	GameManager.s_instance.m_isLocked = true 													-- now locked, a transition is in progress.
+	GameManager.s_instance.m_associatedEventData = eventData or {} 								-- save the data associated with the call.
+	GameManager.s_instance.m_controller:event(eventName) 										-- trigger an event, which should fire onMessage()
+	return true
 end)
 
 -- TODO: Proper transitions.

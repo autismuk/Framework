@@ -132,6 +132,7 @@ function Transitioner:resetScene(display)
 	display.xScale,display.yScale = def.xScaleEnd,def.yScaleEnd
 	display.x,display.y = def.xEnd,def.yEnd 
 	display.rotation = def.rotationEnd 
+	display.anchorX,display.anchorY = 0,0
 	display.isVisible = true
 end 
 
