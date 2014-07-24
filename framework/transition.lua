@@ -11,36 +11,92 @@
 
 local Transitioner = Framework:createClass("system.transition")
 
+--//	Constructor
+
 function Transitioner:constructor(info)
-	self.m_transitionLibrary = {}
-	self:setupStandardTransitions()
+	self.m_transitionLibrary = {}																-- Storage of transitions
+	self:setupStandardTransitions() 															-- Load them.
 end
+
+--// 	Destructor
 
 function Transitioner:destructor()
 	self.m_transitionLibrary = nil
 end 
 
+--//	Run a transition. This consiss of two parts ; phase 1, which transitions the old scene off, phase 2 which transitions
+--//	the new scene on (and the old scene off if it is concurrent)
+--//	@display1 			[container/group]			scene to transition out (may be nil)
+--//	@display2 			[continaer/group]			scene to transition in
+--//	@transitionType 	[string]					transition name
+--//	@transitionTime 	[number]					time in seconds
+--//	@notifier 			[object]					object to notify when complete
+--//	@notifyMethod 		[string]					method in that object to call.
+
 function Transitioner:execute(display1,display2,transitionType,transitionTime,notifier,notifyMethod)
-	self.m_fromDisplay = display1 self.m_toDisplay = display2 
-	self.m_transition = self.m_transitionLibrary[transitionType:lower()]
-	self.m_time = transitionTime 
+	self.m_fromDisplay = display1 self.m_toDisplay = display2  									-- save display
+	self.m_transition = self.m_transitionLibrary[transitionType:lower()]						-- get the transition.
+	assert(self.m_transition ~= nil,"Transition unknown "..transitionType)						-- check it exists
+	assert(transitionTime > 0 and transitionTime < 10,"Bad transition time") 					-- these are in seconds.
+	self.m_time = transitionTime  																-- save time, notifier and method.
 	self.m_notifier = notifier
 	self.m_method = notifyMethod
-	print("Executing transition",display1,display2,transitionType,transitionTime)
-	self:exitTransition()
+	self.m_nextPhase = 1 																		-- next phase is phase 1.
+	self:executePhase()
 end 
 
+--//	Execute the next phase of the transition - 1 = phase out first (not concurrent), 2 phase in second (phase out first if concurrent)
+--//	3 notify we have finished.
+
+function Transitioner:executePhase()
+	local phase = self.m_nextPhase 																-- get phase
+	self.m_nextPhase = self.m_nextPhase + 1 													-- next time, do the next phase.
+
+	if phase == 1 then 																			-- phase 1.
+		if self.m_fromDisplay ~= nil and not self.m_transition.concurrent then  				-- if there is a from, and it is not concurrent run it first.
+			self:setupTransform(self.m_fromDisplay,self.m_transition.from,true)
+		else
+			self:executePhase() 																-- otherwise go to the next phase, as phase 1 may not happen.
+		end
+	elseif phase == 2 then   																	-- phase 2. out (if concurrent) and new one in.
+		if self.m_fromDisplay ~= nil and self.m_transition.concurrent then 						-- if concurrent transition, run from-out simultaneously.
+			self:setupTransform(self.m_fromDisplay,self.m_transition.from,false)
+		end 
+		self:setupTransform(self.m_toDisplay,self.m_transition.to,true) 						-- transition the new one in.
+	else 																						-- phase 3, which means its exit time.
+		self:exitTransition()																	-- call the function to exit.
+	end
+end 
+
+--//	Start a transform on the given display object, optionally running executePhase() when done.
+--//	@displayObject 			[displayObject]		Object to transform
+--//	@transformDefinition	[transform]			Transform definition (collection of xEnd/yEnd/xStart etc.)
+--//	@executeOnCompletion	[boolean]			If true, then when the transform is finished, call executePhase() to do the next phase.
+
+function Transitioner:setupTransform(displayObject,transformDefinition,executeOnCompletion)
+	print(self.m_nextPhase-1,displayObject,transformDefinition,executeOnCompletion)
+	if executeOnCompletion then self:executePhase() end  -- TODO: Fudge, will be done by oncomplete()
+end 
+
+--//	Transition is complete - tidy everything up and reset things back for continuation, notify the listener
+--//	we've done, and null all references.
+
 function Transitioner:exitTransition()
-	if self.m_fromDisplay ~= nil then self:resetScene(self.m_fromDisplay) end 
-	self:resetScene(self.m_toDisplay)
-	self.m_toDisplay:toFront()
+	if self.m_fromDisplay ~= nil then self:resetScene(self.m_fromDisplay) end 					-- reset from scene
+	self:resetScene(self.m_toDisplay) 															-- reset to scene
+	self.m_toDisplay:toFront() 																	-- bring scene to the front
+	self.m_fromDisplay = nil self.m_toDisplay = nil 											-- null stuff out
 	self.m_notifier[self.m_method](self.m_notifier)
+	self.m_notifier = nil 																		-- forget about notifier
 end 
 
 Transitioner.defaults = { 	alphaStart = 1.0, alphaEnd = 1.0,									-- List of transition default values
 					   	  	xScaleStart = 1.0,xScaleEnd = 1.0,yScaleStart = 1.0,yScaleEnd = 1.0,
 					  	 	xStart = 0,yStart = 0,xEnd = 0,yEnd = 0, 
 					   		rotationStart = 0,rotationEnd = 0}
+
+--//	Reset a scene back to the default state.
+--//	@display 		[container/group]		thing to reset.
 
 function Transitioner:resetScene(display)
 	if display == nil then return end
@@ -51,10 +107,10 @@ function Transitioner:resetScene(display)
 	display.rotaition = def.rotationEnd 
 end 
 
---//	Support function for transition creations.
+--//	Support function for transition creations. It's purpose is to get the transition date (below) into the m_transitionLibrary table.
 
 function Transitioner:define(name,fromTransition,toTransition,options)
-	self.m_transitionLibrary[name] = { from = fromTransition, to = toTransition, concurrent = false }
+	self.m_transitionLibrary[name:lower()] = { from = fromTransition, to = toTransition, concurrent = false }
 	if options ~= nil and options.concurrent then self.m_transitionLibrary[name].concurrent = true end
 end 
 
