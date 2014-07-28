@@ -11,11 +11,14 @@
 --- ************************************************************************************************************************************************************************
 
 -- Standard Stub OOP create as a global.
-_G.Base =  _G.Base or { new = function(s) local o = {} setmetatable(o,s) s.__index = s s:initialise() return o end, initialise = function() end }
+_G.Base =  _G.Base or { new = function(s,...) local o = { } setmetatable(o,s) s.__index = s o:initialise(...) return o end, initialise = function() end }
 
 local Control = {
 	debug = false
 }
+
+local outputDirectory = "" 																		-- where to store the resulting files.
+local imageDirectory = "" 																		-- where to find images
 
 --- ************************************************************************************************************************************************************************
 -- Class encapsulating the Graphic Image Manipulation library. You could replace the main methods  to use ImageMagick 
@@ -90,15 +93,165 @@ end
 
 function Graphics:resize(targetFile,originalFile,newWidth,newHeight)
 	local cmd 
-	if newHeight == nil then 
-		newWidth = newWidth or 100
+	if newHeight == nil then 																	-- no height, its percent
+		newWidth = newWidth or 100 																-- default to 100%
 		cmd = ("convert -resize %dx%d%%! %s %s"):format(newWidth,newWidth,originalFile,targetFile)
-	else
+	else 																						-- otherwise absolute size
 		cmd = ("convert -resize %dx%d! %s %s"):format(newWidth,newHeight,originalFile,targetFile)
 	end
-	self:_execute(cmd)
+	self:_execute(cmd)																			-- then do it.
 end
 
+local graphicInstance = Graphics:new()
+
+--- ************************************************************************************************************************************************************************
+--																	Image information/representation class
+--- ************************************************************************************************************************************************************************
+
+local Image = Base:new()
+
+function Image:initialise(imageName,imageDef)
+	self.m_imageName = imageName:lower() 														-- save name
+	self.m_imageIsScaled = false  																-- simply, just file name, no scaling
+	self.m_imageFileName = imageDef 
+	local scaling = ""
+	if imageDef:find("@") ~= nil then  															-- @ present means scaling
+		self.m_imageFileName,scaling = imageDef:match("^(.*)@(.*)$") 							-- get scaling bit
+		self.m_imageIsScaled = true 															-- mark that it is scaled.
+	end
+	self.m_imageFileName = imageDirectory .. self.m_imageFileName 								-- filename from directory
+	if self.m_imageFileName:match("%.%w+$") == nil then 										-- add .png if no file type
+		self.m_imageFileName = self.m_imageFileName .. ".png"
+	end
+	local size = graphicInstance:getSize(self.m_imageFileName) 									-- get size
+	self.m_width = size.width self.m_height = size.height
+	if scaling ~= "" then  																		-- scaling ?
+		local a,b 
+		a,b = scaling:match("^(%d+)x(%d+)") 													-- check absolute size
+		if b ~= nil then 
+			self.m_width = tonumber(a) self.m_height = tonumber(b)
+		elseif scaling:match("^(%d+)%%$") ~= nil then 											-- check scaled by percentage
+			a = tonumber(scaling:sub(1,-2))
+			self.m_width = math.floor(self.m_width * a / 100)
+			self.m_height = math.floor(self.m_height * a / 100)
+		else
+			error("Do not understand scaling "..imageDef)
+		end 
+	end
+	self.m_pixels = self.m_width * self.m_height 												-- calculate pixels.
+	--print(self.m_imageName,self.m_imageIsScaled,self.m_imageFileName,scaling,self.m_width,self.m_height)
+end 
+
+function Image:getName() return self.m_imageName end 											-- get the working name.
+
+--- ************************************************************************************************************************************************************************
+--																	Packing Descriptor Object
+--- ************************************************************************************************************************************************************************
+
+local PackingDescriptor = Base:new()
+
+function PackingDescriptor:initialise(width)
+	self.m_items = {}																			-- list of x,y,w,h,ref 
+	self.m_width = width self.m_height = 16 													-- width and height of packing space.
+end 
+
+function PackingDescriptor:append(reference,width,height)
+	if height > self.m_height then return false end 											-- it is just too small.
+	local newRec = { x1 = math.random(0,self.m_width-width),									-- create a new record, which is a possible placement.
+					 y1 = math.random(0,self.m_height-height),
+					 width = width, height = height,
+					 reference = reference }
+	newRec.x2 = newRec.x1 + width -1 newRec.y2 = newRec.y1 + height - 1 						-- calculate x2,y2
+	for _,ref in ipairs(self.m_items) do 														-- check against all current
+		if self:overlaps(newRec,ref) then return false end 										-- fail if overlapped.
+	end 
+	self.m_items[#self.m_items+1] = newRec 														-- okay, add to the list
+	return true 																				-- and return okay.
+end 
+
+function PackingDescriptor:overlaps(r1,r2)
+	return not (r1.x1 > r2.x2 or r2.x1 > r1.x2 or r1.y1 > r2.y2 or r2.y1 > r1.y2)
+end 
+
+function PackingDescriptor:extendHeight(pixels)
+	self.m_height = self.m_height + pixels
+end 
+
+function PackingDescriptor:render(outputFile)
+	graphicInstance:createImage(outputFile,self.m_width,self.m_height)							-- empty sprite sheet
+	for _,ref in pairs(self.m_items) do  														-- work through all packed
+		local fileName = ref.reference.m_imageFileName 											-- get file name
+		if ref.reference.m_imageIsScaled then 													-- if scaled
+			local tmpFile = "tmpfile.png" 														-- produce a temporary scaled image
+			graphicInstance:resize(tmpFile,fileName,ref.reference.m_width,ref.reference.m_height)
+			fileName = tmpFile
+		end 
+		graphicInstance:composite(outputFile,fileName,ref.x1,ref.y1)							-- put on the sprite sheet
+	end 
+	os.remove("tmpfile.png")
+end 
+
+--- ************************************************************************************************************************************************************************
+--
+--															Global Methods used by image generating scripts
+--
+--- ************************************************************************************************************************************************************************
+
+local images = {} 																				-- mapping of image names to image objects
+local imageList = {} 																			-- same but a straight list.
+
+function input(directory) imageDirectory = directory or "" end  								-- set directories.
+function output(directory) outputDirectory = directory or "" end 
+
+function import(...) 																			-- import images for use in the spritesheet
+	local argList = { ... }
+	for _,argument in ipairs(argList) do 														-- work through all arguments
+		if type(argument) == "string" then 														-- handle single strings.
+			local newArg = {}
+			newArg[argument] = argument 
+			argument = newArg 
+		end 
+		for k,v in pairs(argument) do 															-- work through pairs
+			if type(k) == "number" then k = v end 												-- handle list input.
+			local image = Image:new(k,v) 														-- create a new image
+			local name = image:getName()
+			assert(images[name] == nil,"Image duplicated "..name) 								-- check not duplicated
+			images[name] = image 																-- save required image.
+			imageList[#imageList+1] = image 													-- add to list.
+		end
+	end 
+end 
+
+function sequence(name,frames,options) end 
+
+function create(imageSheetFile,libraryFile,sheetWidth,packTries) 
+	sheetWidth = sheetWidth or 512 packTries = packTries or 25 									-- default values
+	table.sort(imageList, function(a,b) return a.m_pixels > b.m_pixels end) 					-- sort so biggest first.
+	for _,ref in ipairs(imageList) do sheetWidth = math.max(sheetWidth,ref.m_width) end 		-- make sure sheet is at *least* wide enough.
+	local bestSize = 99999999 																	-- best overall image sheet size
+	local bestSheet = nil 																		-- best image sheet result.
+	for i = 1,packTries do 																		-- repeatedly try packing.
+		local sheet = PackingDescriptor:new(sheetWidth) 										-- create a new packing descriptor
+		for _,ref in ipairs(imageList) do 														-- work through the image list.
+			repeat 
+				local isInserted = sheet:append(ref,ref.m_width,ref.m_height) 					-- try to add a graphic square in.
+				if not isInserted and math.random(1,19) == 1 then sheet:extendHeight(4) end 	-- if failed, then make it bigger, very occasionally.
+			until isInserted 																	-- until it is put in.
+		end 																					-- put all objects in.
+		if sheet.m_height < bestSize then 														-- best result so far.
+			bestSize = sheet.m_height 															-- save the height
+			bestSheet = sheet  																	-- and the packing information.
+		end 
+		--print(sheet.m_height,sheet.m_width)
+	end 																						-- do as many times as you want to get best packing.
+	bestSheet:render(imageSheetFile)															-- create the images file.
+	-- TODO: Copy frame information into images.
+	-- TODO: Generate tables and stuff.
+
+	print("Packed into ",bestSheet.m_width,bestSheet.m_height)
+end 
+
+--[[
 gm = Graphics:new()
 gm:createImage("demo.png",384,384)
 sz = gm:getSize("images/teeth1.png")
@@ -108,3 +261,4 @@ gm:resize("teethlarge.png","images/teeth1.png",240,250)
 sz = gm:getSize("teethlarge.png")
 print(sz.width,sz.height)
 gm:composite("demo.png","teethlarge.png",30,30)
+--]]

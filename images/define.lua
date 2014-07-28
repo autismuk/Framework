@@ -1,7 +1,7 @@
 --
 --		Typical definition file. This is an actual lua script which leverages tosprite.lua and graphics magick
 --	
-require("tosprite.lua") 															-- we need this library to make things work.
+require("tosprite") 																-- we need this library to make things work.
 
 --
 --		Set I/O Files.
@@ -13,7 +13,7 @@ input("images/")
 --
 --		Import some images in various ways.
 --
-import({ "ball", "brick "}) 														-- table
+import({ "ball", "brick"}) 															-- table
 import( "circlemask","teeth1","teeth2" ) 											-- multiple parameters
 import( { button1 = "buttonBlueSmall", button2 = "buttonBlueSmallOver" }) 			-- renamed some files
 import( { warped = "teeth1@40x240" }) 												-- scaling and resizing
@@ -31,7 +31,7 @@ sequence("bigteeth", { "bigteeth1","bigteeth2"}, { time = 200 })
 -- 		Now pack them and generate the image sheet stuff.
 --
 
-create("sprites.png","sprites.lua",512,40)											-- imagesheet, library file, imagesheet width (default 256), retries (default 25)
+create("sprites.png","sprites.lua")													-- imagesheet, library file, imagesheet width (default 256), retries (default 25)
 
 
 -- this generates a library .lua class which can be required(), returns an object, it has the following members
