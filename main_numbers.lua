@@ -123,8 +123,8 @@ function Player:constructor(info)
 	self.m_y = display.contentHeight / 2 
 	self.m_radius = 32 																			-- player size
 	self.m_images = {}
-	self.m_images[1] = display.newImage("images/teeth1.png",self.m_x,self.m_y) 					-- we cheat the animation 
-	self.m_images[2] = display.newImage("images/teeth2.png",self.m_x,self.m_y)
+	self.m_images[1] = display.newImage("images/images/teeth1.png",self.m_x,self.m_y) 			-- we cheat the animation 
+	self.m_images[2] = display.newImage("images/images/teeth2.png",self.m_x,self.m_y)
 	self.m_images[1].isVisible = false 
 	self.m_images[2].isVisible = false
 	self.m_controller = info.controller 														-- remember the controller
