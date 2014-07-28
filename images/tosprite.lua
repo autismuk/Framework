@@ -191,6 +191,12 @@ function PackingDescriptor:render(outputFile)
 	os.remove("tmpfile.png")
 end 
 
+function PackingDescriptor:copyReferences()
+	for _,ref in pairs(self.m_items) do 														-- work through all the entries.
+		ref.reference.m_position = ref 															-- put a pointer to the position data 
+	end 
+end
+
 --- ************************************************************************************************************************************************************************
 --
 --															Global Methods used by image generating scripts
@@ -225,7 +231,7 @@ end
 function sequence(name,frames,options) end 
 
 function create(imageSheetFile,libraryFile,sheetWidth,packTries) 
-	sheetWidth = sheetWidth or 512 packTries = packTries or 25 									-- default values
+	sheetWidth = sheetWidth or 512 packTries = packTries or 75 									-- default values
 	table.sort(imageList, function(a,b) return a.m_pixels > b.m_pixels end) 					-- sort so biggest first.
 	for _,ref in ipairs(imageList) do sheetWidth = math.max(sheetWidth,ref.m_width) end 		-- make sure sheet is at *least* wide enough.
 	local bestSize = 99999999 																	-- best overall image sheet size
@@ -245,20 +251,36 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 		--print(sheet.m_height,sheet.m_width)
 	end 																						-- do as many times as you want to get best packing.
 	bestSheet:render(imageSheetFile)															-- create the images file.
-	-- TODO: Copy frame information into images.
-	-- TODO: Generate tables and stuff.
+	bestSheet:copyReferences() 																	-- copy references to the position data into the images
 
 	print("Packed into ",bestSheet.m_width,bestSheet.m_height)
+
+	local h = io.open(libraryFile,"w")
+	h:write("-- Automatically generated.\n")
+	h:write("local options = { frames={}, names={}, sequenceData={}, sequenceNames={} }\n")		-- create empty structures.
+	h:write("options.spriteFileName = \"" .. imageSheetFile .. "\"\n")							-- tell it which file to use.
+	h:write("options.sheetContentWidth = "..bestSheet.m_width.."\n") 							-- sheet content width/height
+	h:write("options.sheetContentHeight = "..bestSheet.m_height.."\n")
+	for _,ref in ipairs(imageList) do 															-- for each item
+		local pos = ref.m_position
+		h:write(("options.frames[%d] = { x = %d,y = %d, width = %d, height = %d }\n"):			-- create a frame
+													format(_,pos.x1,pos.y1,pos.width,pos.height))
+		h:write(("options.names[\"%s\"] = %d\n"):format(ref:getName(),_)) 						-- and a back-reference
+	end
+	h:write("options.defaultSheet = graphics.newImageSheet(options.spriteFileName,options)\n")
+	h:write("options.getImageSheet = function(self) return graphics.newImageSheet(self.spriteFileName,self) end\n")
+	h:write("options.getFrameNumber = function(self,name) return self.names[name:lower()] end\n")
+	h:write("options.newImage = function(self,id) if type(id) == 'string' then id = self.names[id:lower()] end return display.newImage(self.defaultSheet,id) end\n")
+	h:write("return options\n")
+	h:close()
 end 
 
 --[[
-gm = Graphics:new()
-gm:createImage("demo.png",384,384)
-sz = gm:getSize("images/teeth1.png")
-print(sz.width,sz.height)
-gm:composite("demo.png","images/teeth1.png",0,0)
-gm:resize("teethlarge.png","images/teeth1.png",240,250)
-sz = gm:getSize("teethlarge.png")
-print(sz.width,sz.height)
-gm:composite("demo.png","teethlarge.png",30,30)
+
+	Import sequenceData into sequence data
+	Cross reference sequence names
+	Write and test getSequenceData
+	Write and test newSprite
+	Retro fit into numbers ?
+
 --]]

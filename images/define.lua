@@ -36,7 +36,7 @@ create("sprites.png","sprites.lua")													-- imagesheet, library file, ima
 
 -- this generates a library .lua class which can be required(), returns an object, it has the following members
 -- 
--- xxx.getImageSheet() 					returns an image sheet, encapsulates the various bits (display.newImageSheet)
--- xxx.getFrameNumber(name)				given a name, return the frame number.
+-- xxx:getImageSheet() 					returns an image sheet, encapsulates the various bits (display.newImageSheet)
+-- xxx:getFrameNumber(name)				given a name, return the frame number.
 -- xxx.newSprite([parent])				get a new sprite/image with optional parent (display.newSprite) 	
 -- xxx.newImage([parent],frame)			extract a single frame - can be either the ID (from getFrameNumber() or the image name)	
