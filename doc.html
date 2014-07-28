@@ -1,4 +1,33 @@
 <!DOCTYPE html><html><head><style>body { background:#333; color:#0F0; font-family:Arial,Verdana;} a { color:#0AA } h1 { color:#FF0; } h2 { color:#0FF } table,tr,td { color: #CCC; padding:4px;border:1px solid white; border-collapse:collapse; }</style></head><body>
+<a name="ads.admob"></a>
+<hr><h1>ads.admob</h1>
+<p><h3>Extends </h3></p>
+<p>Advert object. admob for iOS and Android, provides a fake if running in simulator.</p>
+<p>Methods : <a href="#Advert_constructor"/>constructor</a>,<a href="#Advert_destructor"/>destructor</a>,<a href="#Advert_getDisplayObjects"/>getDisplayObjects</a>,<a href="#Advert_getHeight"/>getHeight</a>,<a href="#Advert_onTimer"/>onTimer</a></p><hr><a name="Advert_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>Constructor information.</td></tr>
+</table>
+<p>Create an advert. Parameters passed are android/ios/universal (Admob AppIDs), advertType, defaults to banner. Must provide the admob app-IDs</p>
+<a name="Advert_destructor"></a>
+<h2>destructor()</h2>
+<p>Tidy up.</p>
+<a name="Advert_getDisplayObjects"></a>
+<h2>getDisplayObjects()</h2>
+<p></p>
+<a name="Advert_getHeight"></a>
+<h2>getHeight()</h2>
+<table>
+<tr><td>return</td><td>number</td><td>height.</td></tr>
+</table>
+<p>Gets the height of the banner in Corona device units. This function can only be called once the first advert is created, due to a limitation in Corona. Therefore if you must know the height of a banner, you will have to create one and destroy one.</p>
+<a name="Advert_onTimer"></a>
+<h2>onTimer(tag,timerID)</h2>
+<table>
+<tr><td>tag</td><td></td><td></td></tr>
+<tr><td>timerID</td><td></td><td></td></tr>
+</table>
+<p>This fakes the 'late' arrival of the actual advert, rather than it being put up straight away.</p>
 <a name="audio.music"></a>
 <hr><h1>audio.music</h1>
 <p><h3>Extends </h3></p>
@@ -62,6 +91,59 @@
 <tr><td>options</td><td>table</td><td>options for play, see audio.play() documents</td></tr>
 </table>
 <p>Play a sound effect from the cache.</p>
+<a name="game.manager"></a>
+<hr><h1>game.manager</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#GameManager_addManagedState"/>addManagedState</a>,<a href="#GameManager_assignManager"/>assignManager</a>,<a href="#GameManager_constructor"/>constructor</a>,<a href="#GameManager_destructor"/>destructor</a>,<a href="#GameManager_endSceneTransition"/>endSceneTransition</a>,<a href="#GameManager_onMessage"/>onMessage</a>,<a href="#GameManager_start"/>start</a>,<a href="#GameManager_startSceneTransition"/>startSceneTransition</a></p><hr><a name="GameManager_addManagedState"></a>
+<h2>addManagedState(stateName,sceneManagerInstance,eventTarget)</h2>
+<table>
+<tr><td>stateName</td><td>string</td><td>name of state</td></tr>
+<tr><td>sceneManagerInstance</td><td>object</td><td>sceneManager associated with scene</td></tr>
+<tr><td>eventTarget</td><td>table</td><td>events and targets, see system.fsm</td></tr>
+</table>
+<p>Add a state, a sceneManager instance and a series of events and targets - helper function.</p>
+<a name="GameManager_assignManager"></a>
+<h2>assignManager(stateName,sceneManagerInstance)</h2>
+<table>
+<tr><td>stateName</td><td>string</td><td>name of state</td></tr>
+<tr><td>sceneManagerInstance</td><td>object</td><td>sceneManager associated with scene</td></tr>
+</table>
+<p>Assign a scene manager instance to a specific state.</p>
+<a name="GameManager_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>constructor information.</td></tr>
+</table>
+<p>Construct a game manager object</p>
+<a name="GameManager_destructor"></a>
+<h2>destructor()</h2>
+<p>Tidy up</p>
+<a name="GameManager_endSceneTransition"></a>
+<h2>endSceneTransition()</h2>
+<p>Complete the transition practicalities after the visual transition has been done this method is called by the transitioner, see above.</p>
+<a name="GameManager_onMessage"></a>
+<h2>onMessage(sender,name,body)</h2>
+<table>
+<tr><td>sender</td><td>object</td><td>controller object</td></tr>
+<tr><td>name</td><td>string</td><td>name of message</td></tr>
+<tr><td>body</td><td></td><td></td></tr>
+</table>
+<p>Handle message. These are sent by the controller object. While the transition is in progress the messaging, timers, updates are off</p>
+<a name="GameManager_start"></a>
+<h2>start(startState)</h2>
+<table>
+<tr><td>startState</td><td>string</td><td>First scene, defaults to 'start'</td></tr>
+</table>
+<p>Start the game manager, go to first scene</p>
+<a name="GameManager_startSceneTransition"></a>
+<h2>startSceneTransition(newState,transitionType,transitionTime)</h2>
+<table>
+<tr><td>newState</td><td>string</td><td>state to go to</td></tr>
+<tr><td>transitionType</td><td>string</td><td>transition type</td></tr>
+<tr><td>transitionTime</td><td>number</td><td>transition time in seconds</td></tr>
+</table>
+<p>Start a transition to a new state</p>
 <a name="game.scene"></a>
 <hr><h1>game.scene</h1>
 <p><h3>Extends system.collection</h3></p>
@@ -94,6 +176,83 @@
 <tr><td>deltaTime</td><td>number</td><td>elapsed time in seconds</td></tr>
 </table>
 <p>Handle enterFrame message, dispatch to all collection objects which implement onUpdate()</p>
+<a name="game.scenemanager"></a>
+<hr><h1>game.scenemanager</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#SceneManager_constructor"/>constructor</a>,<a href="#SceneManager_destructor"/>destructor</a>,<a href="#SceneManager_getScene"/>getScene</a>,<a href="#SceneManager_postClose"/>postClose</a>,<a href="#SceneManager_postOpen"/>postOpen</a>,<a href="#SceneManager_preClose"/>preClose</a>,<a href="#SceneManager_preOpen"/>preOpen</a>,<a href="#SceneManager_resourceConstructor"/>resourceConstructor</a>,<a href="#SceneManager_resourceDestructor"/>resourceDestructor</a>,<a href="#SceneManager_setEventData"/>setEventData</a></p><hr><a name="SceneManager_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td>table</td><td>Unused</td></tr>
+</table>
+<p>Create a new Game Scene Manager</p>
+<a name="SceneManager_destructor"></a>
+<h2>destructor()</h2>
+<p>Tidy up.</p>
+<a name="SceneManager_doPostClose"></a>
+<a name="SceneManager_doPostOpen"></a>
+<a name="SceneManager_doPreClose"></a>
+<a name="SceneManager_doPreOpen"></a>
+<a name="SceneManager_getScene"></a>
+<h2>getScene()</h2>
+<table>
+<tr><td>return</td><td>object</td><td>Scene object</td></tr>
+</table>
+<p>Get the scene associated with the scene manager instance</p>
+<a name="SceneManager_postClose"></a>
+<h2>postClose(scene,manager,data,resources)</h2>
+<table>
+<tr><td>scene</td><td>object</td><td>game.scene object being worked on</td></tr>
+<tr><td>manager</td><td>object</td><td>manager controlling it.</td></tr>
+<tr><td>data</td><td>table</td><td>control data passed by event</td></tr>
+<tr><td>resources</td><td>table</td><td>Resource table</td></tr>
+</table>
+<p>Handler for postClose event, called when scene transitioned off and about to be deleted.</p>
+<a name="SceneManager_postOpen"></a>
+<h2>postOpen(scene,manager,data,resources)</h2>
+<table>
+<tr><td>scene</td><td>object</td><td>game.scene object being worked on</td></tr>
+<tr><td>manager</td><td>object</td><td>manager controlling it.</td></tr>
+<tr><td>data</td><td>table</td><td>control data passed by event</td></tr>
+<tr><td>resources</td><td>table</td><td>Resource table</td></tr>
+</table>
+<p>Handler for preOpen event, called when scene displayed on stage but has not been started</p>
+<a name="SceneManager_preClose"></a>
+<h2>preClose(scene,manager,data,resources)</h2>
+<table>
+<tr><td>scene</td><td>object</td><td>game.scene object being worked on</td></tr>
+<tr><td>manager</td><td>object</td><td>manager controlling it.</td></tr>
+<tr><td>data</td><td>table</td><td>control data passed by event</td></tr>
+<tr><td>resources</td><td>table</td><td>Resource table</td></tr>
+</table>
+<p>Handler for preClose event, called when scene has been exited but it is still visible, about to be transitioned off.</p>
+<a name="SceneManager_preOpen"></a>
+<h2>preOpen(manager,data,resources)</h2>
+<table>
+<tr><td>manager</td><td>object</td><td>manager controlling it.</td></tr>
+<tr><td>data</td><td>table</td><td>control data passed by event</td></tr>
+<tr><td>resources</td><td>table</td><td>Resource table</td></tr>
+<tr><td>return</td><td>object</td><td>game.scene object</td></tr>
+</table>
+<p>Handler for preOpen event, creates a new scene, before starting to transition it on.</p>
+<a name="SceneManager_resourceConstructor"></a>
+<h2>resourceConstructor(rt)</h2>
+<table>
+<tr><td>rt</td><td>table</td><td>Resource table</td></tr>
+</table>
+<p>Create/Load resources</p>
+<a name="SceneManager_resourceDestructor"></a>
+<h2>resourceDestructor(rt)</h2>
+<table>
+<tr><td>rt</td><td>table</td><td>Resource table</td></tr>
+</table>
+<p>Free/Tidy up resources</p>
+<a name="SceneManager_setEventData"></a>
+<h2>setEventData(data)</h2>
+<table>
+<tr><td>data</td><td>table</td><td>event provided data.</td></tr>
+</table>
+<p>Set the associated event data, combined with the info table passed into the constructor</p>
 <a name="io.controller.fouraxis"></a>
 <hr><h1>io.controller.fouraxis</h1>
 <p><h3>Extends </h3></p>
@@ -375,4 +534,60 @@
 <a name="TimerClass_sortTimerList"></a>
 <h2>sortTimerList()</h2>
 <p>Add a new timer event Sort the timer items so the next triggered ones (e.g. earliest fire time) are up front.</p>
+<a name="system.transition"></a>
+<hr><h1>system.transition</h1>
+<p><h3>Extends </h3></p>
+<p></p>
+<p>Methods : <a href="#Transitioner_constructor"/>constructor</a>,<a href="#Transitioner_define"/>define</a>,<a href="#Transitioner_destructor"/>destructor</a>,<a href="#Transitioner_execute"/>execute</a>,<a href="#Transitioner_executePhase"/>executePhase</a>,<a href="#Transitioner_exitTransition"/>exitTransition</a>,<a href="#Transitioner_resetScene"/>resetScene</a>,<a href="#Transitioner_setupStandardTransitions"/>setupStandardTransitions</a>,<a href="#Transitioner_setupTransform"/>setupTransform</a></p><hr><a name="Transitioner_constructor"></a>
+<h2>constructor(info)</h2>
+<table>
+<tr><td>info</td><td></td><td></td></tr>
+</table>
+<p>Constructor</p>
+<a name="Transitioner_define"></a>
+<h2>define(name,fromTransition,toTransition,options)</h2>
+<table>
+<tr><td>name</td><td></td><td></td></tr>
+<tr><td>fromTransition</td><td></td><td></td></tr>
+<tr><td>toTransition</td><td></td><td></td></tr>
+<tr><td>options</td><td></td><td></td></tr>
+</table>
+<p>Support function for transition creations. It's purpose is to get the transition date (below) into the m_transitionLibrary table.</p>
+<a name="Transitioner_destructor"></a>
+<h2>destructor()</h2>
+<p>Destructor</p>
+<a name="Transitioner_execute"></a>
+<h2>execute(display1,display2,transitionType,transitionTime,notifier,notifyMethod)</h2>
+<table>
+<tr><td>display1</td><td>container/group</td><td>scene to transition out (may be nil)</td></tr>
+<tr><td>display2</td><td>continaer/group</td><td>scene to transition in</td></tr>
+<tr><td>transitionType</td><td>string</td><td>transition name</td></tr>
+<tr><td>transitionTime</td><td>number</td><td>time in seconds</td></tr>
+<tr><td>notifier</td><td>object</td><td>object to notify when complete</td></tr>
+<tr><td>notifyMethod</td><td>string</td><td>method in that object to call.</td></tr>
+</table>
+<p>Run a transition. This consiss of two parts ; phase 1, which transitions the old scene off, phase 2 which transitions the new scene on (and the old scene off if it is concurrent)</p>
+<a name="Transitioner_executePhase"></a>
+<h2>executePhase()</h2>
+<p>Execute the next phase of the transition - 1 = phase out first (not concurrent), 2 phase in second (phase out first if concurrent) 3 notify we have finished.</p>
+<a name="Transitioner_exitTransition"></a>
+<h2>exitTransition()</h2>
+<p>Transition is complete - tidy everything up and reset things back for continuation, notify the listener we've done, and null all references.</p>
+<a name="Transitioner_resetScene"></a>
+<h2>resetScene(display)</h2>
+<table>
+<tr><td>display</td><td>container/group</td><td>thing to reset.</td></tr>
+</table>
+<p>Reset a scene back to the default state.</p>
+<a name="Transitioner_setupStandardTransitions"></a>
+<h2>setupStandardTransitions()</h2>
+<p>Create the table of standard transitions</p>
+<a name="Transitioner_setupTransform"></a>
+<h2>setupTransform(displayObject,transformDefinition,executeOnCompletion)</h2>
+<table>
+<tr><td>displayObject</td><td>displayObject</td><td>Object to transform</td></tr>
+<tr><td>transformDefinition</td><td>transform</td><td>Transform definition (collection of xEnd/yEnd/xStart etc.)</td></tr>
+<tr><td>executeOnCompletion</td><td>boolean</td><td>If true, then when the transform is finished, call executePhase() to do the next phase.</td></tr>
+</table>
+<p>Start a transform on the given display object, optionally running executePhase() when done.</p>
 <hr><p><i>LUA Autodoc by Paul Robson 2014</i></p><hr></body></html>
