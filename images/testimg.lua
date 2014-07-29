@@ -20,6 +20,13 @@ import( { warped = "teeth1@40x240" }) 												-- scaling and resizing
 import({ bigteeth1 = "teeth1@140%" })
 import({ bigteeth2 = "teeth2@140%" })
 
+local x = { "buttonBlueMini", "buttonBlueMiniOver","buttonBlueOver","buttonBlueSmall","buttonBlueSmallOver1",
+		"closebtn-over","crane arm","crateB 2","crateB" }
+import(x)
+
+x = { "default", "egg", "facebookbtn-over", "glow", "grass", "level1btn", "moon", "ofbtn-over", "pausebtn", "star" }
+import(x)
+
 --
 -- 		Now lets define some sequences
 --
@@ -40,3 +47,5 @@ create("sprites.png","sprites.lua")													-- imagesheet, library file, ima
 -- xxx:getFrameNumber(name)				given a name, return the frame number.
 -- xxx.newSprite([sequenceData])		get a new sprite/image with optional parent (display.newSprite) 	
 -- xxx.newImage(frame)					extract a single frame - can be either the ID (from getFrameNumber() or the image name)	
+-- xxx.cloneSequence(name) 				create a shallow copy of an existing sequence.
+-- xxx.addSequence(sequence) 			add a sequence to the sequence list.

@@ -267,12 +267,21 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 	h:write("options.sheetContentWidth = "..bestSheet.m_width.."\n") 							-- sheet content width/height
 	h:write("options.sheetContentHeight = "..bestSheet.m_height.."\n")
 	h:write("-- image sheet data\n")
+	local pixelCount = 0
 	for _,ref in ipairs(imageList) do 															-- for each item
 		local pos = ref.m_position
 		h:write(("options.frames[%d] = { x = %d,y = %d, width = %d, height = %d }\n"):			-- create a frame
 													format(_,pos.x1,pos.y1,pos.width,pos.height))
 		h:write(("options.names[\"%s\"] = %d\n"):format(ref:getName(),_)) 						-- and a back-reference
+		pixelCount = pixelCount + ref.m_pixels
 	end
+
+	print("ImageSheet size is "..bestSheet.m_width.." x "..bestSheet.m_height.." pixels")		-- status information.
+	print("Pixels in images",pixelCount) 													
+	local sheetCount = bestSheet.m_width * bestSheet.m_height 
+	print("Pixels in sheet ",sheetCount)
+	print("Packing percent ",math.floor(100*pixelCount/sheetCount))
+
 	h:write("-- sequence data\n")
 	local seqCount = 1
 	for name,ref in pairs(sequences) do 														-- work through the sequence.
@@ -297,14 +306,16 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 	h:write("options.getFrameNumber = function(self,name) return self.names[name:lower()] end\n")
 	h:write("options.newImage = function(self,id) if type(id) == 'string' then id = self.names[id:lower()] end return display.newImage(self.defaultSheet,id) end\n")
 	h:write("options.newSprite = function(self,seqData) return display.newSprite(options.defaultSheet,seqData or options.sequenceData) end\n")
+	h:write("options.cloneSequence = function(self,name) local c = {} for k,v in pairs(self.sequenceNames[name:lower()]) do c[k] = v end return c end\n")
+	h:write("options.addSequence = function(self,name,seq) name = name:lower() seq.name = name options.sequenceNames[name] = seq options.sequenceData[#options.sequenceData+1] = seq end\n")
 	h:write("return options\n")
 	h:close()
 end 
 
 --[[
 
-	Write and test getSequenceData() of some sort, allows a sequence to be duplicated/overwritten.
 	Sequential import (e.g. teeth1,teeth2,teeth3)
+	Wildcard import (e.g. teeth*)
 	Retro fit into numbers ?
 
 --]]
