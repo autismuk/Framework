@@ -3,6 +3,7 @@ local options = { frames={}, names={}, sequenceData={}, sequenceNames={} }
 options.spriteFileName = "sprites.png"
 options.sheetContentWidth = 512
 options.sheetContentHeight = 472
+-- image sheet data
 options.frames[1] = { x = 164,y = 0, width = 200, height = 200 }
 options.names["circlemask"] = 1
 options.frames[2] = { x = 259,y = 203, width = 203, height = 197 }
@@ -16,15 +17,22 @@ options.names["teeth2"] = 5
 options.frames[6] = { x = 467,y = 159, width = 40, height = 240 }
 options.names["warped"] = 6
 options.frames[7] = { x = 406,y = 422, width = 73, height = 32 }
-options.names["button1"] = 7
+options.names["button2"] = 7
 options.frames[8] = { x = 209,y = 432, width = 73, height = 32 }
-options.names["button2"] = 8
+options.names["button1"] = 8
 options.frames[9] = { x = 334,y = 451, width = 35, height = 15 }
 options.names["brick"] = 9
 options.frames[10] = { x = 145,y = 453, width = 16, height = 16 }
 options.names["ball"] = 10
+-- sequence data
+options.sequenceData[1] = { name = "teeth", frames = { 4,5 }, time = 500, loopCount = 4 }
+options.sequenceNames["teeth"] = options.sequenceData[1]
+options.sequenceData[2] = { name = "bigteeth", frames = { 3,2 }, time = 400 }
+options.sequenceNames["bigteeth"] = options.sequenceData[2]
+-- method prototyping
 options.defaultSheet = graphics.newImageSheet(options.spriteFileName,options)
 options.getImageSheet = function(self) return graphics.newImageSheet(self.spriteFileName,self) end
 options.getFrameNumber = function(self,name) return self.names[name:lower()] end
 options.newImage = function(self,id) if type(id) == 'string' then id = self.names[id:lower()] end return display.newImage(self.defaultSheet,id) end
+options.newSprite = function(self) return display.newSprite(options.defaultSheet,options.sequenceData) end
 return options

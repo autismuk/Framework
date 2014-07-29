@@ -25,7 +25,7 @@ import({ bigteeth2 = "teeth2@140%" })
 --
 
 sequence("teeth", { "teeth1","teeth2"}, { time = 500, loopCount = 4 }) 				-- sequences - name, frames, and sequence options
-sequence("bigteeth", { "bigteeth1","bigteeth2"}, { time = 200 })
+sequence("bigteeth", { "bigteeth1","bigteeth2"}, { time = 400 })
 
 --
 -- 		Now pack them and generate the image sheet stuff.
@@ -38,5 +38,5 @@ create("sprites.png","sprites.lua")													-- imagesheet, library file, ima
 -- 
 -- xxx:getImageSheet() 					returns an image sheet, encapsulates the various bits (display.newImageSheet)
 -- xxx:getFrameNumber(name)				given a name, return the frame number.
--- xxx.newSprite([parent])				get a new sprite/image with optional parent (display.newSprite) 	
--- xxx.newImage([parent],frame)			extract a single frame - can be either the ID (from getFrameNumber() or the image name)	
+-- xxx.newSprite([sequenceData])		get a new sprite/image with optional parent (display.newSprite) 	
+-- xxx.newImage(frame)					extract a single frame - can be either the ID (from getFrameNumber() or the image name)	

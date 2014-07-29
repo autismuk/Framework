@@ -205,6 +205,7 @@ end
 
 local images = {} 																				-- mapping of image names to image objects
 local imageList = {} 																			-- same but a straight list.
+local sequences = {} 																			-- sequence name => frames,options
 
 function input(directory) imageDirectory = directory or "" end  								-- set directories.
 function output(directory) outputDirectory = directory or "" end 
@@ -228,7 +229,11 @@ function import(...) 																			-- import images for use in the spritesh
 	end 
 end 
 
-function sequence(name,frames,options) end 
+function sequence(name,frames,options)
+	name = name:lower() 																		-- case irrelevant
+	assert(sequences[name] == nil,"Sequence duplicated "..name)									-- check unique
+	sequences[name] = { frames = frames, options = options or {} }								-- save stuff
+end
 
 function create(imageSheetFile,libraryFile,sheetWidth,packTries) 
 	sheetWidth = sheetWidth or 512 packTries = packTries or 75 									-- default values
@@ -252,8 +257,8 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 	end 																						-- do as many times as you want to get best packing.
 	bestSheet:render(imageSheetFile)															-- create the images file.
 	bestSheet:copyReferences() 																	-- copy references to the position data into the images
-
-	print("Packed into ",bestSheet.m_width,bestSheet.m_height)
+	for _,ref in ipairs(imageList) do ref.m_index = _ end 										-- copy indexs into image structure
+	--print("Packed into ",bestSheet.m_width,bestSheet.m_height)
 
 	local h = io.open(libraryFile,"w")
 	h:write("-- Automatically generated.\n")
@@ -261,26 +266,45 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 	h:write("options.spriteFileName = \"" .. imageSheetFile .. "\"\n")							-- tell it which file to use.
 	h:write("options.sheetContentWidth = "..bestSheet.m_width.."\n") 							-- sheet content width/height
 	h:write("options.sheetContentHeight = "..bestSheet.m_height.."\n")
+	h:write("-- image sheet data\n")
 	for _,ref in ipairs(imageList) do 															-- for each item
 		local pos = ref.m_position
 		h:write(("options.frames[%d] = { x = %d,y = %d, width = %d, height = %d }\n"):			-- create a frame
 													format(_,pos.x1,pos.y1,pos.width,pos.height))
 		h:write(("options.names[\"%s\"] = %d\n"):format(ref:getName(),_)) 						-- and a back-reference
 	end
+	h:write("-- sequence data\n")
+	local seqCount = 1
+	for name,ref in pairs(sequences) do 														-- work through the sequence.
+		local s = ("{ name = \"%s\", frames = {"):format(name) 									-- start to build definition.
+		for _,name in ipairs(ref.frames) do 													-- work through frame
+			if s:sub(-1,-1) == "{" then s = s .." " else s = s .. "," end 						-- add seperator.
+			local image = images[name:lower()]													-- get image data.
+			assert(image ~= null,"Animation frame unknown "..name)								-- check it exists
+			s = s .. tostring(image.m_index)													-- append the index value.
+		end
+		s = s .. " }" 																			-- end frames list.
+		for k,v in pairs(ref.options) do 
+			s = s .. ", " .. k .. " = "..v
+		end
+		h:write(("options.sequenceData[%d] = %s }\n"):format(seqCount,s))
+		h:write(("options.sequenceNames[\"%s\"] = options.sequenceData[%d]\n"):format(name,seqCount))
+		seqCount = seqCount + 1
+	end
+	h:write("-- method prototyping\n")
 	h:write("options.defaultSheet = graphics.newImageSheet(options.spriteFileName,options)\n")
 	h:write("options.getImageSheet = function(self) return graphics.newImageSheet(self.spriteFileName,self) end\n")
 	h:write("options.getFrameNumber = function(self,name) return self.names[name:lower()] end\n")
 	h:write("options.newImage = function(self,id) if type(id) == 'string' then id = self.names[id:lower()] end return display.newImage(self.defaultSheet,id) end\n")
+	h:write("options.newSprite = function(self,seqData) return display.newSprite(options.defaultSheet,seqData or options.sequenceData) end\n")
 	h:write("return options\n")
 	h:close()
 end 
 
 --[[
 
-	Import sequenceData into sequence data
-	Cross reference sequence names
-	Write and test getSequenceData
-	Write and test newSprite
+	Write and test getSequenceData() of some sort, allows a sequence to be duplicated/overwritten.
+	Sequential import (e.g. teeth1,teeth2,teeth3)
 	Retro fit into numbers ?
 
 --]]
