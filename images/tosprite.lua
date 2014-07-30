@@ -19,7 +19,7 @@ local Control = {
 
 local outputDirectory = "" 																		-- where to store the resulting files.
 local imageDirectory = "" 																		-- where to find images
-
+local targetDirectory = "" 																		-- where final image is relative to main.lua
 --- ************************************************************************************************************************************************************************
 -- Class encapsulating the Graphic Image Manipulation library. You could replace the main methods  to use ImageMagick 
 -- or any library you like. This was tested with version 1.3.18 - composite() is straightforward, getSize() is dependent on the return format of the identity
@@ -209,6 +209,7 @@ local sequences = {} 																			-- sequence name => frames,options
 
 function input(directory) imageDirectory = directory or "" end  								-- set directories.
 function output(directory) outputDirectory = directory or "" end 
+function target(directory) targetDirectory = directory or "" end 
 
 function import(...) 																			-- import images for use in the spritesheet
 	local argList = { ... }
@@ -236,7 +237,7 @@ function sequence(name,frames,options)
 end
 
 function create(imageSheetFile,libraryFile,sheetWidth,packTries) 
-	sheetWidth = sheetWidth or 512 packTries = packTries or 75 									-- default values
+	sheetWidth = sheetWidth or 512 packTries = packTries or 40 									-- default values
 	table.sort(imageList, function(a,b) return a.m_pixels > b.m_pixels end) 					-- sort so biggest first.
 	for _,ref in ipairs(imageList) do sheetWidth = math.max(sheetWidth,ref.m_width) end 		-- make sure sheet is at *least* wide enough.
 	local bestSize = 99999999 																	-- best overall image sheet size
@@ -263,7 +264,7 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 	local h = io.open(libraryFile,"w")
 	h:write("-- Automatically generated.\n")
 	h:write("local options = { frames={}, names={}, sequenceData={}, sequenceNames={} }\n")		-- create empty structures.
-	h:write("options.spriteFileName = \"" .. imageSheetFile .. "\"\n")							-- tell it which file to use.
+	h:write("options.spriteFileName = \"" .. targetDirectory .. imageSheetFile .. "\"\n")		-- tell it which file to use.
 	h:write("options.sheetContentWidth = "..bestSheet.m_width.."\n") 							-- sheet content width/height
 	h:write("options.sheetContentHeight = "..bestSheet.m_height.."\n")
 	h:write("-- image sheet data\n")
