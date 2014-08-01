@@ -114,12 +114,12 @@ function Image:initialise(imageName,imageDef)
 	self.m_imageName = imageName:lower() 														-- save name
 	self.m_imageIsScaled = false  																-- simply, just file name, no scaling
 	self.m_imageFileName = imageDef 
-	self.m_name = self.m_imageName
+	self.m_name = imageName
 	local scaling = ""
 	if imageDef:find("@") ~= nil then  															-- @ present means scaling
 		self.m_imageFileName,scaling = imageDef:match("^(.*)@(.*)$") 							-- get scaling bit
 		self.m_imageIsScaled = true 															-- mark that it is scaled.
-		self.m_name = self.m_imageFileName
+		--self.m_name = self.m_imageFileName
 	end
 	self.m_imageFileName = imageDirectory .. self.m_imageFileName 								-- filename from directory
 	if self.m_imageFileName:match("%.%w+$") == nil then 										-- add .png if no file type
@@ -238,8 +238,30 @@ function sequence(name,frames,options)
 	sequences[name] = { frames = frames, options = options or {} }								-- save stuff
 end
 
+function import3D(directory,name,scaling,options)
+	local imageCount = 1
+	options = options or { time = 1000 }
+	local seq = { frames = {}, options = options }
+	repeat
+		local fileName = imageDirectory..directory.."/image_"..("%05d"):format(imageCount)..".png"
+		local h = io.open(fileName,"r")
+		if h ~= nil then 
+			h:close() 
+			local tid = imageDirectory 
+			imageDirectory = ""
+			local table = {}
+			table[name.."_"..imageCount] = fileName..scaling
+			import(table)
+			imageDirectory = tid
+			seq.frames[#seq.frames+1] = name.."_"..imageCount
+		end 
+		imageCount = imageCount + 1
+	until h == nil
+	sequence(name,seq.frames,seq.options)
+end 
+
 function create(imageSheetFile,libraryFile,sheetWidth,packTries) 
-	sheetWidth = sheetWidth or 512 packTries = packTries or 40 									-- default values
+	sheetWidth = sheetWidth or 512 packTries = packTries or 20 									-- default values
 	table.sort(imageList, function(a,b) return a.m_pixels > b.m_pixels end) 					-- sort so biggest first.
 	for _,ref in ipairs(imageList) do sheetWidth = math.max(sheetWidth,ref.m_width) end 		-- make sure sheet is at *least* wide enough.
 	local bestSize = 99999999 																	-- best overall image sheet size

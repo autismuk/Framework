@@ -20,14 +20,16 @@ target("images/")
 --		Import some images in various ways.
 --
 
-import("arrow"..scale,"ghost"..scale,"player"..scale,"player_banked"..scale)
-import3D("enemy1",scale)
-import3D("enemy2",scale)
-import3D("enemy3",scale)
-import3D("enemy4",scale)
-import3D("enemy5",scale)
-import3D("prize",scale)
-import3D("tank",scale)
+import("arrow"..scale,"ghost"..scale,"player"..scale,"player_banked"..scale,"bullet"..scale)
+
+input("")
+import3D("enemy1","enemy1",scale)
+import3D("enemy2","enemy2",scale)
+import3D("enemy3","enemy3",scale)
+import3D("enemy4","enemy4",scale)
+import3D("enemy5","enemy5",scale)
+import3D("prize","prize",scale)
+import3D("tank","tank",scale)
 
 create("sprites.png","sprites.lua")													-- imagesheet, library file, imagesheet width (default 256), retries (default 40)
 
