@@ -114,10 +114,12 @@ function Image:initialise(imageName,imageDef)
 	self.m_imageName = imageName:lower() 														-- save name
 	self.m_imageIsScaled = false  																-- simply, just file name, no scaling
 	self.m_imageFileName = imageDef 
+	self.m_name = self.m_imageName
 	local scaling = ""
 	if imageDef:find("@") ~= nil then  															-- @ present means scaling
 		self.m_imageFileName,scaling = imageDef:match("^(.*)@(.*)$") 							-- get scaling bit
 		self.m_imageIsScaled = true 															-- mark that it is scaled.
+		self.m_name = self.m_imageFileName
 	end
 	self.m_imageFileName = imageDirectory .. self.m_imageFileName 								-- filename from directory
 	if self.m_imageFileName:match("%.%w+$") == nil then 										-- add .png if no file type
@@ -142,7 +144,7 @@ function Image:initialise(imageName,imageDef)
 	--print(self.m_imageName,self.m_imageIsScaled,self.m_imageFileName,scaling,self.m_width,self.m_height)
 end 
 
-function Image:getName() return self.m_imageName end 											-- get the working name.
+function Image:getName() return self.m_name end 										-- get the working name.
 
 --- ************************************************************************************************************************************************************************
 --																	Packing Descriptor Object
@@ -256,12 +258,12 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 		end 
 		--print(sheet.m_height,sheet.m_width)
 	end 																						-- do as many times as you want to get best packing.
-	bestSheet:render(imageSheetFile)															-- create the images file.
+	bestSheet:render(outputDirectory..imageSheetFile)											-- create the images file.
 	bestSheet:copyReferences() 																	-- copy references to the position data into the images
 	for _,ref in ipairs(imageList) do ref.m_index = _ end 										-- copy indexs into image structure
 	--print("Packed into ",bestSheet.m_width,bestSheet.m_height)
 
-	local h = io.open(libraryFile,"w")
+	local h = io.open(outputDirectory..libraryFile,"w")
 	h:write("-- Automatically generated.\n")
 	h:write("local options = { frames={}, names={}, sequenceData={}, sequenceNames={} }\n")		-- create empty structures.
 	h:write("options.spriteFileName = \"" .. targetDirectory .. imageSheetFile .. "\"\n")		-- tell it which file to use.
