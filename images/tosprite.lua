@@ -239,7 +239,7 @@ function sequence(name,frames,options)
 end
 
 function import3D(directory,name,scaling,options)
-	local imageCount = 1
+	local imageCount = 0
 	options = options or { time = 1000 }
 	local seq = { frames = {}, options = options }
 	repeat
