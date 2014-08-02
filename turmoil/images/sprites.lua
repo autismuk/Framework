@@ -141,20 +141,20 @@ options.names["enemy2_0"] = 67
 options.frames[68] = { x = 371,y = 923, width = 64, height = 64 }
 options.names["tank_9"] = 68
 -- sequence data
-options.sequenceData[1] = { name = "tank", frames = { 30,27,22,21,20,23,25,24,34,68 }, time = 1200 }
-options.sequenceNames["tank"] = options.sequenceData[1]
-options.sequenceData[2] = { name = "enemy2", frames = { 67,66,62,64,61,56,55,54 }, time = 300, loopDirection = "bounce" }
-options.sequenceNames["enemy2"] = options.sequenceData[2]
+options.sequenceData[1] = { name = "enemy1", frames = { 45,47,44,39,38,37,40,42,41,43,52,60,53,63,65 }, time = 800 }
+options.sequenceNames["enemy1"] = options.sequenceData[1]
+options.sequenceData[2] = { name = "tank", frames = { 30,27,22,21,20,23,25,24,34,68 }, time = 1200 }
+options.sequenceNames["tank"] = options.sequenceData[2]
 options.sequenceData[3] = { name = "prize", frames = { 18,26,19,29,31,33,32,28 }, time = 500, loopDirection = "bounce" }
 options.sequenceNames["prize"] = options.sequenceData[3]
-options.sequenceData[4] = { name = "enemy1", frames = { 45,47,44,39,38,37,40,42,41,43,52,60,53,63,65 }, time = 800 }
-options.sequenceNames["enemy1"] = options.sequenceData[4]
-options.sequenceData[5] = { name = "enemy5", frames = { 9,4,3,2,5,7,6,8 }, time = 700, loopDirection = "bounce" }
-options.sequenceNames["enemy5"] = options.sequenceData[5]
-options.sequenceData[6] = { name = "enemy3", frames = { 57,59,58,36,51,35,17 }, time = 850 }
-options.sequenceNames["enemy3"] = options.sequenceData[6]
-options.sequenceData[7] = { name = "enemy4", frames = { 12,11,14,16,15,10,13 }, time = 750 }
-options.sequenceNames["enemy4"] = options.sequenceData[7]
+options.sequenceData[4] = { name = "enemy5", frames = { 9,4,3,2,5,7,6,8 }, time = 700, loopDirection = "bounce" }
+options.sequenceNames["enemy5"] = options.sequenceData[4]
+options.sequenceData[5] = { name = "enemy4", frames = { 12,11,14,16,15,10,13 }, time = 750 }
+options.sequenceNames["enemy4"] = options.sequenceData[5]
+options.sequenceData[6] = { name = "enemy2", frames = { 67,66,62,64,61,56,55,54 }, time = 300, loopDirection = "bounce" }
+options.sequenceNames["enemy2"] = options.sequenceData[6]
+options.sequenceData[7] = { name = "enemy3", frames = { 57,59,58,36,51,35,17 }, time = 850 }
+options.sequenceNames["enemy3"] = options.sequenceData[7]
 -- method prototyping
 options.defaultSheet = graphics.newImageSheet(options.spriteFileName,options)
 options.getImageSheet = function(self) return graphics.newImageSheet(self.spriteFileName,self) end
