@@ -13,7 +13,6 @@ local demoSprites = require("images.sprites")													-- library which has b
 
 local imageSheet = demoSprites:getImageSheet()													-- get an image sheet
 
-
 for i = 1,68 do 																				-- display all images.
 	local d = demoSprites:newImage(i)															-- create an image
 	d.x = (i - 1) % 10 * 40																		-- position it etc.

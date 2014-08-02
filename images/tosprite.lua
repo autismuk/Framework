@@ -115,11 +115,14 @@ function Image:initialise(imageName,imageDef)
 	self.m_imageIsScaled = false  																-- simply, just file name, no scaling
 	self.m_imageFileName = imageDef 
 	self.m_name = imageName
+	if imageName:find("@") ~= nil then 
+		self.m_name = imageName:match("^(.*)@")
+	end
 	local scaling = ""
 	if imageDef:find("@") ~= nil then  															-- @ present means scaling
 		self.m_imageFileName,scaling = imageDef:match("^(.*)@(.*)$") 							-- get scaling bit
 		self.m_imageIsScaled = true 															-- mark that it is scaled.
-		--self.m_name = self.m_imageFileName
+		self.m_name = self.m_imageFileName
 	end
 	self.m_imageFileName = imageDirectory .. self.m_imageFileName 								-- filename from directory
 	if self.m_imageFileName:match("%.%w+$") == nil then 										-- add .png if no file type
@@ -208,10 +211,17 @@ end
 local images = {} 																				-- mapping of image names to image objects
 local imageList = {} 																			-- same but a straight list.
 local sequences = {} 																			-- sequence name => frames,options
+local generateSequences = true 																	-- true if generating sequences for imports
 
 function input(directory) imageDirectory = directory or "" end  								-- set directories.
 function output(directory) outputDirectory = directory or "" end 
 function target(directory) targetDirectory = directory or "" end 
+
+function sequence(name,frames,options)
+	name = name:lower() 																		-- case irrelevant
+	assert(sequences[name] == nil,"Sequence duplicated "..name)									-- check unique
+	sequences[name] = { frames = frames, options = options or {} }								-- save stuff
+end
 
 function import(...) 																			-- import images for use in the spritesheet
 	local argList = { ... }
@@ -228,15 +238,14 @@ function import(...) 																			-- import images for use in the spritesh
 			assert(images[name] == nil,"Image duplicated "..name) 								-- check not duplicated
 			images[name] = image 																-- save required image.
 			imageList[#imageList+1] = image 													-- add to list.
+			if generateSequences then 
+				local short = image:getName()
+				print(short)
+				sequence(short,{ short })
+			end
 		end
 	end 
 end 
-
-function sequence(name,frames,options)
-	name = name:lower() 																		-- case irrelevant
-	assert(sequences[name] == nil,"Sequence duplicated "..name)									-- check unique
-	sequences[name] = { frames = frames, options = options or {} }								-- save stuff
-end
 
 function import3D(directory,name,scaling,options,forgetLast)
 	local imageCount = 0
@@ -255,7 +264,9 @@ function import3D(directory,name,scaling,options,forgetLast)
 		imageDirectory = ""
 		local table = {}
 		table[name.."_"..img] = fileName..scaling
+		generateSequences = false
 		import(table)
+		generateSequences = true
 		imageDirectory = tid
 		seq.frames[#seq.frames+1] = name.."_"..img
 	end
