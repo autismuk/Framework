@@ -14,18 +14,23 @@ local demoSprites = require("images.sprites")													-- library which has b
 local imageSheet = demoSprites:getImageSheet()													-- get an image sheet
 
 
-for i = 1,29 do 																				-- display all images.
+for i = 1,61 do 																				-- display all images.
 	local d = demoSprites:newImage(i)															-- create an image
-	d.x = (i - 1) % 6 * 50																		-- position it etc.
-	d.y = math.floor((i - 1) / 6) * 50		
+	d.x = (i - 1) % 10 * 40																		-- position it etc.
+	d.y = math.floor((i - 1) / 10) * 40		
 	d.anchorX,d.anchorY = 0,0
-	d.width,d.height = 50,50
+	d.width,d.height = 40,40
 end
 
-local animation = demoSprites:newSprite()														-- new sprite
-animation.x,animation.y = 200,300 																-- move to correct place
-animation:setSequence("enemy1")																-- select and play an animation.
-animation:play()
+local h = display.contentHeight/8
+for i = 0,7 do
+	local animation = demoSprites:newSprite()														-- new sprite
+	animation.x,animation.y = display.contentWidth-64,i*h+h/2 										-- move to correct place
+	animation:setSequence("enemy2")																	-- select and play an animation.
+	animation:play()
+	animation.xScale = h/64
+	animation.yScale = h/64
+end
 
 --- ************************************************************************************************************************************************************************
 --[[

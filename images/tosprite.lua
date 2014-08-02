@@ -238,25 +238,27 @@ function sequence(name,frames,options)
 	sequences[name] = { frames = frames, options = options or {} }								-- save stuff
 end
 
-function import3D(directory,name,scaling,options)
+function import3D(directory,name,scaling,options,forgetLast)
 	local imageCount = 0
 	options = options or { time = 1000 }
 	local seq = { frames = {}, options = options }
 	repeat
 		local fileName = imageDirectory..directory.."/image_"..("%05d"):format(imageCount)..".png"
 		local h = io.open(fileName,"r")
-		if h ~= nil then 
-			h:close() 
-			local tid = imageDirectory 
-			imageDirectory = ""
-			local table = {}
-			table[name.."_"..imageCount] = fileName..scaling
-			import(table)
-			imageDirectory = tid
-			seq.frames[#seq.frames+1] = name.."_"..imageCount
-		end 
+		if h ~= nil then h:close() end 
 		imageCount = imageCount + 1
 	until h == nil
+		if forgetLast == true then imageCount = imageCount - 1 end
+	for img = 0,imageCount-2 do 
+		local fileName = imageDirectory..directory.."/image_"..("%05d"):format(img)..".png"
+		local tid = imageDirectory 
+		imageDirectory = ""
+		local table = {}
+		table[name.."_"..img] = fileName..scaling
+		import(table)
+		imageDirectory = tid
+		seq.frames[#seq.frames+1] = name.."_"..img
+	end
 	sequence(name,seq.frames,seq.options)
 end 
 
@@ -319,6 +321,7 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 		end
 		s = s .. " }" 																			-- end frames list.
 		for k,v in pairs(ref.options) do 
+			if type(v) == "string" then v = '"'..v..'"' end
 			s = s .. ", " .. k .. " = "..v
 		end
 		h:write(("options.sequenceData[%d] = %s }\n"):format(seqCount,s))
