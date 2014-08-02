@@ -20,6 +20,7 @@ local Control = {
 local outputDirectory = "" 																		-- where to store the resulting files.
 local imageDirectory = "" 																		-- where to find images
 local targetDirectory = "" 																		-- where final image is relative to main.lua
+
 --- ************************************************************************************************************************************************************************
 -- Class encapsulating the Graphic Image Manipulation library. You could replace the main methods  to use ImageMagick 
 -- or any library you like. This was tested with version 1.3.18 - composite() is straightforward, getSize() is dependent on the return format of the identity
@@ -113,16 +114,13 @@ local Image = Base:new()
 function Image:initialise(imageName,imageDef)
 	self.m_imageName = imageName:lower() 														-- save name
 	self.m_imageIsScaled = false  																-- simply, just file name, no scaling
-	self.m_imageFileName = imageDef 
-	self.m_name = imageName
-	if imageName:find("@") ~= nil then 
-		self.m_name = imageName:match("^(.*)@")
-	end
+	self.m_imageFileName = imageDef  											
+	if imageName:find("@") ~= nil then imageName = imageName:match("^(.*)@") end 				-- remove any @ part from the short name
+	self.m_name = imageName 																	-- and store it.
 	local scaling = ""
 	if imageDef:find("@") ~= nil then  															-- @ present means scaling
 		self.m_imageFileName,scaling = imageDef:match("^(.*)@(.*)$") 							-- get scaling bit
 		self.m_imageIsScaled = true 															-- mark that it is scaled.
-		self.m_name = self.m_imageFileName
 	end
 	self.m_imageFileName = imageDirectory .. self.m_imageFileName 								-- filename from directory
 	if self.m_imageFileName:match("%.%w+$") == nil then 										-- add .png if no file type
@@ -147,7 +145,7 @@ function Image:initialise(imageName,imageDef)
 	--print(self.m_imageName,self.m_imageIsScaled,self.m_imageFileName,scaling,self.m_width,self.m_height)
 end 
 
-function Image:getName() return self.m_name end 										-- get the working name.
+function Image:getShortName() return self.m_name end 											-- get the working name.
 
 --- ************************************************************************************************************************************************************************
 --																	Packing Descriptor Object
@@ -211,7 +209,6 @@ end
 local images = {} 																				-- mapping of image names to image objects
 local imageList = {} 																			-- same but a straight list.
 local sequences = {} 																			-- sequence name => frames,options
-local generateSequences = true 																	-- true if generating sequences for imports
 
 function input(directory) imageDirectory = directory or "" end  								-- set directories.
 function output(directory) outputDirectory = directory or "" end 
@@ -223,6 +220,15 @@ function sequence(name,frames,options)
 	sequences[name] = { frames = frames, options = options or {} }								-- save stuff
 end
 
+function addImage(imageName,imageDefinition)
+	local image = Image:new(imageName,imageDefinition) 											-- create a new image
+	local name = image:getShortName()
+	assert(images[name] == nil,"Image duplicated "..name) 										-- check not duplicated
+	images[name] = image 																		-- save required image.
+	imageList[#imageList+1] = image 															-- add to list.
+	return image
+end 
+
 function import(...) 																			-- import images for use in the spritesheet
 	local argList = { ... }
 	for _,argument in ipairs(argList) do 														-- work through all arguments
@@ -233,44 +239,32 @@ function import(...) 																			-- import images for use in the spritesh
 		end 
 		for k,v in pairs(argument) do 															-- work through pairs
 			if type(k) == "number" then k = v end 												-- handle list input.
-			local image = Image:new(k,v) 														-- create a new image
-			local name = image:getName()
-			assert(images[name] == nil,"Image duplicated "..name) 								-- check not duplicated
-			images[name] = image 																-- save required image.
-			imageList[#imageList+1] = image 													-- add to list.
-			if generateSequences then 
-				local short = image:getName()
-				print(short)
-				sequence(short,{ short })
-			end
+			local imageName = addImage(k,v):getShortName()
+			sequence(imageName,{imageName},{})
 		end
 	end 
 end 
 
 function import3D(directory,name,scaling,options,forgetLast)
 	local imageCount = 0
-	options = options or { time = 1000 }
-	local seq = { frames = {}, options = options }
-	repeat
+	options = options or { time = 1000 }														-- defaults.
+	local seq = { frames = {}, options = options } 												-- sequence for this.
+	repeat 																						-- figure out how many images there are
 		local fileName = imageDirectory..directory.."/image_"..("%05d"):format(imageCount)..".png"
 		local h = io.open(fileName,"r")
 		if h ~= nil then h:close() end 
 		imageCount = imageCount + 1
 	until h == nil
-		if forgetLast == true then imageCount = imageCount - 1 end
-	for img = 0,imageCount-2 do 
-		local fileName = imageDirectory..directory.."/image_"..("%05d"):format(img)..".png"
-		local tid = imageDirectory 
-		imageDirectory = ""
-		local table = {}
-		table[name.."_"..img] = fileName..scaling
-		generateSequences = false
-		import(table)
-		generateSequences = true
-		imageDirectory = tid
-		seq.frames[#seq.frames+1] = name.."_"..img
+
+	if forgetLast == true then imageCount = imageCount - 1 end 									-- optionally ignore the last one (repeating sequences)
+
+	for img = 0,imageCount-2 do  																-- work through all images
+		local fileName = imageDirectory..directory.."/image_"..("%05d"):format(img)..".png" 	-- this is the file name.
+		local imageName = name .. "_" .. img 													-- short name
+		local image = addImage(imageName,fileName .. scaling) 									-- add it in.
+		seq.frames[#seq.frames+1] = image:getShortName() 										-- add it to the sequence
 	end
-	sequence(name,seq.frames,seq.options)
+	sequence(name,seq.frames,seq.options) 														-- add the sequence to the sequence list.
 end 
 
 function create(imageSheetFile,libraryFile,sheetWidth,packTries) 
@@ -295,10 +289,10 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 	end 																						-- do as many times as you want to get best packing.
 	bestSheet:render(outputDirectory..imageSheetFile)											-- create the images file.
 	bestSheet:copyReferences() 																	-- copy references to the position data into the images
-	for _,ref in ipairs(imageList) do ref.m_index = _ end 										-- copy indexs into image structure
+	for _,ref in ipairs(imageList) do ref.m_index = _ end 										-- copy indexes into image structure
 	--print("Packed into ",bestSheet.m_width,bestSheet.m_height)
 
-	local h = io.open(outputDirectory..libraryFile,"w")
+	local h = io.open(outputDirectory..libraryFile,"w") 										-- create the library file.
 	h:write("-- Automatically generated.\n")
 	h:write("local options = { frames={}, names={}, sequenceData={}, sequenceNames={} }\n")		-- create empty structures.
 	h:write("options.spriteFileName = \"" .. targetDirectory .. imageSheetFile .. "\"\n")		-- tell it which file to use.
@@ -310,7 +304,7 @@ function create(imageSheetFile,libraryFile,sheetWidth,packTries)
 		local pos = ref.m_position
 		h:write(("options.frames[%d] = { x = %d,y = %d, width = %d, height = %d }\n"):			-- create a frame
 													format(_,pos.x1,pos.y1,pos.width,pos.height))
-		h:write(("options.names[\"%s\"] = %d\n"):format(ref:getName(),_)) 						-- and a back-reference
+		h:write(("options.names[\"%s\"] = %d\n"):format(ref:getShortName(),_)) 					-- and a back-reference
 		pixelCount = pixelCount + ref.m_pixels
 	end
 
