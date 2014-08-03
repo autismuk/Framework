@@ -122,8 +122,6 @@ Framework:addObjectMethod("performGameEvent", function(self,eventName,eventData)
 	return true
 end)
 
--- TODO: Proper transitions.
-
 --- ************************************************************************************************************************************************************************
 --[[
 

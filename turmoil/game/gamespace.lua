@@ -127,6 +127,20 @@ function GameSpace:tap(event)
 	return false
 end
 
+--//	Get the game space size - the number of horizontal channels
+--//	@return 	[number]		Number of channels.
+
+function GameSpace:getSize()
+	return self.m_channelCount 
+end 
+
+--//	Get the sprite size in pixels to fit a channel.
+--//	@return 	[number]		Sprite size in pixels.
+
+function GameSpace:getSpriteSize()
+	return self.m_spriteSize 
+end 
+
 --- ************************************************************************************************************************************************************************
 --[[
 
