@@ -14,7 +14,8 @@ local GameSpace = Framework:createClass("game.gamespace")
 function GameSpace:constructor(info)
 	self.m_headerSize = info.header or 0 														-- extract out parameters.
 	self.m_channelCount = info.channels or 7 
-	self.m_currentLevel = info.level or 1
+	self.m_factory = info.factory 																-- spawning factory.
+	self.m_currentLevel = info.level 															-- game level.
 	self.m_borderSize = 2 																		-- width of border.
 	self.m_borderList = {} 																		-- list of border objects
 	self:addBorder(0,display.contentWidth,0) 													-- top and bottom borders.
@@ -42,7 +43,7 @@ function GameSpace:destructor()
 		end 
 	end 
 	for _,ref in ipairs(self.m_borderList) do ref:removeSelf() end 
-	self.m_borderList = nil
+	self.m_borderList = nil self.m_factory = nil
 end 
 
 --//	Add a single border part to the gamespace - this is purely visual.
@@ -65,13 +66,18 @@ end
 
 --//	Assign an object to a random channel.
 --//	@object  	[enemy object]	object to assign.
+--// 	@preferred  [number]		channel to try first (optional)
 --//	@return 	[number]		channel number or nil if cannot assign.
 
-function GameSpace:assignChannel(object)
+function GameSpace:assignChannel(object,preferred)
 	if self.m_channelObjectCount == self.m_channelCount then return nil end 					-- return nil if no space available.
 	local c
-	repeat c = math.random(1,self.m_channelCount) until self.m_channelObjects[c] == nil 		-- find an empty channel.
+	repeat  																					-- find an empty channel.
+		c = math.random(1,self.m_channelCount) 													-- pick one randomly.
+		if preferred ~= nil then c = preferred preferred = nil end 								-- if preferred channel, use that first time.
+	until self.m_channelObjects[c] == nil 			 											-- keep going until empty slot found.
 	self.m_channelObjects[c] = object 															-- put object in channel.
+	self.m_channelObjectCount = self.m_channelObjectCount + 1 									-- bump count of objects
 	return c 																					-- return channel number.
 end 
 
@@ -82,6 +88,7 @@ function GameSpace:deassignChannel(object)
 	for i = 1,#self.m_channelCount do 															-- work through all channels.
 		if self.m_channelObjects[i] == object then 												-- found the relevant object ?
 			self.m_channelObjects[i] = nil 														-- mark channel as empty.
+			self.m_channelObjectCount = self.m_channelObjectCount - 1 							-- reduce count of objects
 			return 																				-- and exit
 		end 
 	end 

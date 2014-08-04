@@ -13,10 +13,15 @@ local Sprites = require("images.sprites")
 
 local Player = Framework:createClass("game.player")
 
+--	Players have four states
+
 Player.WAIT_STATE = 0 																			-- state, waiting for command.
 Player.MOVE_STATE = 1 																			-- moving to a specific position.
 Player.FETCH_STATE = 2 																			-- going to grab a prize
 Player.RETURN_STATE = 3 																		-- returning from grabbing a prize.
+
+--//	Create a new player - needs a gameSpace parameter so it knows where it is operating.
+--//	@info 	[table]	cosntructor info
 
 function Player:constructor(info)
 	self.m_gameSpace = info.gameSpace 															-- space player is operating in.
@@ -29,14 +34,21 @@ function Player:constructor(info)
 	self:tag("taplistener")																		-- want to listen ?
 end 
 
+--//	Tidy up
+
 function Player:destructor()
 	self.m_sprite:removeSelf() 																	-- remove sprite object
 	self.m_gameSpace = nil  																	-- null reference.
 end 
 
+--//	Get objects that are part of the scene.
+--//	@return 	[list]	List of display objects
+
 function Player:getDisplayObjects() 
 	return { self.m_sprite }
 end 
+
+--//	Reposition and put correct sprite up for the current player status
 
 function Player:reposition()
 	self.m_sprite:setSequence("player") 														-- set to player sprite (e.g. not moving)
@@ -48,6 +60,11 @@ function Player:reposition()
 	if self.m_playerState == Player.RETURN_STATE then s = -s end  								-- returning from prize grab, so face other way
 	self.m_sprite.xScale = s 																	-- set x scale, sign shows sprite direction.
 end
+
+--//	Handle message - listens for control messages
+--//	@sender 	[object]	who sent it
+--//	@message 	[string]	what it is
+--//	@data 		[object]	associated data
 
 function Player:onMessage(sender,message,data)
 	if self.m_playerState == Player.RETURN_STATE or 											-- if fetching a prize, can do nothing till
@@ -71,7 +88,10 @@ function Player:onMessage(sender,message,data)
 									  					transition = easing.inOutSine,
 									  					onComplete = function() self:endMovement() end })
 	self.m_channel = data.y 																	-- update position.
+	self:playSound("move")
 end 
+
+--//	Called to end movement of player
 
 function Player:endMovement()
 	self.m_playerState = Player.WAIT_STATE 														-- back to wait state, can fire now.
@@ -91,7 +111,7 @@ end
 
 		Date 		Version 	Notes
 		---- 		------- 	-----
-		14-Jul-14	0.1 		Initial version of file
+		3-Aug-14	0.1 		Initial version of file
 
 --]]
 --- ************************************************************************************************************************************************************************
