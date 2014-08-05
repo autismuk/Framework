@@ -11,10 +11,13 @@
 
 local GameSpace = Framework:createClass("game.gamespace")
 
+--//	Constructor - requires enemy factory, scene, level number.
+
 function GameSpace:constructor(info)
 	self.m_headerSize = info.header or 0 														-- extract out parameters.
 	self.m_channelCount = info.channels or 7 
 	self.m_factory = info.factory 																-- spawning factory.
+	self.m_scene = info.scene 																	-- owning scene
 	self.m_currentLevel = info.level 															-- game level.
 	self.m_borderSize = 2 																		-- width of border.
 	self.m_borderList = {} 																		-- list of border objects
@@ -27,6 +30,9 @@ function GameSpace:constructor(info)
 	self.m_channelObjects = {} 																	-- object in each channel, or nil if empty.
 	self.m_channelObjectCount = 0 																-- number of objects in channels in total.
 
+	self.m_fireTimer = 0 																		-- timer for creating new enemies
+	self.m_fireTimerRate = math.max(0.5,3.5 - info.level/4)										-- how often they ping out.
+
 	for c = 1,self.m_channelCount-1 do  														-- create channels.
 		local y = self.m_borderSize + self.m_channelSize * c 
 		self:addBorder(0,display.contentWidth/2-self.m_channelSize,y)
@@ -35,6 +41,8 @@ function GameSpace:constructor(info)
 	display.getCurrentStage():addEventListener("tap",self)										-- listen for taps.
 end
 
+--//	Tidy up
+
 function GameSpace:destructor()
 	display.getCurrentStage():removeEventListener("tap",self)									-- stop listening for taps.
 	for c = 1,self.m_channelCount do 															-- delete any objects that haven't been deleted.
@@ -42,8 +50,21 @@ function GameSpace:destructor()
 			self.m_channelObjects[c]:delete()
 		end 
 	end 
-	for _,ref in ipairs(self.m_borderList) do ref:removeSelf() end 
-	self.m_borderList = nil self.m_factory = nil
+	for _,ref in ipairs(self.m_borderList) do ref:removeSelf() end 								-- remove all borders
+	self.m_borderList = nil self.m_factory = nil self.m_scene = nil 							-- null references
+end 
+
+--//	Auto spawn object code on update
+--//	@deltaTime 	[number]	Elapsed time.
+
+function GameSpace:onUpdate(deltaTime)
+	self.m_fireTimer = self.m_fireTimer + deltaTime 											-- elapsed time.
+	if self.m_fireTimer > self.m_fireTimerRate or self.m_channelObjectCount == 0 then 			-- if time out, or no enemies at all visible.
+		if self:isAnyChannelAvailable() and not self.m_factory:isQueueEmpty() then  			-- if there is space, and the queue is not empty.
+			self.m_factory:spawn(self.m_scene,self) 											-- create a new enemy
+		end
+		self.m_fireTimer = 0 																	-- reset the timer.
+	end
 end 
 
 --//	Add a single border part to the gamespace - this is purely visual.
@@ -116,7 +137,7 @@ end
 --//	@return 	[number,number]	Physical coordinates.
 
 function GameSpace:getPos(xPercent,yChannel)
-	return xPercent * display.contentWidth / 100, self.m_channelSize * (yChannel - 0.5)+ self.m_headerSize
+	return xPercent * display.contentWidth / 100, self.m_channelSize * (yChannel - 0.5)+ self.m_headerSize + self.m_borderSize / 2
 end 
 
 --//	Handle tap messages, convert to the logical system.

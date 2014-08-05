@@ -13,9 +13,13 @@ local EnemyFactory = Framework:createClass("game.enemyFactory")
 
 EnemyFactory.TYPE_COUNT = 7 
 
+--//	Create a new enemy factory, using the level to decide how many bad guys.
+--//	@info 	[table]	constructor information
+
 function EnemyFactory:constructor(info)
 	self.m_enemyTotals = {} 																	-- count of enemies to kill of each type.
 	self.m_enemyCount = info.level * 4 + 10 													-- number of bad guys in each level.
+	
 	for i = 1,EnemyFactory.TYPE_COUNT do self.m_enemyTotals[i] = 0 end 							-- clear individual count
 	for i = 1,self.m_enemyCount do 																-- add them distributed randomly.
 		local n = math.random(1,EnemyFactory.TYPE_COUNT)
@@ -25,8 +29,13 @@ function EnemyFactory:constructor(info)
 	self.m_level = info.level 																	-- save the game level.
 end
 
+--//	Tidy up.
+
 function EnemyFactory:destructor() 
 end 
+
+--//	Rebuild the queue from the counts - these are monsters not killed, so moving them out via spawn does not affect the
+--//	totals
 
 function EnemyFactory:createEnemyQueue()
 	self.m_enemyQueue = {} 																		-- queue of enemies to spawn.
@@ -46,10 +55,24 @@ function EnemyFactory:createEnemyQueue()
 	end
 end 
 
+--//	Handle an enemy being killed.
+--//	@typeID 		[number]		enemy type that was killed.
+
 function EnemyFactory:killedEnemy(typeID)
 	self.m_enemyTotals[typeID] = self.m_enemyTotals[typeID] - 1 								-- reduce one for the totals for this type
 	self.m_enemyCount = self.m_enemyCount - 1 													-- and the overall total.
 end 
+
+--//	Check to see if there is anything left to spawn
+--//	@return 	[boolean]			true if the queue is empty
+
+function EnemyFactory:isQueueEmpty()
+	return self.m_nextQueueItem > #self.m_enemyQueue 
+end 
+
+--//	Spawn a new enemy from the front of the queue.
+--//	@sceneRef 	[scene]				scene to add it to
+--//	@gameSpace 	[gamespace]			game space it belongs in.
 
 function EnemyFactory:spawn(sceneRef,gameSpace)
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.

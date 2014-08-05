@@ -32,11 +32,9 @@ function SCManager:preOpen(manager,data,resources)
 	local headerSpace = scene.m_advertObject:getHeight() 										-- get the advert object height
 
 	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, channels = 7, 		-- create a game space as required.
-																		scene = scene, factory = data.factory })
+																		scene = scene, factory = data.factory, level = 1 })
 
 	scene:new("game.player", { gameSpace = scene.m_gameSpace,level = 1 }) 						-- add a player.
-
-	for i = 1,7 do data.factory:spawn(scene,scene.m_gameSpace) end -- TEMP: And some enemies.
 
 	return scene
 end 
@@ -61,12 +59,13 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-4) Auto spawning in game space (replacing basic one)
+4.5) Ghost ?
+4.7) Fetching
 5) Missile objects/manager.
-6) Collisions (game over/shooting)
+6) Collisions (game over/shooting) (note collision when fetching)
 7) Scoring
 8) Audio
-9) Wrapper
+9) Wrapper, level selection, title screen etc.
 10) Testing esp. Admob.
 
 --]]
