@@ -31,6 +31,8 @@ import3D("enemy5","enemy5",scale, { time = 700, loopDirection = "bounce"})
 import3D("prize","prize",scale, { time = 500,loopDirection = "bounce"})
 import3D("tank","tank",scale, { time = 1200 })
 
+sequence("smallprize",{ "prize_1" })
+
 create("sprites.png","sprites.lua")													-- imagesheet, library file, imagesheet width (default 256), retries (default 40)
 
 

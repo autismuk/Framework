@@ -3,7 +3,7 @@
 ---				Name : 		gamemanager.lua
 ---				Purpose :	Object which controls the game state and scenes.
 ---				Created:	23 July 2014
----				Updated:	24 July 2014
+---				Updated:	05 August 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -65,10 +65,12 @@ end
 
 --//	Start the game manager, go to first scene
 --//	@startState 	[string]	First scene, defaults to 'start'
+--//	@eventData 		[table]		Optional event data for starting.
 
-function GameManager:start(startState)
+function GameManager:start(startState,eventData)
 	assert(not self.m_isLocked,"start() called before transition completed.") 					-- check a state transition is not in progress,
 	self.m_isLocked = true 																		-- it will now be locked
+	self.m_associatedEventData = eventData or {} 												-- can pass in event data to the start.
 	self.m_controller:start(startState) 														-- pass start state to controlling object.
 end 
 
@@ -128,6 +130,7 @@ end)
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		23-Jul-14	0.1 		Initial version of file
+		05-Aug-14 	0.11 		GameManager:start() accepts a second parameter which is event data.
 
 --]]
 --- ************************************************************************************************************************************************************************

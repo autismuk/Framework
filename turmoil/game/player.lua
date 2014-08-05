@@ -20,6 +20,8 @@ Player.MOVE_STATE = 1 																			-- moving to a specific position.
 Player.FETCH_STATE = 2 																			-- going to grab a prize
 Player.RETURN_STATE = 3 																		-- returning from grabbing a prize.
 
+Player.FIRE_RATE = 0.8 																			-- Player fire delays in milliseconds.
+
 --//	Create a new player - needs a gameSpace parameter so it knows where it is operating.
 --//	@info 	[table]	cosntructor info
 
@@ -32,6 +34,7 @@ function Player:constructor(info)
 	self.m_playerState = Player.WAIT_STATE  													-- waiting for command
 	self:reposition() 																			-- can reposition.
 	self:tag("taplistener")																		-- want to listen ?
+	self.m_timeToFire = 0 																		-- elapsed time to fire.
 end 
 
 --//	Tidy up
@@ -101,9 +104,12 @@ function Player:endMovement()
 end 
 
 function Player:onUpdate(deltaTime)
-	-- TODO: Update firing time.
-	-- TODO: Move if fetching a prize
-	-- TODO: Check for fire if in wait_state and time elapsed.
+	self.m_timeToFire = self.m_timeToFire + deltaTime 											-- update timing.
+	if self.m_playerState == Player.WAIT_STATE and self.m_timeToFire > Player.FIRE_RATE then	-- only fire if not moving.
+		self:sendMessage("missileManager","fire",												-- fire a missile in given direction and channel.
+								{ channel = self.m_channel, direction = self.m_faceRight and 1 or -1 })
+		self.m_timeToFire = 0 																	-- reset timer.
+	end 
 end 
 
 --- ************************************************************************************************************************************************************************

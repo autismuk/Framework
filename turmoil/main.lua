@@ -30,19 +30,24 @@ function SCManager:preOpen(manager,data,resources)
 					android = "ca-app-pub-8354094658055499/9860763610" }
 	scene.m_advertObject = scene:new("ads.admob",adIDs)											-- create a new advert object
 	local headerSpace = scene.m_advertObject:getHeight() 										-- get the advert object height
-	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, channels = 7 })		-- create a gamespace allowing for that
 
-	local eFactory = Framework:new("game.enemyFactory",{ enemyCount = { 3,3,3,3,3,3,3 }, level = 1 })
-	scene:new("game.player", { gameSpace = scene.m_gameSpace,factory = eFactory, level = 1 }) 	-- add a player.
-	for i = 1,7 do eFactory:spawn(scene,scene.m_gameSpace) end
+	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, channels = 7, 		-- create a game space as required.
+																		scene = scene, factory = data.factory })
+
+	scene:new("game.player", { gameSpace = scene.m_gameSpace,level = 1 }) 						-- add a player.
+
+	for i = 1,7 do data.factory:spawn(scene,scene.m_gameSpace) end -- TEMP: And some enemies.
+
 	return scene
 end 
 
 local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
-manager:addManagedState("start",scene,{ same = "start" })
+manager:addManagedState("main",scene,{ same = "main" })
 Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start"} })
-manager:start()
+
+local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
+manager:start("main",{ factory = eFactory })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -56,12 +61,12 @@ manager:start()
 
 --[[
 
-4) Auto spawning in game space.
-5) Missile objects and autofiring.
+4) Auto spawning in game space (replacing basic one)
+5) Missile objects/manager.
 6) Collisions (game over/shooting)
 7) Scoring
 8) Audio
 9) Wrapper
-10) Testing
+10) Testing esp. Admob.
 
 --]]

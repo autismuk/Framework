@@ -110,6 +110,7 @@ function Enemy6:onUpdate(deltaTime)
 	self.super.onUpdate(self,deltaTime) 														-- super update
 	if self.m_elapsedTime > self.m_startTime then 												-- has it reached pinging time
 		self.m_hasStarted = true 																-- if so, mark as such.
+		self.m_sprite:setSequence("smallprize") 												-- only use the small sprite image.
 	end 
 end 
 
