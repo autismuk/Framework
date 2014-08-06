@@ -67,8 +67,16 @@ function Missile:onUpdate(deltaTime)
 	if not self.m_sprite.inUse then return end 													-- if in cache do nothing
 	self.m_xPosition = self.m_xPosition + self.m_xDirection * deltaTime * Missile.SPEED 		-- move missile
 	self:reposition() 																			-- redraw
-	if self.m_xPosition < 0 or self.m_xPosition > 100 then self:returnToCache() end 			-- if off screen return to cache
-	-- TODO: Check collision
+	if self.m_xPosition < 0 or self.m_xPosition > 100 then 										-- if off screen return to cache
+		self:returnToCache() 
+	else 
+		local object = self.m_gameSpace:fetchObject(self.m_channel) 							-- get object in channel.
+		if object ~= nil and object:collide(self.m_xPosition) and object:isShootable() then  	-- if exists and collides with
+			object:kill() 																		-- kill it 
+			self:playSound("bomb")
+			self:returnToCache()																-- return missile to cache.
+		end
+	end 			
 end 
 
 --//	Reposition sprite graphic

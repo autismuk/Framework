@@ -45,7 +45,7 @@ local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
 
 manager:addManagedState("main",scene,{ same = "main" })
-Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start"} })
+Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start","bomb" } })
 
 local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
 manager:start("main",{ factory = eFactory })
@@ -63,8 +63,9 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-5) Missile objects/manager.
-6) Collisions (game over/shooting) (note collision when fetching, not ghost.)
+6) Shoot tanks (bounce back)
+6.2) Explosion effect.
+6.5) Collisions (enemies/player)
 7) Scoring
 8) Audio
 9) Wrapper, level selection, title screen etc.

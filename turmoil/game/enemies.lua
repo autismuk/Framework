@@ -95,6 +95,19 @@ end
 
 function EnemyBase:isGrabbable() return false end 
 
+--//	Is the object shootable
+--//	@return 	[boolean]		true if it is.
+
+function EnemyBase:isShootable() return true end 
+
+--//	Does the object at the given horizontal position collide with this enemy (note, this does not test the channel)
+--//	@xPosition 	[number]		Position horizontally
+--//	@return 	[boolean]		True if collides.
+
+function EnemyBase:collide(xPosition)
+	return math.abs(xPosition - self.m_xPosition) < 4
+end 
+
 --//	Get the object's horizontal position 
 --//	@return 	[number]		logical position 0..100
 
@@ -148,6 +161,10 @@ function Enemy6:onUpdate(deltaTime)
 	end 
 end 
 
+function Enemy6:isShootable() 																	-- can only be shot when in motion.
+	return self.m_hasStarted 
+end
+
 local Enemy7 = Framework:createClass("game.enemy.type7","game.enemybase") 						-- the arrow to tank class.
 
 function Enemy7:constructor(info)
@@ -179,6 +196,8 @@ function EnemyGhost:getSpriteSequence() return "ghost" end
 function EnemyGhost:getSpeed() return 13 end 
 
 function EnemyGhost:bounce() self:delete() end 													-- deletes self on bounce.
+
+function EnemyGhost:isShootable() return false end  											-- cannot be shot.
 
 --- ************************************************************************************************************************************************************************
 --[[
