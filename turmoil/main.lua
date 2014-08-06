@@ -64,7 +64,6 @@ manager:start("main",{ factory = eFactory })
 --[[
 
 6) Shoot tanks (bounce back)
-6.2) Explosion effect.
 6.5) Collisions (enemies/player)
 7) Scoring
 8) Audio

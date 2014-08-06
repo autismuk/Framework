@@ -9,9 +9,11 @@
 ---
 --- ************************************************************************************************************************************************************************
 
-local EnemyBase = Framework:createClass("game.enemybase")
 
 local Sprites = require("images.sprites")
+require("utils.particle")
+
+local EnemyBase = Framework:createClass("game.enemybase")
 
 --//	Construct a new enemy - requires gameSpace in, factory, type ID.
 --//	@info 	[table]		Constructor information
@@ -69,6 +71,7 @@ end
 
 function EnemyBase:kill()
 	self.m_enemyFactory:killedEnemy(self.m_enemyType)											-- tell the factory it has died
+	Framework:new("graphics.particle.short", { emitter = "explosion",x = self.m_sprite.x,y = self.m_sprite.y,time = 0.5, scale = 0.35 } )
 	-- TODO: score points (note different states of 6/7)
 	self:delete()																				-- and kill object.
 end 
