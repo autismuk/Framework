@@ -21,6 +21,7 @@ require("game.gamespace")
 require("game.player")
 require("game.enemies")
 require("game.factory")
+require("game.missiles")
 
 local SCManager = Framework:createClass("test.sceneManager","game.sceneManager")
 
@@ -35,17 +36,20 @@ function SCManager:preOpen(manager,data,resources)
 																		scene = scene, factory = data.factory, level = 1 })
 
 	scene:new("game.player", { gameSpace = scene.m_gameSpace,level = 1 }) 						-- add a player.
+	scene:new("game.missilemanager", { gameSpace = scene.m_gameSpace, scene = scene }) 			-- add a missile manager.
 
 	return scene
 end 
 
 local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
+
 manager:addManagedState("main",scene,{ same = "main" })
 Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start"} })
 
 local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
 manager:start("main",{ factory = eFactory })
+
 
 --- ************************************************************************************************************************************************************************
 --[[

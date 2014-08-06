@@ -113,13 +113,16 @@ function Player:endMovement()
 	self:reposition() 																			-- tidy up display.
 end 
 
+--//	Handle player update - checks for autofire, checks for ghost creation, auto moves for fetching prie.
+--//	@deltaTime 	[number] 		Elapsed time in seconds.
+
 function Player:onUpdate(deltaTime)
 	self.m_timeToFire = self.m_timeToFire + deltaTime 											-- update timing.
 
 	if self.m_playerState == Player.WAIT_STATE and self.m_timeToFire > Player.FIRE_RATE then	-- only fire if not moving.
 		self:sendMessage("missileManager","fire",												-- fire a missile in given direction and channel.
 								{ channel = self.m_channel, direction = self.m_faceRight and 1 or -1 })
-		self:playSound("shoot")
+		self:playSound("shoot")																	-- firing sound.s
 		self.m_timeToFire = 0 																	-- reset timer.
 	end 
 
