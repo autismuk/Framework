@@ -1,30 +1,29 @@
 --- ************************************************************************************************************************************************************************
 ---
 ---				Name : 		particle.lua
----				Purpose :	Particle Class (now Executive compatible)
----				Created:	26 May 2014
+---				Purpose :	Particle Classes ported from Executive
+---				Created:	14 July 2014
+---				Updated:	06 August 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
----				License:	MIT
+---				License:	Copyright Paul Robson (c) 2014+
 ---
 --- ************************************************************************************************************************************************************************
-
--- Standard OOP (with Constructor parameters added.)
-_G.Base =  _G.Base or { new = function(s,...) local o = { } setmetatable(o,s) s.__index = s o:initialise(...) return o end, initialise = function() end }
 
 --- ************************************************************************************************************************************************************************
 --																						Basic Emitter Class
 --- ************************************************************************************************************************************************************************
 
-local Emitter = Base:new()
+local Emitter = Framework:createClass("graphics.particle")
 
-Emitter.JSONInstance = require("json") 														-- instance of json required to decode effects
-Emitter.effectsFolder = "effects" 															-- effects folder
+local JSONInstance = require("json") 														-- instance of json required to decode effects
+local effectsFolder = "effects" 															-- effects folder
 
 --//	Create a new emitter using the emitter file given
 --//	@emitterFile [string] 		Name of emitter file in folder, without .json suffix
 
 function Emitter:constructor(info)
 	self.emitterFile = info.emitter  														-- save emitter file name
+	self.scale = info.scale or 1 															-- save scale, default to 1
 	if self.emitterFile ~= nil then  														-- if one provided, load it.
 		self:loadParameters(self.emitterFile)
 	end
@@ -40,6 +39,7 @@ function Emitter:start(x,y)
 	assert(self.emitter == nil,"Emitter started twice")
 	self.emitter = display.newEmitter(self.emitterParams) 									-- create a new emitter
 	self.emitter.x,self.emitter.y = x,y  													-- move it
+	self.emitter.xScale,self.emitter.yScale = self.scale,self.scale 						-- scale it.
 	return self
 end 
 
@@ -51,13 +51,13 @@ end
 
 --//%	Load a parameter file
 
-function Emitter:loadParameters()
-	local filePath = system.pathForFile(Emitter.effectsFolder .. "/" .. 					-- the file to load with the parameters
+function Emitter:loadParameters()	
+	local filePath = system.pathForFile(effectsFolder .. "/" .. 							-- the file to load with the parameters
 															self.emitterFile .. ".json")
 	local handle = io.open(filePath,"r") 													-- read it in.
 	local fileData = handle:read("*a")
 	handle:close()
-	self.emitterParams = Emitter.JSONInstance.decode(fileData) 								-- convert from JSON to LUA
+	self.emitterParams = JSONInstance.decode(fileData) 										-- convert from JSON to LUA
 	self:fixParameter("textureFileName") 													-- update files used with full path.
 end 
 
@@ -66,7 +66,7 @@ end
 
 function Emitter:fixParameter(paramName)
 	if self.emitterParams[paramName] ~= nil then  											-- if present
-		self.emitterParams[paramName] = Emitter.effectsFolder .. "/" .. 					-- fix it
+		self.emitterParams[paramName] = effectsFolder .. "/" .. 							-- fix it
 																self.emitterParams[paramName]	
 	end
 end
@@ -75,15 +75,15 @@ end
 --													This emitter class self-destructs after a given time period
 --- ************************************************************************************************************************************************************************
 
-local ShortEmitter = Emitter:new()
+local ShortEmitter = Framework:createClass("graphics.particle.short","graphics.particle")
 
 --//	Create a new emitter using the emitter file given
 --//	@emitterFile [string] 		Name of emitter file in folder, without .json suffix
 --//	@timeFrame [number]			Period of emitter life, if you don't want to use the duration parameter
 
 function ShortEmitter:constructor(info)
-	self.timeFrame = info.time
-	Emitter.constructor(self,info)
+	self.timeFrame = info.time * 1000														-- copy and scale from seconds to milliseconds
+	Emitter.constructor(self,info) 															-- call super constructor.
 end 
 
 --//	Start an emitter 
@@ -107,7 +107,7 @@ end
 --												Looping Particle Emitter. Continually restarts until told not to
 --- ************************************************************************************************************************************************************************
 
-local LoopingShortEmitter = ShortEmitter:new()
+local LoopingShortEmitter = Framework:createClass("graphics.particle.looping","graphics.particle.short")
 
 --//	Create a new emitter using the emitter file given
 --//	@emitterFile [string] 		Name of emitter file in folder, without .json suffix
@@ -138,4 +138,13 @@ function LoopingShortEmitter:cancel()
 	self.isCancelled = true 																-- on the next time out it will actually stop & clear up
 end 
 
-return { Emitter = Emitter, ShortEmitter = ShortEmitter, LoopingShortEmitter = LoopingShortEmitter }
+--- ************************************************************************************************************************************************************************
+--[[
+
+		Date 		Version 	Notes
+		---- 		------- 	-----
+		06-Aug-14	0.1 		Initial version of file
+
+--]]
+--- ************************************************************************************************************************************************************************
+

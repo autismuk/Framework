@@ -16,7 +16,12 @@ require("framework.framework")																	-- framework.
 --require("main_test")
 --require("main_numbers")
 --require("main_manager")
-require("main_sprite")
+--require("main_sprite")
+
+require("utils.particle")
+print(42)
+
+local c = Framework:new("graphics.particle.looping", { emitter = "explosion",x = 360,y = 100,time = 0.5, scale = 0.2 } )
 
 --- ************************************************************************************************************************************************************************
 --[[
