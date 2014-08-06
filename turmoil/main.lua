@@ -59,10 +59,8 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-4.5) Ghost ?
-4.7) Fetching
 5) Missile objects/manager.
-6) Collisions (game over/shooting) (note collision when fetching)
+6) Collisions (game over/shooting) (note collision when fetching, not ghost.)
 7) Scoring
 8) Audio
 9) Wrapper, level selection, title screen etc.

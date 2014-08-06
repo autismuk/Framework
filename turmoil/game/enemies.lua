@@ -13,6 +13,9 @@ local EnemyBase = Framework:createClass("game.enemybase")
 
 local Sprites = require("images.sprites")
 
+--//	Construct a new enemy - requires gameSpace in, factory, type ID.
+--//	@info 	[table]		Constructor information
+
 function EnemyBase:constructor(info)
 
 	self.m_gameSpace = info.gameSpace 															-- remember game space
@@ -32,15 +35,23 @@ function EnemyBase:constructor(info)
 
 end 
 
+--//	Delete enemy.
+
 function EnemyBase:destructor()
-	self:deassignChannel(self) 																	-- remove from channel
+	self.m_gameSpace:deassignChannel(self) 														-- remove from channel
 	self.m_sprite:removeSelf() 																	-- remove sprite and null references
 	self.m_sprite = nil self.m_gameSpace = nil self.m_enemyFactory = nil 
 end 
 
+--//	Get display objects
+--//	@return 	[list]	list with the sprite in it
+
 function EnemyBase:getDisplayObjects()
 	return { self.m_sprite }
 end 
+
+--//	move enemy base
+--//	@deltaTime 	[number]	elapsed time.
 
 function EnemyBase:onUpdate(deltaTime)
 	self.m_elapsedTime = self.m_elapsedTime + deltaTime  										-- update object life timer
@@ -53,24 +64,41 @@ function EnemyBase:onUpdate(deltaTime)
 	self:reposition() 																			-- redraw.
 end 
 
+--//	This kills, as opposed to deletes an object. The game space is notified the channel is empty, and points may
+--//	be accumulated.
+
 function EnemyBase:kill()
 	self.m_enemyFactory:killedEnemy(self.m_enemyType)											-- tell the factory it has died
-	-- TODO: explosion
-	-- TODO: score points11
+	-- TODO: score points (note different states of 6/7)
 	self:delete()																				-- and kill object.
 end 
+
+--//	What happens when we reach the end of a channel.
 
 function EnemyBase:bounce() 
 	self.m_xDirection = -self.m_xDirection 														-- reverse horizontal direction.
 end 
 
+--//	Update screen position.
+
 function EnemyBase:reposition()
+	if not self:isAlive() then return end
 	local x,y = self.m_gameSpace:getPos(self.m_xPosition,self.m_channel) 						-- get physical position
 	self.m_sprite.x,self.m_sprite.y = x,y 														-- update position
 	self.m_sprite.xScale = self.m_gameSpace:getSpriteSize()/64									-- reset sprite size
 	self.m_sprite.yScale = self.m_gameSpace:getSpriteSize()/64
 	if self.m_xDirection < 0 then self.m_sprite.xScale = -self.m_sprite.xScale end 				-- adjust for right-left movement
 end 
+
+--//	Is the object grabbable
+--//	@return 	[boolean]		true if it is.
+
+function EnemyBase:isGrabbable() return false end 
+
+--//	Get the object's horizontal position 
+--//	@return 	[number]		logical position 0..100
+
+function EnemyBase:getX() return self.m_xPosition end 
 
 local Enemy1 = Framework:createClass("game.enemy.type1","game.enemybase") 						
 function Enemy1:getSpriteSequence() return "enemy1" end 
@@ -100,7 +128,13 @@ function Enemy6:constructor(info)
 	self.m_startTime = 4 																		-- when it starts pinging (seconds)
 end 
 
-function Enemy6:getSpriteSequence() return "prize" end 
+function Enemy6:getSpriteSequence() 
+	return "prize" 
+end 
+
+function Enemy6:isGrabbable()
+	return not self.m_hasStarted 
+end 
 
 function Enemy6:getSpeed() 
 	return self.m_hasStarted and 100 or 0 														-- stationary until it starts pinging
@@ -137,6 +171,14 @@ end
 function Enemy7:getSpeed() 
 	return self.m_isTank and 6 or 10 															-- tanks are slower.
 end
+
+local EnemyGhost = Framework:createClass("game.enemy.ghost","game.enemybase")					-- ghost enemy (indestructable)
+
+function EnemyGhost:getSpriteSequence() return "ghost" end 
+
+function EnemyGhost:getSpeed() return 13 end 
+
+function EnemyGhost:bounce() self:delete() end 													-- deletes self on bounce.
 
 --- ************************************************************************************************************************************************************************
 --[[

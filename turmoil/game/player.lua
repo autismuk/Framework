@@ -20,7 +20,10 @@ Player.MOVE_STATE = 1 																			-- moving to a specific position.
 Player.FETCH_STATE = 2 																			-- going to grab a prize
 Player.RETURN_STATE = 3 																		-- returning from grabbing a prize.
 
-Player.FIRE_RATE = 0.8 																			-- Player fire delays in milliseconds.
+Player.FIRE_RATE = 0.8 																			-- Player fire delays in seconds.
+Player.GHOST_TIME = 3.0 																		-- time after which ghost is sent.
+
+Player.FETCH_SPEED = 125 																		-- Grabbing the grabbable speed.
 
 --//	Create a new player - needs a gameSpace parameter so it knows where it is operating.
 --//	@info 	[table]	cosntructor info
@@ -35,6 +38,7 @@ function Player:constructor(info)
 	self:reposition() 																			-- can reposition.
 	self:tag("taplistener")																		-- want to listen ?
 	self.m_timeToFire = 0 																		-- elapsed time to fire.
+	self.m_timeInWait = 0 																		-- time in wait state.
 end 
 
 --//	Tidy up
@@ -60,7 +64,6 @@ function Player:reposition()
 	local s = self.m_gameSpace:getSpriteSize()/64 												-- scale to required size.
 	self.m_sprite.yScale = s  																	-- set y scale
 	if not self.m_faceRight then s = -s end 													-- facing left ?
-	if self.m_playerState == Player.RETURN_STATE then s = -s end  								-- returning from prize grab, so face other way
 	self.m_sprite.xScale = s 																	-- set x scale, sign shows sprite direction.
 end
 
@@ -99,17 +102,60 @@ end
 function Player:endMovement()
 	self.m_playerState = Player.WAIT_STATE 														-- back to wait state, can fire now.
 	self.m_transaction = nil 																	-- forget transaction reference
+	local object = self.m_gameSpace:fetchObject(self.m_channel) 								-- get the object in this channel.
+	if object ~= nil then  																		-- if there is one
+		if object:isGrabbable() then  															-- and it is grabbable.
+			self.m_xDirection = -1 																-- make it face the grabbable object.
+			if object:getX() > 50 then self.m_xDirection = 1 end 
+			self.m_playerState = Player.FETCH_STATE 											-- and switch to the fetch state
+		end
+	end
 	self:reposition() 																			-- tidy up display.
-	-- TODO: If prize available go and get it.
 end 
 
 function Player:onUpdate(deltaTime)
 	self.m_timeToFire = self.m_timeToFire + deltaTime 											-- update timing.
+
 	if self.m_playerState == Player.WAIT_STATE and self.m_timeToFire > Player.FIRE_RATE then	-- only fire if not moving.
 		self:sendMessage("missileManager","fire",												-- fire a missile in given direction and channel.
 								{ channel = self.m_channel, direction = self.m_faceRight and 1 or -1 })
+		self:playSound("shoot")
 		self.m_timeToFire = 0 																	-- reset timer.
 	end 
+
+	if self.m_playerState == Player.WAIT_STATE then 											-- if in wait state
+		self.m_timeInWait = self.m_timeInWait + deltaTime  										-- bump time in wait state
+		if self.m_timeInWait > Player.GHOST_TIME then  											-- time to send ghost
+			self.m_gameSpace:launchGhostEnemy(self.m_channel)									-- ask the game space to do it.
+			self.m_timeInWait = 0 																-- reset waiting counter.
+		end
+	else 
+		self.m_timeInWait = 0 																	-- if not, clear it.
+	end 
+
+	if self.m_playerState == Player.FETCH_STATE or 												-- if fetching or returning.
+								self.m_playerState == Player.RETURN_STATE then
+		local xPrevious = self.m_xPosition 														-- save original x position.
+		self.m_xPosition = self.m_xPosition + Player.FETCH_SPEED * deltaTime * self.m_xDirection-- move it out.
+		if self.m_xPosition < 0 or self.m_xPosition > 100 then 									-- reached the end 
+			local object = self.m_gameSpace:fetchObject(self.m_channel) 						-- get the object
+			if object ~= nil and object:isGrabbable() then 
+				self:playSound("prize")
+				object:kill()
+			end 
+			self.m_xDirection = -self.m_xDirection 												-- reverse the movement
+			self.m_playerState = Player.RETURN_STATE 											-- now returning to the middle.
+		end 
+		if self.m_playerState == Player.RETURN_STATE then 
+			local sign = (self.m_xPosition - 50) * (xPrevious - 50) 							-- will be > 0 if both same side.
+			if sign <= 0 then 
+				self.m_xPosition = 50 															-- back in the middle
+				self.m_playerState = Player.WAIT_STATE 											-- back waiting for commands.
+			end 
+		end 
+		self.m_faceRight = self.m_xDirection > 0 												-- update right facing flag
+		self:reposition() 																		-- and redraw.
+	end
 end 
 
 --- ************************************************************************************************************************************************************************

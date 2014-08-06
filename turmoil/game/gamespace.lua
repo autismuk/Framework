@@ -106,7 +106,7 @@ end
 --//	@object 	[enemyObject]	object to remove.
 
 function GameSpace:deassignChannel(object)
-	for i = 1,#self.m_channelCount do 															-- work through all channels.
+	for i = 1,self.m_channelCount do 															-- work through all channels.
 		if self.m_channelObjects[i] == object then 												-- found the relevant object ?
 			self.m_channelObjects[i] = nil 														-- mark channel as empty.
 			self.m_channelObjectCount = self.m_channelObjectCount - 1 							-- reduce count of objects
@@ -114,6 +114,23 @@ function GameSpace:deassignChannel(object)
 		end 
 	end 
 	error("Cannot deassign gamespace channel")													-- object was not found.
+end 
+
+--//	Launch a 'ghost' enemy which cannot be destroyed
+--//	@channel [number] 	channel to launch it in.
+
+function GameSpace:launchGhostEnemy(channel)
+	if self:isChannelInUse(channel) then return end 											-- exit if channel in use.
+	self.m_scene:new("game.enemy.ghost", { gameSpace = self, factory = nil, 					-- create a special instance (not via factory)
+								type = nil, preferred = channel, level = self.m_currentLevel })
+end 
+
+--//	Get the reference of an object in the channel
+--//	@channel 	[number]	channel to access
+--//	@return 	[object]	object reference in channel, or nil if empty.
+
+function GameSpace:fetchObject(channel)
+	return self.m_channelObjects[channel]
 end 
 
 --//	Check to see if a channel is occupied
