@@ -122,7 +122,7 @@ function Player:onUpdate(deltaTime)
 	if self.m_playerState == Player.WAIT_STATE and self.m_timeToFire > Player.FIRE_RATE then	-- only fire if not moving.
 		self:sendMessage("missileManager","fire",												-- fire a missile in given direction and channel.
 								{ channel = self.m_channel, direction = self.m_faceRight and 1 or -1 })
-		self:playSound("shoot")																	-- firing sound.s
+		--self:playSound("shoot")																	-- firing sound.s
 		self.m_timeToFire = 0 																	-- reset timer.
 	end 
 

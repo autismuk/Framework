@@ -14,7 +14,7 @@ require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")																	-- framework.
 require("utils.admob")
 require("utils.registry")
-
+require("utils.stubscene")
 --require("main_spritetest")
 require("utils.sound")
 require("game.gamespace")
@@ -41,14 +41,20 @@ function SCManager:preOpen(manager,data,resources)
 	return scene
 end 
 
+Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start","bomb" } })
+
 local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
 
+local stub = Framework:new("utils.stubscene", { name = "start", targets = { play = "main", another = "a.n.other" }})
+print(stub)
+manager:addManagedState("start",stub, { play = "main" })
+
 manager:addManagedState("main",scene,{ same = "main" })
-Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start","bomb" } })
+
 
 local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
-manager:start("main",{ factory = eFactory })
+manager:start("start",{ factory = eFactory })
 
 
 --- ************************************************************************************************************************************************************************
@@ -63,11 +69,16 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-6) Shoot tanks (bounce back)
+4) Add memory/gfx display.
+5) Stub scene object.
+5.1) Speed up delivery of bad guys too slow.
+5.2) Sort firing noise ? (replace warp in sound)
+6) Shoot tanks (bounce back if facing)
 6.5) Collisions (enemies/player)
 7) Scoring
 8) Audio
 9) Wrapper, level selection, title screen etc.
 10) Testing esp. Admob.
+
 
 --]]
