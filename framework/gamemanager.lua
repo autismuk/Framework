@@ -11,6 +11,8 @@
 
 local GameManager = Framework:createClass("game.manager")
 
+GameManager.s_displayMemoryUsage = (system.getInfo("environment") == "simulator") 				-- display memory usage on simulator
+
 --//	Construct a game manager object
 --//	@info [table] 	constructor information.
 
@@ -31,6 +33,11 @@ function GameManager:constructor(info)
 	self.m_associatedEventData = nil 															-- data passed to event.
 	self.m_currentSceneInstance = nil 															-- reference to currently displayed scene
 	self.m_transitioner = Framework:new("system.transition")									-- create transitioning object.
+	if GameManager.s_displayMemoryUsage and GameManager.s_textObject == nil then 				-- need a memory text object ?
+		GameManager.s_textObject = display.newText("",4,4,native.systemFont,14)					-- create a text object
+		GameManager.s_textObject.anchorX,GameManager.s_textObject.anchorY = 0,0 				-- anchor at 0,0 and make it magenta.
+		GameManager.s_textObject:setFillColor(1,0,1)
+	end
 end
 
 --//	Tidy up
@@ -114,6 +121,17 @@ function GameManager:endSceneTransition()
 	self.m_newScene:doPostOpen() 																-- do the post open on the new scene.
 	self.m_currentSceneInstance = self.m_newScene self.m_newScene = nil 						-- update the current scene instance member variable
 	self.m_isLocked = false 																	-- and we can now take transition changes again.
+	if GameManager.s_displayMemoryUsage then self:memory() end 									-- display memory usage ?
+end
+
+--//	Put memory information as a little text string at the screen top.
+
+function GameManager:memory()
+	collectgarbage() 																			-- perform GC
+  	local textMem = system.getInfo( "textureMemoryUsed" ) / 1024 								-- get texture memory in kb
+  	local msg =  "Mem:"..math.floor(collectgarbage("count")).. "kb Tex:"..math.floor(textMem).."kb" -- create message
+  	GameManager.s_textObject.text = msg  														-- update memory text
+  	GameManager.s_textObject:toFront() 															-- make sure it is on top.
 end
 
 Framework:addObjectMethod("performGameEvent", function(self,eventName,eventData)

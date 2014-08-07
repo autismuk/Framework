@@ -37,7 +37,6 @@ function SCManager:preOpen(manager,data,resources)
 
 	scene:new("game.player", { gameSpace = scene.m_gameSpace,level = 1 }) 						-- add a player.
 	scene:new("game.missilemanager", { gameSpace = scene.m_gameSpace, scene = scene }) 			-- add a missile manager.
-
 	return scene
 end 
 
@@ -47,14 +46,13 @@ local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
 
 local stub = Framework:new("utils.stubscene", { name = "start", targets = { play = "main", another = "a.n.other" }})
-print(stub)
 manager:addManagedState("start",stub, { play = "main" })
 
 manager:addManagedState("main",scene,{ same = "main" })
 
 
 local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
-manager:start("start",{ factory = eFactory })
+manager:start("main",{ factory = eFactory })
 
 
 --- ************************************************************************************************************************************************************************
@@ -69,8 +67,7 @@ manager:start("start",{ factory = eFactory })
 
 --[[
 
-4) Add memory/gfx display.
-5) Stub scene object.
+5) Stub scene object (complete)
 5.1) Speed up delivery of bad guys too slow.
 5.2) Sort firing noise ? (replace warp in sound)
 6) Shoot tanks (bounce back if facing)
