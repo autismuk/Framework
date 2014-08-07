@@ -22,6 +22,7 @@ require("game.player")
 require("game.enemies")
 require("game.factory")
 require("game.missiles")
+require("utils.fontmanager")
 
 local SCManager = Framework:createClass("test.sceneManager","game.sceneManager")
 
@@ -45,15 +46,16 @@ Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start",
 local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
 
-local stub = Framework:new("utils.stubscene", { name = "start", targets = { play = "main", another = "a.n.other" }})
+local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
+
+local stub = Framework:new("utils.stubscene", { name = "start", targets = { play = "Start Game", instructions = "Instructions" }, data = { factory = eFactory }})
+
 manager:addManagedState("start",stub, { play = "main" })
 
 manager:addManagedState("main",scene,{ same = "main" })
 
 
-local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
-manager:start("main",{ factory = eFactory })
-
+manager:start("start",{ factory = eFactory })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -67,7 +69,7 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-5) Stub scene object (complete)
+5) Stub scene object (complete it)
 5.1) Speed up delivery of bad guys too slow.
 5.2) Sort firing noise ? (replace warp in sound)
 6) Shoot tanks (bounce back if facing)
