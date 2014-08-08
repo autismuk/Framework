@@ -18,15 +18,15 @@ EnemyFactory.TYPE_COUNT = 7
 
 function EnemyFactory:constructor(info)
 	self.m_enemyTotals = {} 																	-- count of enemies to kill of each type.
-	self.m_enemyCount = info.level * 4 + 10 													-- number of bad guys in each level.
-	
+	self.m_level = Framework.fw.status:getLevel()												-- get current level from status object.
+	self.m_enemyCount = self.m_level * 4 + 10 													-- number of bad guys in each level.
 	for i = 1,EnemyFactory.TYPE_COUNT do self.m_enemyTotals[i] = 0 end 							-- clear individual count
 	for i = 1,self.m_enemyCount do 																-- add them distributed randomly.
 		local n = math.random(1,EnemyFactory.TYPE_COUNT)
 		self.m_enemyTotals[n] = self.m_enemyTotals[n] + 1
 	end 
 	self:createEnemyQueue() 																	-- reset the queue of enemies
-	self.m_level = info.level 																	-- save the game level.
+	self:tag("enemyFactory")
 end
 
 --//	Tidy up.
@@ -53,7 +53,7 @@ function EnemyFactory:createEnemyQueue()
 			self.m_enemyQueue[j] = t 
 		end
 	end
-end 
+ end 
 
 --//	Handle an enemy being killed.
 --//	@typeID 		[number]		enemy type that was killed.
@@ -75,12 +75,22 @@ end
 --//	@gameSpace 	[gamespace]			game space it belongs in.
 
 function EnemyFactory:spawn(sceneRef,gameSpace)
+	if not gameSpace:isAnyChannelAvailable() then return end 									-- exit if no space available for spawning.
+	if self:isQueueEmpty() then return end 														-- nothing to spawn.
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.
 	--tID = 3 																					-- uncomment this to force a specific enemy type.
 	self.m_nextQueueItem = self.m_nextQueueItem + 1 											-- bump the queue.
-	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, factory = self,type = tID, 	-- spawn one.
-																					level = self.m_level })
+	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, type = tID,level = self.m_level }) 	-- spawn one.																					
 	self:playSound("appear")
+end 
+
+function EnemyFactory:onMessage(sender,message,data)
+	if message == "spawn" then 
+		self:spawn(data.scene,data.gameSpace)
+	end 
+	if message == "kill" then 
+		self:killedEnemy(data.type)
+	end
 end 
 
 --- ************************************************************************************************************************************************************************

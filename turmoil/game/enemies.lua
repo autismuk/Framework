@@ -21,12 +21,11 @@ local EnemyBase = Framework:createClass("game.enemybase")
 function EnemyBase:constructor(info)
 
 	self.m_gameSpace = info.gameSpace 															-- remember game space
-	self.m_enemyFactory = info.factory 															-- remember factory
 	self.m_enemyType = info.type 																-- type reference.
 	self.m_sprite = Sprites:newSprite() 														-- sprite for this enemy
 	self.m_sprite:setSequence(self:getSpriteSequence()) 										-- set sequence and play
 	self.m_sprite:play()
-	self.m_speedScalar = math.min(1 + (info.level - 1) / 8,3)
+	self.m_speedScalar = math.min(1 + (Framework.fw.status:getLevel() - 1) / 8,3)
 	self.m_channel = self.m_gameSpace:assignChannel(self,info.preferred) 						-- assign it to a channel, possible preference
 	self.m_xPosition = 0 self.m_xDirection = 1 													-- start on left
 	if math.random(1,2) == 1 then  																-- or right, random choice
@@ -42,8 +41,8 @@ end
 function EnemyBase:destructor()
 	self.m_gameSpace:deassignChannel(self) 														-- remove from channel
 	self.m_sprite:removeSelf() 																	-- remove sprite and null references
-	self.m_sprite = nil self.m_gameSpace = nil self.m_enemyFactory = nil 
-end 
+	self.m_sprite = nil self.m_gameSpace = nil
+end
 
 --//	Get display objects
 --//	@return 	[list]	list with the sprite in it
@@ -70,7 +69,7 @@ end
 --//	be accumulated.
 
 function EnemyBase:kill()
-	self.m_enemyFactory:killedEnemy(self.m_enemyType)											-- tell the factory it has died
+	self:sendMessage("enemyFactory","kill", { type = self.m_enemyType })						-- tell the factory it has died
 	Framework:new("graphics.particle.short", { emitter = "explosion",x = self.m_sprite.x,y = self.m_sprite.y,time = 0.5, scale = 0.35 } )
 	-- TODO: score points (note different states of 6/7)
 	self:delete()																				-- and kill object.

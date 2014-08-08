@@ -10,19 +10,19 @@
 --- ************************************************************************************************************************************************************************
 
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
+--require("main_spritetest")
 require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")																	-- framework.
 require("utils.admob")
 require("utils.registry")
 require("utils.stubscene")
---require("main_spritetest")
 require("utils.sound")
 require("game.gamespace")
 require("game.player")
 require("game.enemies")
 require("game.factory")
 require("game.missiles")
-require("utils.fontmanager")
+require("game.status")
 
 local SCManager = Framework:createClass("test.sceneManager","game.sceneManager")
 
@@ -33,29 +33,27 @@ function SCManager:preOpen(manager,data,resources)
 	scene.m_advertObject = scene:new("ads.admob",adIDs)											-- create a new advert object
 	local headerSpace = scene.m_advertObject:getHeight() 										-- get the advert object height
 
-	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, channels = 7, 		-- create a game space as required.
-																		scene = scene, factory = data.factory, level = 1 })
-
+	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, scene = scene }) 	-- create a game space as required.
+																					
 	scene:new("game.player", { gameSpace = scene.m_gameSpace }) 								-- add a player.
 	scene:new("game.missilemanager", { gameSpace = scene.m_gameSpace, scene = scene }) 			-- add a missile manager.
 	return scene
 end 
 
 Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start","bomb","appear" } })
+Framework:new("game.status")
 
 local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
 
-local eFactory = Framework:new("game.enemyFactory",{ level = 1 }) 							-- create an enemy factory.
+local eFactory = Framework:new("game.enemyFactory") 											-- create an enemy factory.
 
-local stub = Framework:new("utils.stubscene", { name = "start", targets = { play = "Start Game", instructions = "Instructions" }, data = { factory = eFactory }})
+local stub = Framework:new("utils.stubscene", { name = "start", targets = { play = "Start Game", instructions = "Instructions" }, data = { }})
 
 manager:addManagedState("start",stub, { play = "main" })
-
 manager:addManagedState("main",scene,{ same = "main" })
 
-
-manager:start("main",{ factory = eFactory })
+manager:start("main",{ })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -69,7 +67,6 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-5) Move factory into an object, level from factory, no factory or level references.
 6.5) Collisions (enemies/player)
 7) Scoring
 8) Audio

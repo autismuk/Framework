@@ -15,10 +15,9 @@ local GameSpace = Framework:createClass("game.gamespace")
 
 function GameSpace:constructor(info)
 	self.m_headerSize = info.header or 0 														-- extract out parameters.
-	self.m_channelCount = info.channels or 7 
-	self.m_factory = info.factory 																-- spawning factory.
 	self.m_scene = info.scene 																	-- owning scene
-	self.m_currentLevel = info.level 															-- game level.
+	self.m_channelCount = Framework.fw.status:getChannels() 									-- get the number of channels
+	self.m_currentLevel = Framework.fw.status:getLevel()										-- game level.
 	self.m_borderSize = 2 																		-- width of border.
 	self.m_borderList = {} 																		-- list of border objects
 	self:addBorder(0,display.contentWidth,0) 													-- top and bottom borders.
@@ -31,8 +30,7 @@ function GameSpace:constructor(info)
 	self.m_channelObjectCount = 0 																-- number of objects in channels in total.
 
 	self.m_fireTimer = 0 																		-- timer for creating new enemies
-	self.m_fireTimerRate = math.max(0.5,2.5 - info.level/4)										-- how often they ping out.
-	print(self.m_fireTimerRate)
+	self.m_fireTimerRate = math.max(0.5,2.5 - self.m_currentLevel/4)							-- how often they ping out.
 	for c = 1,self.m_channelCount-1 do  														-- create channels.
 		local y = self.m_borderSize + self.m_channelSize * c 
 		self:addBorder(0,display.contentWidth/2-self.m_channelSize,y)
@@ -51,7 +49,7 @@ function GameSpace:destructor()
 		end 
 	end 
 	for _,ref in ipairs(self.m_borderList) do ref:removeSelf() end 								-- remove all borders
-	self.m_borderList = nil self.m_factory = nil self.m_scene = nil 							-- null references
+	self.m_borderList = nil self.m_scene = nil 													-- null references
 end 
 
 --//	Auto spawn object code on update
@@ -60,8 +58,8 @@ end
 function GameSpace:onUpdate(deltaTime)
 	self.m_fireTimer = self.m_fireTimer + deltaTime 											-- elapsed time.
 	if self.m_fireTimer > self.m_fireTimerRate or self.m_channelObjectCount == 0 then 			-- if time out, or no enemies at all visible.
-		if self:isAnyChannelAvailable() and not self.m_factory:isQueueEmpty() then  			-- if there is space, and the queue is not empty.
-			self.m_factory:spawn(self.m_scene,self) 											-- create a new enemy
+		if self:isAnyChannelAvailable() then 													-- if there is space, spawn a facory
+			self:sendMessage("enemyFactory","spawn", { scene = self.m_scene, gameSpace = self })
 		end
 		self.m_fireTimer = 0 																	-- reset the timer.
 	end
@@ -121,8 +119,8 @@ end
 
 function GameSpace:launchGhostEnemy(channel)
 	if self:isChannelInUse(channel) then return end 											-- exit if channel in use.
-	self.m_scene:new("game.enemy.ghost", { gameSpace = self, factory = nil, 					-- create a special instance (not via factory)
-								type = nil, preferred = channel, level = self.m_currentLevel })
+	self.m_scene:new("game.enemy.ghost", { gameSpace = self, 									-- create a special instance (not via factory)
+													type = nil, preferred = channel, level = self.m_currentLevel })
 end 
 
 --//	Get the reference of an object in the channel
