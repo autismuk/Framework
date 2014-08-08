@@ -41,7 +41,7 @@ function SCManager:preOpen(manager,data,resources)
 	return scene
 end 
 
-Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start","bomb" } })
+Framework:new("audio.sound",{ sounds = { "dead", "move","prize","shoot","start","bomb","appear" } })
 
 local manager = Framework:new("game.manager")
 scene = Framework:new("test.sceneManager")
@@ -55,7 +55,7 @@ manager:addManagedState("start",stub, { play = "main" })
 manager:addManagedState("main",scene,{ same = "main" })
 
 
-manager:start("start",{ factory = eFactory })
+manager:start("main",{ factory = eFactory })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -69,10 +69,10 @@ manager:start("start",{ factory = eFactory })
 
 --[[
 
-5) Stub scene object (complete it)
+4.1) Object that crosses once slowly then fast
+4.2) Object with curve - slower in the middle.
+4.3) Other object types ?
 5.1) Speed up delivery of bad guys too slow.
-5.2) Sort firing noise ? (replace warp in sound)
-6) Shoot tanks (bounce back if facing)
 6.5) Collisions (enemies/player)
 7) Scoring
 8) Audio

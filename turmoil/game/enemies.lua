@@ -184,12 +184,23 @@ function Enemy7:bounce()
 	end
 end 
 
+function Enemy7:kill() 																			-- tanks can only be killed from behind.
+	if self.m_isTank then 																		-- if it is a tank.
+		if self.m_xDirection * (self.m_xPosition - 50) < 0 then 								-- and it is shot face on.
+			self.m_xPosition = self.m_xPosition - self.m_xDirection * 10 						-- throw it backwards
+			self.m_xPosition = math.min(99,math.max(self.m_xPosition,1))						-- force into range.
+			return 
+		end 
+	end
+	self.super.kill(self)																		-- call normal kill method
+end 
+
 function Enemy7:getSpriteSequence() 
 	return "arrow" 
 end 
 
 function Enemy7:getSpeed() 
-	return self.m_isTank and 6 or 10 															-- tanks are slower.
+	return self.m_isTank and 6 or 11 															-- tanks are slower.
 end
 
 local EnemyGhost = Framework:createClass("game.enemy.ghost","game.enemybase")					-- ghost enemy (indestructable)

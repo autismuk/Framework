@@ -76,9 +76,11 @@ end
 
 function EnemyFactory:spawn(sceneRef,gameSpace)
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.
+
 	self.m_nextQueueItem = self.m_nextQueueItem + 1 											-- bump the queue.
 	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, factory = self,type = tID, 	-- spawn one.
 																					level = self.m_level })
+	self:playSound("appear")
 end 
 
 --- ************************************************************************************************************************************************************************
