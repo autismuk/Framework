@@ -36,7 +36,7 @@ function SCManager:preOpen(manager,data,resources)
 	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, channels = 7, 		-- create a game space as required.
 																		scene = scene, factory = data.factory, level = 1 })
 
-	scene:new("game.player", { gameSpace = scene.m_gameSpace,level = 1 }) 						-- add a player.
+	scene:new("game.player", { gameSpace = scene.m_gameSpace }) 								-- add a player.
 	scene:new("game.missilemanager", { gameSpace = scene.m_gameSpace, scene = scene }) 			-- add a missile manager.
 	return scene
 end 
@@ -69,10 +69,7 @@ manager:start("main",{ factory = eFactory })
 
 --[[
 
-4.1) Object that crosses once slowly then fast
-4.2) Object with curve - slower in the middle.
-4.3) Other object types ?
-5.1) Speed up delivery of bad guys too slow.
+5) Move factory into an object, level from factory, no factory or level references.
 6.5) Collisions (enemies/player)
 7) Scoring
 8) Audio

@@ -76,7 +76,7 @@ end
 
 function EnemyFactory:spawn(sceneRef,gameSpace)
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.
-
+	--tID = 3 																					-- uncomment this to force a specific enemy type.
 	self.m_nextQueueItem = self.m_nextQueueItem + 1 											-- bump the queue.
 	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, factory = self,type = tID, 	-- spawn one.
 																					level = self.m_level })

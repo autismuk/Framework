@@ -31,8 +31,8 @@ function GameSpace:constructor(info)
 	self.m_channelObjectCount = 0 																-- number of objects in channels in total.
 
 	self.m_fireTimer = 0 																		-- timer for creating new enemies
-	self.m_fireTimerRate = math.max(0.5,3.5 - info.level/4)										-- how often they ping out.
-
+	self.m_fireTimerRate = math.max(0.5,2.5 - info.level/4)										-- how often they ping out.
+	print(self.m_fireTimerRate)
 	for c = 1,self.m_channelCount-1 do  														-- create channels.
 		local y = self.m_borderSize + self.m_channelSize * c 
 		self:addBorder(0,display.contentWidth/2-self.m_channelSize,y)

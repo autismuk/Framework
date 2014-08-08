@@ -116,27 +116,55 @@ end
 
 function EnemyBase:getX() return self.m_xPosition end 
 
-local Enemy1 = Framework:createClass("game.enemy.type1","game.enemybase") 						
+local Enemy1 = Framework:createClass("game.enemy.type1","game.enemybase") 						-- Enemy 1 slows down in the middle			
 function Enemy1:getSpriteSequence() return "enemy1" end 
-function Enemy1:getSpeed() return 20 end
 
-local Enemy2 = Framework:createClass("game.enemy.type2","game.enemybase")
+function Enemy1:getSpeed() 																	
+	local n = math.abs(50-self.m_xPosition)/50
+	return math.sin(n*1.6) * 24 + 6
+end
+
+local Enemy2 = Framework:createClass("game.enemy.type2","game.enemybase") 						-- Enemy 2 changes speed every time it turns round.
 function Enemy2:getSpriteSequence() return "enemy2" end 
-function Enemy2:getSpeed() return 8 end
 
-local Enemy3 = Framework:createClass("game.enemy.type3","game.enemybase")
+function Enemy2:getSpeed() 
+	if self.m_speed == nil then self.m_speed = math.random(6,36) end
+	return self.m_speed 
+end
+
+function Enemy2:bounce()
+	self.super.bounce(self)
+	self.m_speed = nil 
+end 
+
+local Enemy3 = Framework:createClass("game.enemy.type3","game.enemybase") 						-- Enemy 3 speeds up with every bounce.
 function Enemy3:getSpriteSequence() return "enemy3" end 
-function Enemy3:getSpeed() return 16 end
 
-local Enemy4 = Framework:createClass("game.enemy.type4","game.enemybase")
+function Enemy3:getSpeed() 
+	self.m_speed = self.m_speed or 8 
+	return self.m_speed
+end
+
+function Enemy3:bounce()
+	self.super.bounce(self)
+	self.m_speed = math.min(128,self.m_speed * 2)
+end
+
+local Enemy4 = Framework:createClass("game.enemy.type4","game.enemybase") 						-- Enemy 4 is fast one way, slow the other
 function Enemy4:getSpriteSequence() return "enemy4" end 
-function Enemy4:getSpeed() return 12 end
 
-local Enemy5 = Framework:createClass("game.enemy.type5","game.enemybase")
+function Enemy4:getSpeed() 
+	if self.m_orientation == nil then
+		self.m_orientation = math.random(1,2) * 2 - 3
+	end
+	return (self.m_orientation * self.m_xDirection) > 0 and 12 or 52 
+end
+
+local Enemy5 = Framework:createClass("game.enemy.type5","game.enemybase") 						-- Enemy 5 is just dull.
 function Enemy5:getSpriteSequence() return "enemy5" end 
 function Enemy5:getSpeed() return 14 end
 
-local Enemy6 = Framework:createClass("game.enemy.type6","game.enemybase") 						-- the prize class.
+local Enemy6 = Framework:createClass("game.enemy.type6","game.enemybase") 						-- the prize class (can be picked up)
 
 function Enemy6:constructor(info)
 	self.super.constructor(self,info)															-- superconstructor

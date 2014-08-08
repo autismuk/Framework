@@ -34,8 +34,8 @@ function GameManager:constructor(info)
 	self.m_currentSceneInstance = nil 															-- reference to currently displayed scene
 	self.m_transitioner = Framework:new("system.transition")									-- create transitioning object.
 	if GameManager.s_displayMemoryUsage and GameManager.s_textObject == nil then 				-- need a memory text object ?
-		GameManager.s_textObject = display.newText("",4,4,native.systemFont,14)					-- create a text object
-		GameManager.s_textObject.anchorX,GameManager.s_textObject.anchorY = 0,0 				-- anchor at 0,0 and make it magenta.
+		GameManager.s_textObject = display.newText("",display.contentWidth-4,4,native.systemFont,14)-- create a text object
+		GameManager.s_textObject.anchorX,GameManager.s_textObject.anchorY = 1,0 				-- anchor at 0,0 and make it magenta.
 		GameManager.s_textObject:setFillColor(1,0,1)
 	end
 end
