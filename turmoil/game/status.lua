@@ -1,7 +1,7 @@
 --- ************************************************************************************************************************************************************************
 ---
----				Name : 		main.lua
----				Purpose :	Top level code "Turmoil"
+---				Name : 		status.lua
+---				Purpose :	Game Status Object
 ---				Created:	8 August 2014
 ---				Updated:	8 August 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
@@ -9,9 +9,16 @@
 ---
 --- ************************************************************************************************************************************************************************
 
-local ScoreObject = Framework:createClass("game.status")
+local StatusObject = Framework:createClass("game.status")
 
-function ScoreObject:constructor(info)
+--//	Initialise Status Object
+
+function StatusObject:constructor(info)
+	self.m_highScore = 0
+	self:reset()
+end 
+
+function StatusObject:reset()
 	self.m_lives = info.lives or 4
 	self.m_score = 0
 	self.m_level = info.level or 1
@@ -19,11 +26,15 @@ function ScoreObject:constructor(info)
 	self:name("status")
 end 
 
-function ScoreObject:destructor() end
-function ScoreObject:getLives() return self.m_lives end 
-function ScoreObject:getScore() return self.m_score end 
-function ScoreObject:getLevel() return self.m_level end 
-function ScoreObject:getChannels() return self.m_channels end 
+function StatusObject:destructor() end
+
+--//	Simple Accessors
+
+function StatusObject:getLives() return self.m_lives end 
+function StatusObject:getScore() return self.m_score end 
+function StatusObject:getHighScore() return self.m_highScore end 
+function StatusObject:getLevel() return self.m_level end 
+function StatusObject:getChannels() return self.m_channels end 
 
 --- ************************************************************************************************************************************************************************
 --[[
