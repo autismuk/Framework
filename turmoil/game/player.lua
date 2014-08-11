@@ -38,7 +38,7 @@ function Player:constructor(info)
 	self:reposition() 																			-- can reposition.
 	self:tag("taplistener")																		-- want to listen ?
 	self.m_timeToFire = 0 																		-- elapsed time to fire.
-	self.m_timeInWait = 0 																		-- time in wait state.
+	self.m_timeInWait = -5 																		-- time in wait state - initially 5 seconds wait.
 end 
 
 --//	Tidy up

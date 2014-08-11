@@ -15,10 +15,10 @@ local StatusObject = Framework:createClass("game.status")
 
 function StatusObject:constructor(info)
 	self.m_highScore = 0
-	self:reset()
+	self:reset(info)
 end 
 
-function StatusObject:reset()
+function StatusObject:reset(info)
 	self.m_lives = info.lives or 4
 	self.m_score = 0
 	self.m_level = info.level or 1
@@ -35,6 +35,12 @@ function StatusObject:getScore() return self.m_score end
 function StatusObject:getHighScore() return self.m_highScore end 
 function StatusObject:getLevel() return self.m_level end 
 function StatusObject:getChannels() return self.m_channels end 
+
+function StatusObject:addScore(score)
+	self.m_score = self.m_score + score
+	self.m_highScore = math.max(self.m_highScore,self.m_score)
+	print(self.m_score)
+end
 
 --- ************************************************************************************************************************************************************************
 --[[

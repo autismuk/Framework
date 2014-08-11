@@ -67,9 +67,10 @@ manager:start("main",{ })
 
 --[[
 
+5.7) Intro bit
 6.5) Collisions (enemies/player)
-7) Scoring
-8) Audio
+6.6) Outro
+
 9) Wrapper, level selection, title screen etc.
 10) Testing esp. Admob.
 

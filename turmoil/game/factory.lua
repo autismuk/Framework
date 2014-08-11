@@ -27,6 +27,7 @@ function EnemyFactory:constructor(info)
 	end 
 	self:createEnemyQueue() 																	-- reset the queue of enemies
 	self:tag("enemyFactory")
+	self.m_started = false
 end
 
 --//	Tidy up.
@@ -76,9 +77,10 @@ end
 
 function EnemyFactory:spawn(sceneRef,gameSpace)
 	if not gameSpace:isAnyChannelAvailable() then return end 									-- exit if no space available for spawning.
+	if not self.m_started then return end 														-- check actually going.
 	if self:isQueueEmpty() then return end 														-- nothing to spawn.
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.
-	--tID = 3 																					-- uncomment this to force a specific enemy type.
+	--tID = 6 																					-- uncomment this to force a specific enemy type.
 	self.m_nextQueueItem = self.m_nextQueueItem + 1 											-- bump the queue.
 	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, type = tID,level = self.m_level }) 	-- spawn one.																					
 	self:playSound("appear")
@@ -90,6 +92,9 @@ function EnemyFactory:onMessage(sender,message,data)
 	end 
 	if message == "kill" then 
 		self:killedEnemy(data.type)
+	end
+	if message == "start" then 
+		self.m_started = true
 	end
 end 
 

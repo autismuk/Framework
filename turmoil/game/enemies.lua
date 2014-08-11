@@ -71,7 +71,7 @@ end
 function EnemyBase:kill()
 	self:sendMessage("enemyFactory","kill", { type = self.m_enemyType })						-- tell the factory it has died
 	Framework:new("graphics.particle.short", { emitter = "explosion",x = self.m_sprite.x,y = self.m_sprite.y,time = 0.5, scale = 0.35 } )
-	-- TODO: score points (note different states of 6/7)
+	Framework.fw.status:addScore(self:getScore())
 	self:delete()																				-- and kill object.
 end 
 
@@ -123,12 +123,20 @@ function Enemy1:getSpeed()
 	return math.sin(n*1.6) * 24 + 6
 end
 
+function Enemy1:getScore()
+	return (50-math.abs(50-math.floor(self.m_xPosition))) * 10
+end 
+
 local Enemy2 = Framework:createClass("game.enemy.type2","game.enemybase") 						-- Enemy 2 changes speed every time it turns round.
 function Enemy2:getSpriteSequence() return "enemy2" end 
 
 function Enemy2:getSpeed() 
 	if self.m_speed == nil then self.m_speed = math.random(6,36) end
 	return self.m_speed 
+end
+
+function Enemy2:getScore()
+	return self.m_speed * 10 
 end
 
 function Enemy2:bounce()
@@ -149,6 +157,10 @@ function Enemy3:bounce()
 	self.m_speed = math.min(128,self.m_speed * 2)
 end
 
+function Enemy3:getScore()
+	return self.m_speed * 10 
+end
+
 local Enemy4 = Framework:createClass("game.enemy.type4","game.enemybase") 						-- Enemy 4 is fast one way, slow the other
 function Enemy4:getSpriteSequence() return "enemy4" end 
 
@@ -159,9 +171,15 @@ function Enemy4:getSpeed()
 	return (self.m_orientation * self.m_xDirection) > 0 and 12 or 52 
 end
 
+function Enemy4:getScore()
+	return self:getSpeed() * 10 
+end
+
 local Enemy5 = Framework:createClass("game.enemy.type5","game.enemybase") 						-- Enemy 5 is just dull.
 function Enemy5:getSpriteSequence() return "enemy5" end 
 function Enemy5:getSpeed() return 14 end
+
+function Enemy5:getScore() return 100 end 
 
 local Enemy6 = Framework:createClass("game.enemy.type6","game.enemybase") 						-- the prize class (can be picked up)
 
@@ -194,6 +212,10 @@ end
 function Enemy6:isShootable() 																	-- can only be shot when in motion.
 	return self.m_hasStarted 
 end
+
+function Enemy6:getScore()
+	return self.m_hasStarted and 50 or 500 
+end 
 
 local Enemy7 = Framework:createClass("game.enemy.type7","game.enemybase") 						-- the arrow to tank class.
 
@@ -229,6 +251,10 @@ end
 function Enemy7:getSpeed() 
 	return self.m_isTank and 6 or 11 															-- tanks are slower.
 end
+
+function Enemy7:getScore()
+	return self.m_isTank and 500 or 50
+end 
 
 local EnemyGhost = Framework:createClass("game.enemy.ghost","game.enemybase")					-- ghost enemy (indestructable)
 
