@@ -42,6 +42,15 @@ function StatusObject:addScore(score)
 	print(self.m_score)
 end
 
+function StatusObject:addLife(count)
+	self.m_lives = math.max(0,self.m_lives + (count or 1))
+end
+
+function StatusObject:nextLevel()
+	self.m_level = self.m_level + 1
+end 
+
+
 --- ************************************************************************************************************************************************************************
 --[[
 
