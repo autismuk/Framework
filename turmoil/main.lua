@@ -15,7 +15,7 @@ require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")																	-- framework.
 require("utils.sound")
 require("game.status")
-require("scene.main")
+require("scene.mainscene")
 require("scene.info")
 
 Framework:new("audio.sound",																	-- create sounds object
@@ -54,6 +54,7 @@ manager:start("info",{ })
 
 --[[
 
+0) Fix the 'initial update' problem.
 1) Adaptable inbetween display.
 6.5) Collisions (enemies/player)
 

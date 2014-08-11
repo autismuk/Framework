@@ -28,7 +28,9 @@ function Scene:onEnterFrame(deltaTime)
 	local count,hash = self:getCollection() 													-- get the collection objects
 	if count == 0 then return end  																-- exit if nothing
 	for _,ref in pairs(hash) do 																-- work through them
-		if ref.onUpdate ~= nil then ref:onUpdate(deltaTime) end 								-- perform onUpdate() on them if they implement it.
+		if ref.onUpdate ~= nil and Framework:isAsyncEnabled() then 								-- perform onUpdate() on them if they implement it.
+			ref:onUpdate(deltaTime) 
+		end 			
 	end
 end 
 

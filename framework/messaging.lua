@@ -56,7 +56,7 @@ function MessagingClass:onEnterFrame(deltaTime)
 	self.m_messageList = {} 																	-- clear the list - messages not due will be added back.
 	for _,msg in ipairs(toSendList) do 															-- work through the message list.
 		msg.timeToSend = msg.timeToSend - deltaTime 											-- subtract time elapsed.
-		if msg.timeToSend <= 0 then 															-- is it time to send ?
+		if msg.timeToSend <= 0 and Framework:isAsyncEnabled() then 								-- is it time to send ?
 			self:sendSingleMessage(msg)															-- send it.
 		else 																					-- not time to send it, put it in the queue.
 			self.m_messageList[#self.m_messageList+1] = msg

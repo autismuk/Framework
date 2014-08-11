@@ -15,10 +15,10 @@ require("utils.fontmanager")
 local Intro = Framework:createClass("game.intro")
 
 function Intro:constructor(info)
-	self.m_text = display.newBitmapText("Let's go for\na kill time !",
+	self.m_text = display.newBitmapText("Go Destroy !",
 										display.contentWidth/2,
 										display.contentHeight/2,
-										"grapple",48)
+										"grapple",64)
 	self.m_text:setJustification()
 	self.m_text:setTintColor(1,1,0)
 	self:tag("introText")

@@ -32,7 +32,7 @@ function InfoMain:constructor(info)
 	self.m_score = {} 																			-- score digits
 	for i = 1,6 do 
 		self.m_score[i] = display.newBitmapText(self.m_group, 									-- create each one
-										 "?",
+										 "-",
 										 display.contentWidth/2 + i * 36-125,
 										 display.contentHeight/2,
 										 "grapple",64):setTintColor(0,1,1)

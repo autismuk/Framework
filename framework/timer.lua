@@ -58,7 +58,8 @@ end
 function TimerClass:onEnterFrame(deltaTime) 
 	if #self.m_timerList == 0 then return end 													-- no timers.
 	for _,ref in ipairs(self.m_timerList) do ref.timeToFire = ref.timeToFire - deltaTime end 	-- subtract delta time from all timers.
-	while #self.m_timerList > 0 and self.m_timerList[1].timeToFire < 0 do 						-- is there something to fire ?
+	while #self.m_timerList > 0 and self.m_timerList[1].timeToFire < 0 and 						-- is there something to fire ?
+																	Framework:isAsyncEnabled() do
 		local timerEvent = self.m_timerList[1] 													-- get the first event
 		table.remove(self.m_timerList,1) 														-- remove it from the timer list.
 		Framework:perform({ soleitem = timerEvent.target },"onTimer",timerEvent.tag)			-- fire the timer event for just that one object.

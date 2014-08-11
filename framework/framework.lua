@@ -266,6 +266,12 @@ function Framework:enterFrame(event)
 	Framework:perform(self.m_index.enterframe,"onEnterFrame",elapsed/1000)						-- call the enterframe method.
 end 
 
+--//	Check to see if asynchromous stuff - messages, updates, etc. should be dispatched. 
+
+function Framework:isAsyncEnabled()
+	return self.m_enterFrameEnabled 
+end 
+
 
 --//	Enable or disable the enterFrame event.
 --//	@isEnabled [boolean]	true to enable, false to disable
