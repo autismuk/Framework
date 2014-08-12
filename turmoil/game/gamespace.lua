@@ -37,6 +37,7 @@ function GameSpace:constructor(info)
 		self:addBorder(display.contentWidth,display.contentWidth/2+self.m_channelSize,y)
 	end
 	display.getCurrentStage():addEventListener("tap",self)										-- listen for taps.
+	self:tag("gameSpace")
 end
 
 --//	Tidy up

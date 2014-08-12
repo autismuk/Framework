@@ -22,6 +22,8 @@ Framework:new("audio.sound",																	-- create sounds object
 					{ sounds = { "dead", "move","prize","shoot","start","bomb","appear" } })
 Framework:new("game.status") 																	-- create game status object.
 
+Framework.fw.status:reset()
+
 local eFactory = Framework:new("game.enemyFactory") 											-- create an enemy factory (todo: not eventually required)
 
 local manager = Framework:new("game.manager")
@@ -40,7 +42,7 @@ manager:addManagedState("end",
 						Framework:new("scene.infoScene", { message = "Game Over"}),
 						{ start = "start", exit = "start"}) 									-- Game Over, Score, go back, or go back.
 
-manager:start("info",{ })
+manager:start("main",{ })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -54,14 +56,13 @@ manager:start("info",{ })
 
 --[[
 
-0) Fix the 'initial update' problem.
-1) Adaptable inbetween display.
-6.5) Collisions (enemies/player)
+
+1) Handle messages to end level on gameSpace.
 
 	- on collision, lose life and destroy enemy
 	- on exit if empty then create next factory, add one life, if zero lives then exit
 	
-6.6) Outro 
+6.7) Prize gives short shield.
 9) Title Screen.
 10) Testing esp. Admob.
 

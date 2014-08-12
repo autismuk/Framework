@@ -111,6 +111,7 @@ function Player:endMovement()
 		end
 	end
 	self:reposition() 																			-- tidy up display.
+	self.m_timeToFire = Player.FIRE_RATE 														-- immediate fire on arrival.
 end 
 
 --//	Handle player update - checks for autofire, checks for ghost creation, auto moves for fetching prie.
@@ -159,6 +160,22 @@ function Player:onUpdate(deltaTime)
 		self.m_faceRight = self.m_xDirection > 0 												-- update right facing flag
 		self:reposition() 																		-- and redraw.
 	end
+
+	if self.m_playerState ~= Player.MOVE_STATE then 											-- cannot be hit when moving
+		local enemyObject = self.m_gameSpace:fetchObject(self.m_channel) 						-- get object in channel.
+		if enemyObject ~= nil and enemyObject:collide(50) then 									-- collided with object
+			Framework.fw.status:addLife(-1) 													-- lose a life.
+			enemyObject:kill() 																	-- kill the object
+			self:sendMessageLater("gameSpace","endLevel",nil,2.5)								-- send an 'end level' message after 2.5 seconds.
+			local spr = Sprites:newImage("player") 												-- clone the sprite so we can animate it
+			spr.x,spr.y = self.m_sprite.x,self.m_sprite.y 
+			spr.xScale,spr.yScale = self.m_sprite.xScale,self.m_sprite.yScale
+			transition.to(spr,{ time = 2000, xScale = 10, yScale = 10, alpha = 0.2, 			-- animate it
+											rotation = 3600, onComplete = function(o) o:removeSelf() end })
+			self:playSound("dead") 																-- death tune
+			self:delete() 																		-- remove the player
+		end 
+	end 
 end 
 
 --- ************************************************************************************************************************************************************************

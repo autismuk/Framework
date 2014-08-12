@@ -28,6 +28,7 @@ function EnemyFactory:constructor(info)
 	self:createEnemyQueue() 																	-- reset the queue of enemies
 	self:tag("enemyFactory")
 	self.m_started = false
+	self:name("enemyFactory")
 end
 
 --//	Tidy up.
@@ -62,6 +63,9 @@ function EnemyFactory:createEnemyQueue()
 function EnemyFactory:killedEnemy(typeID)
 	self.m_enemyTotals[typeID] = self.m_enemyTotals[typeID] - 1 								-- reduce one for the totals for this type
 	self.m_enemyCount = self.m_enemyCount - 1 													-- and the overall total.
+	if self.m_enemyCount == 0 then 																-- killed everything ?
+			self:sendMessageLater("gameSpace","endLevel",nil,1)									-- send an 'end level' message after one second.
+	end
 end 
 
 --//	Check to see if there is anything left to spawn

@@ -39,15 +39,17 @@ function InfoMain:constructor(info)
 		self.m_score[i].yScale = 1.7
 	end
 
-	local yPos = display.contentHeight * 3 / 4 													-- lives display
-	local sprite = Sprites:newImage("player")
-	sprite.x,sprite.y = display.contentWidth * 0.35, yPos
-	self.m_group:insert(sprite)
+	if Framework.fw.status:getLives() > 0 then
+		local yPos = display.contentHeight * 3 / 4 													-- lives display
+		local sprite = Sprites:newImage("player")
+		sprite.x,sprite.y = display.contentWidth * 0.35, yPos
+		self.m_group:insert(sprite)
 
-	display.newBitmapText(self.m_group,
-						  "x "..Framework.fw.status:getLives(),
-						  display.contentWidth * 0.6,yPos,
-						  "grapple",64):setTintColor(0,1,0.5)
+		display.newBitmapText(self.m_group,
+							  "x "..Framework.fw.status:getLives(),
+							  display.contentWidth * 0.6,yPos,
+							  "grapple",64):setTintColor(0,1,0.5)
+	end 
 
 	self.m_homeIcon = display.newImage(self.m_group,"images/home.png",							-- home icon in bottom right
 														display.contentWidth-40,display.contentHeight-40)
@@ -113,7 +115,7 @@ local InfoScene = Framework:createClass("scene.infoScene","game.sceneManager")
 
 function InfoScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")
-	scene:new("scene.infoScene.main")
+	scene:new("scene.infoScene.main",data)
 	return scene
 end 
 
