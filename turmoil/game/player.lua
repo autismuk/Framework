@@ -22,6 +22,7 @@ Player.RETURN_STATE = 3 																		-- returning from grabbing a prize.
 
 Player.FIRE_RATE = 0.8 																			-- Player fire delays in seconds.
 Player.GHOST_TIME = 3.0 																		-- time after which ghost is sent.
+Player.SHIELD_TIME = 6.0 																		-- shield time.
 
 Player.FETCH_SPEED = 125 																		-- Grabbing the grabbable speed.
 
@@ -41,6 +42,7 @@ function Player:constructor(info)
 	self:tag("taplistener")																		-- want to listen ?
 	self.m_timeToFire = 0 																		-- elapsed time to fire.
 	self.m_timeInWait = -5 																		-- time in wait state - initially 5 seconds wait.
+	self.m_shield = 0 																			-- if > 0 then shield is visible.
 end 
 
 --//	Tidy up
@@ -67,7 +69,6 @@ function Player:reposition()
 	self.m_sprite.yScale = s  																	-- set y scale
 	if not self.m_faceRight then s = -s end 													-- facing left ?
 	self.m_sprite.xScale = s 																	-- set x scale, sign shows sprite direction.
-	self.m_spriteShield.x,self.m_spriteShield.y = x,y 											-- reposition shield
 	self.m_spriteShield.xScale,self.m_spriteShield.yScale = s,s
 end
 
@@ -148,8 +149,9 @@ function Player:onUpdate(deltaTime)
 		if self.m_xPosition < 0 or self.m_xPosition > 100 then 									-- reached the end 
 			local object = self.m_gameSpace:fetchObject(self.m_channel) 						-- get the object
 			if object ~= nil and object:isGrabbable() then 
-				self:playSound("prize")
-				object:kill()
+				self:playSound("prize") 														-- play sfx
+				object:kill() 																	-- kill it as grabbed
+				self.m_shield = Player.SHIELD_TIME 												-- set the shield to be displayed a while
 			end 
 			self.m_xDirection = -self.m_xDirection 												-- reverse the movement
 			self.m_playerState = Player.RETURN_STATE 											-- now returning to the middle.
@@ -165,7 +167,7 @@ function Player:onUpdate(deltaTime)
 		self:reposition() 																		-- and redraw.
 	end
 
-	if self.m_playerState ~= Player.MOVE_STATE then 											-- cannot be hit when moving
+	if self.m_playerState ~= Player.MOVE_STATE and self.m_shield < 0 then 						-- cannot be hit when moving or the shield is up.
 		local enemyObject = self.m_gameSpace:fetchObject(self.m_channel) 						-- get object in channel.
 		if enemyObject ~= nil and enemyObject:collide(50) then 									-- collided with object
 			Framework.fw.status:addLife(-1) 													-- lose a life.
@@ -181,9 +183,14 @@ function Player:onUpdate(deltaTime)
 		end 
 	end 
 
+	self.m_spriteShield.x,self.m_spriteShield.y = self.m_sprite.x,self.m_sprite.y 				-- reposition shield
+
 	self.m_clock = (self.m_clock or 0) + deltaTime 												-- animate the shield rotation and alpha.
 	self.m_spriteShield.rotation = -self.m_clock * 70
 	self.m_spriteShield.alpha = math.abs(math.sin(self.m_clock*3))
+
+	self.m_shield = self.m_shield - deltaTime 													-- shield timer.
+	self.m_spriteShield.isVisible = (self.m_shield >= 0)
 end 
 
 --- ************************************************************************************************************************************************************************

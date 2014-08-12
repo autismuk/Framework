@@ -136,7 +136,7 @@ function Enemy2:getSpeed()
 end
 
 function Enemy2:getScore()
-	return self.m_speed * 10 
+	return self:getSpeed() * 10 
 end
 
 function Enemy2:bounce()
@@ -158,7 +158,7 @@ function Enemy3:bounce()
 end
 
 function Enemy3:getScore()
-	return self.m_speed * 10 
+	return self:getSpeed() * 10 
 end
 
 local Enemy4,SuperClass = Framework:createClass("game.enemy.type4","game.enemybase") 			-- Enemy 4 is fast one way, slow the other

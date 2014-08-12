@@ -47,7 +47,7 @@ manager:addManagedState("end",
 						Framework:new("scene.infoScene", { message = "Game Over"}),
 						{ start = "start", exit = "start"}) 									-- Game Over, Score, go back, or go back.
 
-manager:start("start",{ })
+manager:start("main",{ })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -61,9 +61,7 @@ manager:start("start",{ })
 
 --[[
 
-7) Prize gives short shield. Implement shield (non graphic bits)
-10) Testing esp. Admob.
-
-Dump super and patch it out.
+2) Player is invincible while moving (is this a good idea ?)
+3) Testing esp. Admob.
 
 --]]
