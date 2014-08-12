@@ -115,7 +115,7 @@ end
 
 function EnemyBase:getX() return self.m_xPosition end 
 
-local Enemy1,SuperClass = Framework:createClass("game.enemy.type1","game.enemybase") 						-- Enemy 1 slows down in the middle			
+local Enemy1,SuperClass = Framework:createClass("game.enemy.type1","game.enemybase") 			-- Enemy 1 slows down in the middle			
 function Enemy1:getSpriteSequence() return "enemy1" end 
 
 function Enemy1:getSpeed() 																	
@@ -127,7 +127,7 @@ function Enemy1:getScore()
 	return (50-math.abs(50-math.floor(self.m_xPosition))) * 10
 end 
 
-local Enemy2,SuperClass = Framework:createClass("game.enemy.type2","game.enemybase") 						-- Enemy 2 changes speed every time it turns round.
+local Enemy2,SuperClass = Framework:createClass("game.enemy.type2","game.enemybase") 			-- Enemy 2 changes speed every time it turns round.
 function Enemy2:getSpriteSequence() return "enemy2" end 
 
 function Enemy2:getSpeed() 
@@ -144,7 +144,7 @@ function Enemy2:bounce()
 	self.m_speed = nil 
 end 
 
-local Enemy3,SuperClass = Framework:createClass("game.enemy.type3","game.enemybase") 						-- Enemy 3 speeds up with every bounce.
+local Enemy3,SuperClass = Framework:createClass("game.enemy.type3","game.enemybase") 			-- Enemy 3 speeds up with every bounce.
 function Enemy3:getSpriteSequence() return "enemy3" end 
 
 function Enemy3:getSpeed() 
@@ -161,7 +161,7 @@ function Enemy3:getScore()
 	return self.m_speed * 10 
 end
 
-local Enemy4,SuperClass = Framework:createClass("game.enemy.type4","game.enemybase") 						-- Enemy 4 is fast one way, slow the other
+local Enemy4,SuperClass = Framework:createClass("game.enemy.type4","game.enemybase") 			-- Enemy 4 is fast one way, slow the other
 function Enemy4:getSpriteSequence() return "enemy4" end 
 
 function Enemy4:getSpeed() 
@@ -175,13 +175,13 @@ function Enemy4:getScore()
 	return self:getSpeed() * 10 
 end
 
-local Enemy5,SuperClass = Framework:createClass("game.enemy.type5","game.enemybase") 						-- Enemy 5 is just dull.
+local Enemy5,SuperClass = Framework:createClass("game.enemy.type5","game.enemybase") 			-- Enemy 5 is just dull.
 function Enemy5:getSpriteSequence() return "enemy5" end 
 function Enemy5:getSpeed() return 14 end
 
 function Enemy5:getScore() return 100 end 
 
-local Enemy6,SuperClass = Framework:createClass("game.enemy.type6","game.enemybase") 						-- the prize class (can be picked up)
+local Enemy6,SuperClass = Framework:createClass("game.enemy.type6","game.enemybase") 			-- the prize class (can be picked up)
 
 function Enemy6:constructor(info)
 	SuperClass.constructor(self,info)															-- superconstructor
@@ -217,7 +217,7 @@ function Enemy6:getScore()
 	return self.m_hasStarted and 50 or 500 
 end 
 
-local Enemy7,SuperClass = Framework:createClass("game.enemy.type7","game.enemybase") 						-- the arrow to tank class.
+local Enemy7,SuperClass = Framework:createClass("game.enemy.type7","game.enemybase") 			-- the arrow to tank class.
 
 function Enemy7:constructor(info)
 	SuperClass.constructor(self,info) 															-- superconstructor
@@ -256,7 +256,7 @@ function Enemy7:getScore()
 	return self.m_isTank and 500 or 50
 end 
 
-local EnemyGhost,SuperClass = Framework:createClass("game.enemy.ghost","game.enemybase")					-- ghost enemy (indestructable)
+local EnemyGhost,SuperClass = Framework:createClass("game.enemy.ghost","game.enemybase")		-- ghost enemy (indestructable)
 
 function EnemyGhost:getSpriteSequence() return "ghost" end 
 

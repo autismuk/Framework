@@ -39,8 +39,18 @@ function titleScene:preOpen(manager,data,resources)
 	scene:new("scene.titleScene.main",data)
 	scene:new("gui.icon.pulsing", { image = "images/go.png", width = 17, x = 87, y = 87, listener = self, message = "start" })
 	scene:new("gui.text.list", { x = 50, y = 65, listener = self, message = "active" , tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },
-								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } )
+								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } ):name("startLevel")
 	return scene
+end 
+
+function titleScene:onMessage(sender,message,data)
+	local startLevel = Framework.fw.startLevel:getSelected()
+	startLevel = math.max(1,(startLevel-1) * 5)
+	Framework.fw.status:setStartLevel(startLevel)
+	Framework.fw.status:reset()
+	if Framework.fw.enemyFactory ~= nil then Framework.fw.enemyFactory:delete() end 
+	Framework:new("game.enemyFactory")
+	self:performGameEvent("start")
 end 
 
 --- ************************************************************************************************************************************************************************

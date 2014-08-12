@@ -22,11 +22,12 @@ function InfoMain:constructor(info)
 	if msg == nil then 																			-- otherwise display level message
 		msg = "Level ".. Framework.fw.status:getLevel()
 	end 
+
 	self.m_group = display.newGroup() 															-- containing group
 	display.newBitmapText(self.m_group, 														-- message text
 						  msg,
 						  display.contentWidth/2,
-						  display.contentHeight/4,
+						  display.contentHeight*0.3,
 						  "grapple",72):setTintColor(1,0.5,0)
 
 	self.m_score = {} 																			-- score digits
@@ -34,13 +35,13 @@ function InfoMain:constructor(info)
 		self.m_score[i] = display.newBitmapText(self.m_group, 									-- create each one
 										 "-",
 										 display.contentWidth/2 + i * 36-125,
-										 display.contentHeight/2,
+										 display.contentHeight*0.55,
 										 "grapple",64):setTintColor(0,1,1)
 		self.m_score[i].yScale = 1.7
 	end
 
 	if Framework.fw.status:getLives() > 0 then
-		local yPos = display.contentHeight * 3 / 4 													-- lives display
+		local yPos = display.contentHeight * 0.8 												-- lives display
 		local sprite = Sprites:newImage("player")
 		sprite.x,sprite.y = display.contentWidth * 0.35, yPos
 		self.m_group:insert(sprite)
@@ -103,13 +104,17 @@ local InfoScene = Framework:createClass("scene.infoScene","game.sceneManager")
 
 function InfoScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")
+	local adIDs = { ios = "ca-app-pub-8354094658055499/9860763610", 							-- admob identifiers.
+					android = "ca-app-pub-8354094658055499/9860763610" }
+	scene.m_advertObject = scene:new("ads.admob",adIDs)											-- create a new advert object
+	local headerSpace = scene.m_advertObject:getHeight() 										-- get the advert object height
 	scene:new("scene.infoScene.main",data)
 	scene:new("gui.icon.pulsing", { image = "images/home.png", width = 17, x = 87, y = 87, listener = self, message = "home" })
 	return scene
 end 
 
 function InfoScene:onMessage(sender,message,body)
-	self:performGameEvent("exit") 															-- and run it
+	self:performGameEvent("exit") 																-- and run it
 end 
 
 --- ************************************************************************************************************************************************************************

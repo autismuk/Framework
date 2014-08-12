@@ -61,6 +61,8 @@ function ActiveText:constructor(info)
 	self.m_vibration = info.vibration
 	if self.m_pulseOnClick == nil then self.m_pulseOnClick = true end
 	if self.m_vibration == nil then self.m_vibration = true end 
+	self.m_wobbleTime = 0
+	self.m_yOriginal = self.m_text.y
 end 
 
 function ActiveText:destructor()
@@ -79,6 +81,18 @@ end
 function ActiveText:getDisplayObjects()
 	return { self.m_text }
 end 
+
+function ActiveText:onUpdate(deltaTime)
+	self.m_wobbleTime = self.m_wobbleTime - deltaTime 
+	if self.m_wobbleTime < 0.25 and self.m_vibration then 
+		local w = math.floor(self.m_wobbleTime * 100) % 10 - 5
+		self.m_text.y = self.m_yOriginal + w 
+	end 
+	if self.m_wobbleTime <= 0 then 
+		self.m_wobbleTime = math.random(200,400) / 100 
+		self.m_text.y = self.m_yOriginal 
+	end
+end
 
 local ActiveTextRotateAbstract,SuperClass = Framework:createClass("gui.text.rotate.abstract","gui.text")
 

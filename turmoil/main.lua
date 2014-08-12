@@ -23,7 +23,7 @@ require("scene.mainscene")
 
 Framework:new("audio.sound",																	-- create sounds object
 					{ sounds = { "dead", "move","prize","shoot","levelcomplete","bomb","appear" } })
-Framework:new("game.status", { lives = 2 }) 													-- create game status object.
+Framework:new("game.status") 																	-- create game status object.
 
 Framework.fw.status:reset()
 
@@ -60,9 +60,7 @@ manager:start("start",{ })
 --- ************************************************************************************************************************************************************************
 
 --[[
-	
-5) Implement periodic short vibrations
-6) Title Screen, go resets status and creates a new factory.
+
 7) Prize gives short shield. Implement shield (non graphic bits)
 10) Testing esp. Admob.
 

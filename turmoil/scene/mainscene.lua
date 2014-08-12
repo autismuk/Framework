@@ -24,11 +24,9 @@ local MainScene = Framework:createClass("scene.mainScene","game.sceneManager")
 
 function MainScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")													-- create a new scene
-	local adIDs = { ios = "ca-app-pub-8354094658055499/9860763610", 							-- admob identifiers.
-					android = "ca-app-pub-8354094658055499/9860763610" }
-	scene.m_advertObject = scene:new("ads.admob",adIDs)											-- create a new advert object
-	local headerSpace = scene.m_advertObject:getHeight() 										-- get the advert object height
 
+	local headerSpace = 0
+	
 	scene.m_gameSpace = scene:new("game.gamespace", { header = headerSpace, scene = scene }) 	-- create a game space as required.
 																					
 	scene:new("game.player", { gameSpace = scene.m_gameSpace }) 								-- add a player.

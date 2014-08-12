@@ -16,7 +16,7 @@ local StatusObject = Framework:createClass("game.status")
 function StatusObject:constructor(info)
 	self.m_highScore = 0
 	self.m_defaultLives = info.lives or 4
-	self.m_level = info.level or 1
+	self.m_defaultLevel = info.level or 1
 	self.m_channels = info.channel or 7
 	self:reset()
 	self:name("status")
@@ -24,6 +24,7 @@ end
 
 function StatusObject:reset()
 	self.m_lives = self.m_defaultLives
+	self.m_level = self.m_defaultLevel
 	self.m_score = 0
 end 
 
@@ -50,6 +51,9 @@ function StatusObject:nextLevel()
 	self.m_level = self.m_level + 1
 end 
 
+function StatusObject:setStartLevel(n)
+	self.m_defaultLevel = n 
+end
 
 --- ************************************************************************************************************************************************************************
 --[[
