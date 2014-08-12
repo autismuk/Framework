@@ -266,6 +266,8 @@ function EnemyGhost:bounce() self:delete() end 													-- deletes self on b
 
 function EnemyGhost:isShootable() return false end  											-- cannot be shot.
 
+function EnemyGhost:kill() return end 															-- cannot be killed.
+
 --- ************************************************************************************************************************************************************************
 --[[
 

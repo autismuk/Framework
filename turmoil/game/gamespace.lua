@@ -185,6 +185,26 @@ function GameSpace:getSpriteSize()
 	return self.m_spriteSize 
 end 
 
+--//	Receive end level message ?
+
+function GameSpace:onMessage(sender,message,data)
+	assert(message == "endLevel")																-- only know this message.
+	local factory = Framework.fw.enemyFactory 													-- get current factory.
+	self:sendMessage(factory,"stop")															-- stop it from spawning.
+	if factory:getEnemyCount() == 0 then 														-- destroyed everything in this level 
+		factory:delete() 																		-- delete the factory that was in use.
+		Framework.fw.status:nextLevel() 														-- go to the next level
+		Framework.fw.status:addLife(1) 															-- gain one life for completing the level. 
+		Framework:new("game.enemyFactory") 														-- create a new factory for the next level.
+	end 
+
+	if Framework.fw.status:getLives() == 0 then 
+		self:performGameEvent("lost")
+	else 
+		self:performGameEvent("continue")
+	end 
+end
+
 --- ************************************************************************************************************************************************************************
 --[[
 

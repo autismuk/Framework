@@ -20,6 +20,9 @@ function EnemyFactory:constructor(info)
 	self.m_enemyTotals = {} 																	-- count of enemies to kill of each type.
 	self.m_level = Framework.fw.status:getLevel()												-- get current level from status object.
 	self.m_enemyCount = self.m_level * 4 + 10 													-- number of bad guys in each level.
+
+	self.m_enemyCount = 2 print("Level count fudge in")											-- testing thing.
+
 	for i = 1,EnemyFactory.TYPE_COUNT do self.m_enemyTotals[i] = 0 end 							-- clear individual count
 	for i = 1,self.m_enemyCount do 																-- add them distributed randomly.
 		local n = math.random(1,EnemyFactory.TYPE_COUNT)
@@ -65,6 +68,7 @@ function EnemyFactory:killedEnemy(typeID)
 	self.m_enemyCount = self.m_enemyCount - 1 													-- and the overall total.
 	if self.m_enemyCount == 0 then 																-- killed everything ?
 			self:sendMessageLater("gameSpace","endLevel",nil,1)									-- send an 'end level' message after one second.
+			self:playSound("levelcomplete")
 	end
 end 
 
@@ -90,6 +94,10 @@ function EnemyFactory:spawn(sceneRef,gameSpace)
 	self:playSound("appear")
 end 
 
+function EnemyFactory:getEnemyCount()
+	return self.m_enemyCount 
+end 
+
 function EnemyFactory:onMessage(sender,message,data)
 	if message == "spawn" then 
 		self:spawn(data.scene,data.gameSpace)
@@ -99,6 +107,10 @@ function EnemyFactory:onMessage(sender,message,data)
 	end
 	if message == "start" then 
 		self.m_started = true
+		self:createEnemyQueue()
+	end
+	if message == "stop" then 
+		self.m_started = false 
 	end
 end 
 

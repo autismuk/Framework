@@ -19,8 +19,8 @@ require("scene.mainscene")
 require("scene.info")
 
 Framework:new("audio.sound",																	-- create sounds object
-					{ sounds = { "dead", "move","prize","shoot","start","bomb","appear" } })
-Framework:new("game.status") 																	-- create game status object.
+					{ sounds = { "dead", "move","prize","shoot","levelcomplete","bomb","appear" } })
+Framework:new("game.status", { lives = 2 }) 													-- create game status object.
 
 Framework.fw.status:reset()
 
@@ -42,7 +42,7 @@ manager:addManagedState("end",
 						Framework:new("scene.infoScene", { message = "Game Over"}),
 						{ start = "start", exit = "start"}) 									-- Game Over, Score, go back, or go back.
 
-manager:start("main",{ })
+manager:start("info",{ })
 
 --- ************************************************************************************************************************************************************************
 --[[
