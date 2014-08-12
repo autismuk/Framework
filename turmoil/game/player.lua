@@ -31,6 +31,8 @@ Player.FETCH_SPEED = 125 																		-- Grabbing the grabbable speed.
 function Player:constructor(info)
 	self.m_gameSpace = info.gameSpace 															-- space player is operating in.
 	self.m_sprite = Sprites:newSprite() 														-- graphic used.
+	self.m_spriteShield = Sprites:newSprite()													-- sprite shield.
+	self.m_spriteShield:setSequence("shield") self.m_spriteShield.isVisible = false 			-- initially not visible.
 	self.m_xPosition = 50 																		-- current position.
 	self.m_channel = math.floor(self.m_gameSpace:getSize()/2) 									-- start channel
 	self.m_faceRight = true  																	-- facing right
@@ -52,7 +54,7 @@ end
 --//	@return 	[list]	List of display objects
 
 function Player:getDisplayObjects() 
-	return { self.m_sprite }
+	return { self.m_sprite,self.m_spriteShield }
 end 
 
 --//	Reposition and put correct sprite up for the current player status
@@ -65,6 +67,8 @@ function Player:reposition()
 	self.m_sprite.yScale = s  																	-- set y scale
 	if not self.m_faceRight then s = -s end 													-- facing left ?
 	self.m_sprite.xScale = s 																	-- set x scale, sign shows sprite direction.
+	self.m_spriteShield.x,self.m_spriteShield.y = x,y 											-- reposition shield
+	self.m_spriteShield.xScale,self.m_spriteShield.yScale = s,s
 end
 
 --//	Handle message - listens for control messages
@@ -176,6 +180,10 @@ function Player:onUpdate(deltaTime)
 			self:delete() 																		-- remove the player
 		end 
 	end 
+
+	self.m_clock = (self.m_clock or 0) + deltaTime 												-- animate the shield rotation and alpha.
+	self.m_spriteShield.rotation = -self.m_clock * 70
+	self.m_spriteShield.alpha = math.abs(math.sin(self.m_clock*3))
 end 
 
 --- ************************************************************************************************************************************************************************

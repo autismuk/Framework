@@ -21,7 +21,7 @@ function EnemyFactory:constructor(info)
 	self.m_level = Framework.fw.status:getLevel()												-- get current level from status object.
 	self.m_enemyCount = self.m_level * 4 + 10 													-- number of bad guys in each level.
 
-	self.m_enemyCount = 2 print("Level count fudge in")											-- testing thing.
+	--self.m_enemyCount = 2 print("Level count fudge in")											-- testing thing.
 
 	for i = 1,EnemyFactory.TYPE_COUNT do self.m_enemyTotals[i] = 0 end 							-- clear individual count
 	for i = 1,self.m_enemyCount do 																-- add them distributed randomly.

@@ -9,14 +9,17 @@
 ---
 --- ************************************************************************************************************************************************************************
 
+ApplicationVersion = "v0.1"
+
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
 --require("main_spritetest")
 require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")																	-- framework.
 require("utils.sound")
 require("game.status")
-require("scene.mainscene")
+require("scene.title")
 require("scene.info")
+require("scene.mainscene")
 
 Framework:new("audio.sound",																	-- create sounds object
 					{ sounds = { "dead", "move","prize","shoot","levelcomplete","bomb","appear" } })
@@ -28,7 +31,9 @@ local eFactory = Framework:new("game.enemyFactory") 											-- create an enem
 
 local manager = Framework:new("game.manager")
 
-manager:addManagedState("start",{}, { start = "info" })											-- title page (and options)
+manager:addManagedState("start",																-- Title Page
+						Framework:new("scene.titleScene"), 
+						{ start = "info" })														-- title page (and options)
 
 manager:addManagedState("info", 																-- Scene before starting, no exit.
 						Framework:new("scene.infoScene", { }),
@@ -42,7 +47,7 @@ manager:addManagedState("end",
 						Framework:new("scene.infoScene", { message = "Game Over"}),
 						{ start = "start", exit = "start"}) 									-- Game Over, Score, go back, or go back.
 
-manager:start("info",{ })
+manager:start("start",{ })
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -55,15 +60,11 @@ manager:start("info",{ })
 --- ************************************************************************************************************************************************************************
 
 --[[
-
-
-1) Handle messages to end level on gameSpace.
-
-	- on collision, lose life and destroy enemy
-	- on exit if empty then create next factory, add one life, if zero lives then exit
 	
-6.7) Prize gives short shield.
-9) Title Screen.
+6.7) Prize gives short shield. Implement shield (non graphic bits)
+9) Title Screen, go resets status and creates a new factory.
 10) Testing esp. Admob.
+
+Dump super and patch it out.
 
 --]]

@@ -20,7 +20,7 @@ target("images/")
 --		Import some images in various ways.
 --
 
-import("arrow"..scale,"ghost"..scale,"player"..scale,"player_banked"..scale,"bullet"..scale)
+import("arrow"..scale,"ghost"..scale,"player"..scale,"player_banked"..scale,"bullet"..scale,"shield"..scale)
 
 input("")
 import3D("enemy1","enemy1",scale, { time = 800 },true)
