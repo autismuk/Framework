@@ -61,8 +61,9 @@ manager:start("start",{ })
 
 --[[
 	
-6.7) Prize gives short shield. Implement shield (non graphic bits)
-9) Title Screen, go resets status and creates a new factory.
+5) Implement periodic short vibrations
+6) Title Screen, go resets status and creates a new factory.
+7) Prize gives short shield. Implement shield (non graphic bits)
 10) Testing esp. Admob.
 
 Dump super and patch it out.

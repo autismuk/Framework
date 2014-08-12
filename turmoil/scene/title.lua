@@ -38,7 +38,7 @@ function titleScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")
 	scene:new("scene.titleScene.main",data)
 	scene:new("gui.icon.pulsing", { image = "images/go.png", width = 17, x = 87, y = 87, listener = self, message = "start" })
-	scene:new("gui.text.list", { x = 50, y = 65, listener = self, message = "active" , tint = { 1,0.8,0.5 },font = { name = "grapple", size = 48 },
+	scene:new("gui.text.list", { x = 50, y = 65, listener = self, message = "active" , tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },
 								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } )
 	return scene
 end 

@@ -43,7 +43,7 @@ end
 --//	Create and register a new class, which may be subclassed from another class.
 --//	@className 			[string]			Class identifier.
 --//	@superClass 		[string/table]		Superclass, may be nil.
-
+--//	@return 			[class,super]		New class prototype, superclass prototype (if any)
 function Framework:createClass(className,superClass)
 	className = className:lower() 																-- class name L/C
 	assert(self:validateClassIdentifier(className),className .. " is a bad class identifier") 	-- validate parameters.
@@ -57,10 +57,9 @@ function Framework:createClass(className,superClass)
 		end 
 		setmetatable(newClass,superClass) 														-- set up the metatable
 		superClass.__index = superClass 
-		newClass.super = superClass 															-- save the superclass.
 	end 
 	self:register(className,newClass)															-- register this new class
-	return newClass 																			-- and return it.
+	return newClass,superClass 																	-- and return it.
 end
 
 --//	Create a new object, given a class name or prototype, and optional initialisation data. Create the object, then set it up

@@ -36,7 +36,7 @@ function IconButton:getDisplayObjects()
 	return { self.m_image }
 end 
 
-local IconButtonPulse = Framework:createClass("gui.icon.pulsing","gui.icon")
+local IconButtonPulse,SuperClass = Framework:createClass("gui.icon.pulsing","gui.icon")
 
 function IconButtonPulse:onUpdate(deltaTime)
 	self.m_clock = (self.m_clock or 0) + deltaTime 
@@ -58,7 +58,9 @@ function ActiveText:constructor(info)
 	self.m_message = info.message or "click"
 	self.m_text:addEventListener("tap",self)
 	self.m_pulseOnClick = info.pulse
+	self.m_vibration = info.vibration
 	if self.m_pulseOnClick == nil then self.m_pulseOnClick = true end
+	if self.m_vibration == nil then self.m_vibration = true end 
 end 
 
 function ActiveText:destructor()
@@ -78,11 +80,11 @@ function ActiveText:getDisplayObjects()
 	return { self.m_text }
 end 
 
-local ActiveTextRotateAbstract = Framework:createClass("gui.text.rotate.abstract","gui.text")
+local ActiveTextRotateAbstract,SuperClass = Framework:createClass("gui.text.rotate.abstract","gui.text")
 
 function ActiveTextRotateAbstract:constructor(info)
 	self.m_current = 1
-	self.super.constructor(self,info)
+	SuperClass.constructor(self,info)
 	self.m_text:setText(self:getEntry(self.m_current))
 end 
 
@@ -99,7 +101,7 @@ function ActiveTextRotateAbstract:tap(event)
 	end 
 	self.m_text:setText(newText)
 	self:updateFont(self.m_text)
-	self.super.tap(self,event)
+	SuperClass.tap(self,event)
 end
 
 function ActiveTextRotateAbstract:getSelected()
@@ -108,11 +110,15 @@ end
 
 function ActiveTextRotateAbstract:updateFont(textObject) end 
 
-local ActiveTextList = Framework:createClass("gui.text.list","gui.text.rotate.abstract")
+local ActiveTextList,SuperClass = Framework:createClass("gui.text.list","gui.text.rotate.abstract")
 
 function ActiveTextList:constructor(info)
-	print("Constructor")
-	self.super.constructor(self,info)
+	self.m_items = info.items
+	SuperClass.constructor(self,info)
+end
+
+function ActiveTextList:getEntry(n)
+	return self.m_items[n]
 end
 
 --- ************************************************************************************************************************************************************************

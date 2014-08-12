@@ -60,13 +60,13 @@ function StubSceneDisplay:tap(event)
 	self:performGameEvent(event.target.framework_action,self.m_data)							-- fire game event with given data.
 end
 
-local StubScene = Framework:createClass("utils.stubscene","game.sceneManager")
+local StubScene,SuperClass = Framework:createClass("utils.stubscene","game.sceneManager")
 
 --//	Constructor - creates stub scene.
 --//	@info 	[table]			has name, targets, same as stubscenedisplay
 
 function StubScene:constructor(info) 
-	self.super.constructor(self,info)															-- superclass constructor
+	SuperClass.constructor(self,info)															-- superclass constructor
 	self.m_name = info.name 																	-- remember stuff
 	self.m_targets = info.targets 
 	self.m_data = info.data

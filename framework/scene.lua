@@ -9,14 +9,14 @@
 ---
 --- ************************************************************************************************************************************************************************
 
-local Scene = Framework:createClass("game.scene","system.collection")							-- create collection class.
+local Scene,SuperClass = Framework:createClass("game.scene","system.collection")				-- create collection class.
 
 
 --//	Construct a scene, which is a collection with updating and a possible global container.
 --//	@info 	[table]		Initialisation info (ignored)
 
 function Scene:constructor(info)
-	self.super.constructor(self,info)
+	SuperClass.constructor(self,info)
 	self.m_container = nil
 	self:tag("enterFrame")
 end 
@@ -39,7 +39,7 @@ end
 --//	@data 		[table]							Optional instantiation data (is passed to constructor as {} if nil)
 
 function Scene:new(className,data) 
-	local newObject = self.super.new(self,className,data) 										-- create a new object
+	local newObject = SuperClass.new(self,className,data) 										-- create a new object
 	if newObject.getDisplayObjects ~= nil then  												-- does it have a getDisplayObjects() method
 		local objects = newObject:getDisplayObjects() 											-- if so get them
 		local container = self:getContainer() 													-- make sure it is created.
@@ -65,7 +65,7 @@ end
 --//	Delete collection ; deletes objects in the collection too.
 
 function Scene:destructor()
-	self.super.destructor(self)																	-- delete all owning objects
+	SuperClass.destructor(self)																	-- delete all owning objects
 	if self.m_container ~= nil then  															-- if a container exists
 		self.m_container:removeSelf() 															-- remove it and any objects contained in it.
 	end
