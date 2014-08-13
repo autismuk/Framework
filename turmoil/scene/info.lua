@@ -77,7 +77,7 @@ function InfoMain:destructor()
 end 
 
 function InfoMain:tap(event)
-	self:performGameEvent("start") 															-- and run it
+	self:performGameEvent("start") 																-- and run it
 end 
 
 function InfoMain:getDisplayObjects() return { self.m_group } end

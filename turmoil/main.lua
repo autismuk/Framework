@@ -47,7 +47,7 @@ manager:addManagedState("end",
 						Framework:new("scene.infoScene", { message = "Game Over"}),
 						{ start = "start", exit = "start"}) 									-- Game Over, Score, go back, or go back.
 
-manager:start("main",{ })
+manager:start("start",{ })
 
 --- ************************************************************************************************************************************************************************
 --[[

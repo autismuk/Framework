@@ -22,7 +22,7 @@ Player.RETURN_STATE = 3 																		-- returning from grabbing a prize.
 
 Player.FIRE_RATE = 0.8 																			-- Player fire delays in seconds.
 Player.GHOST_TIME = 3.0 																		-- time after which ghost is sent.
-Player.SHIELD_TIME = 6.0 																		-- shield time.
+Player.SHIELD_TIME = 5.0 																		-- shield time.
 
 Player.FETCH_SPEED = 125 																		-- Grabbing the grabbable speed.
 
@@ -105,6 +105,7 @@ end
 --//	Called to end movement of player
 
 function Player:endMovement()
+	if not self:isAlive() then return end
 	self.m_playerState = Player.WAIT_STATE 														-- back to wait state, can fire now.
 	self.m_transaction = nil 																	-- forget transaction reference
 	local object = self.m_gameSpace:fetchObject(self.m_channel) 								-- get the object in this channel.
@@ -167,19 +168,22 @@ function Player:onUpdate(deltaTime)
 		self:reposition() 																		-- and redraw.
 	end
 
-	if self.m_playerState ~= Player.MOVE_STATE and self.m_shield < 0 then 						-- cannot be hit when moving or the shield is up.
-		local enemyObject = self.m_gameSpace:fetchObject(self.m_channel) 						-- get object in channel.
-		if enemyObject ~= nil and enemyObject:collide(50) then 									-- collided with object
-			Framework.fw.status:addLife(-1) 													-- lose a life.
-			enemyObject:kill() 																	-- kill the object
-			self:sendMessageLater("gameSpace","endLevel",nil,2.5)								-- send an 'end level' message after 2.5 seconds.
-			local spr = Sprites:newImage("player") 												-- clone the sprite so we can animate it
-			spr.x,spr.y = self.m_sprite.x,self.m_sprite.y 
-			spr.xScale,spr.yScale = self.m_sprite.xScale,self.m_sprite.yScale
-			transition.to(spr,{ time = 2000, xScale = 10, yScale = 10, alpha = 0.2, 			-- animate it
-											rotation = 3600, onComplete = function(o) o:removeSelf() end })
-			self:playSound("dead") 																-- death tune
-			self:delete() 																		-- remove the player
+	if self.m_shield < 0 then 																	-- cannot be hit when the shield is up.
+		local channel = self.m_gameSpace:physicalToLogical(self.m_sprite.y) 					-- get the channel
+		if channel ~= nil then 
+			local enemyObject = self.m_gameSpace:fetchObject(math.floor(channel)) 				-- get object in channel.
+			if enemyObject ~= nil and enemyObject:collide(50) then 								-- collided with object
+				Framework.fw.status:addLife(-1) 												-- lose a life.
+				enemyObject:kill() 																-- kill the object
+				self:sendMessageLater("gameSpace","endLevel",nil,2.5)							-- send an 'end level' message after 2.5 seconds.
+				local spr = Sprites:newImage("player") 											-- clone the sprite so we can animate it
+				spr.x,spr.y = self.m_sprite.x,self.m_sprite.y 
+				spr.xScale,spr.yScale = self.m_sprite.xScale,self.m_sprite.yScale
+				transition.to(spr,{ time = 2000, xScale = 10, yScale = 10, alpha = 0.2, 		-- animate it
+												rotation = 3600, onComplete = function(o) o:removeSelf() end })
+				self:playSound("dead") 															-- death tune
+				self:delete() 																	-- remove the player
+			end
 		end 
 	end 
 

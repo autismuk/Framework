@@ -156,6 +156,18 @@ function GameSpace:getPos(xPercent,yChannel)
 	return xPercent * display.contentWidth / 100, self.m_channelSize * (yChannel - 0.5)+ self.m_headerSize + self.m_borderSize / 2
 end 
 
+--//	Convert physical vertical position to channel number, or nil if not definitely 'in' channel.
+--//	@yPos 		[number]		Vertical sprite position.
+--//	@return 	[number]		channel number or nil
+
+function GameSpace:physicalToLogical(yPos)
+	yPos = yPos - self.m_headerSize - self.m_borderSize / 2 									-- Convert to a channel position
+	yPos = yPos / self.m_channelSize + 1
+	local frac = yPos - math.floor(yPos) 														-- what position in channel
+	if frac < 0.25 or frac > 0.75 then return nil end 											-- if not roughly central return nil.
+	return math.floor(yPos) 																	-- return integer channel number.
+end 
+
 --//	Handle tap messages, convert to the logical system.
 --//	@event 		[event]			Event Data
 --//	@return 	[boolean]		True as processed.
