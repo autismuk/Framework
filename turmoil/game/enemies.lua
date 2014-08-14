@@ -273,7 +273,8 @@ function EnemyGhost:kill() return end 															-- cannot be killed.
 
 		Date 		Version 	Notes
 		---- 		------- 	-----
-		04-Aug-2014	0.1 		Initial version of file
+		04-Aug-14	0.1 		Initial version of file
+		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************

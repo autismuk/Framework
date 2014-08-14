@@ -16,6 +16,7 @@ require("utils.particle")
 local Sprites = require("images.sprites")
 
 --//	Create the Information Screen
+--//	@info 	[table]			Constructor information
 
 function InfoMain:constructor(info)
 	local msg = info.message 																	-- provided message
@@ -123,6 +124,7 @@ end
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		11-Aug-2014	0.1 		Initial version of file
+		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************

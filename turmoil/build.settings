@@ -14,6 +14,20 @@ settings =
             },
         },      
 
+    excludeFiles = 
+    {
+        all = { "main_spritetest.lua", "rawgfx/*","miscellany/*" },
+    },
+
+    android =
+    {
+        usesPermissions =
+        {
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE"
+        },
+    },
+
    	iphone =
     {
         plist =

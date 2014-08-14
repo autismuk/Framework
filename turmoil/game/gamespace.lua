@@ -210,7 +210,7 @@ function GameSpace:onMessage(sender,message,data)
 		Framework:new("game.enemyFactory") 														-- create a new factory for the next level.
 	end 
 
-	if Framework.fw.status:getLives() == 0 then 
+	if Framework.fw.status:getLives() == 0 then  												-- if lives zero, then exit else continue.
 		self:performGameEvent("lost")
 	else 
 		self:performGameEvent("continue")
@@ -223,6 +223,7 @@ end
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		2-Aug-14	0.1 		Initial version of file
+		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************

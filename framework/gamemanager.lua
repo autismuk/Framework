@@ -149,6 +149,7 @@ end)
 		---- 		------- 	-----
 		23-Jul-14	0.1 		Initial version of file
 		05-Aug-14 	0.11 		GameManager:start() accepts a second parameter which is event data.
+		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************

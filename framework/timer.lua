@@ -115,6 +115,7 @@ Framework:addObjectMethod("cancelTimer",function(self,tag)
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		16-Jul-14	0.1 		Initial version of file
+		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************

@@ -9,10 +9,9 @@
 ---
 --- ************************************************************************************************************************************************************************
 
-ApplicationVersion = "v0.1"
+ApplicationVersion = "v1.0"
 
 display.setStatusBar(display.HiddenStatusBar)													-- hide status bar.
---require("main_spritetest")
 require("strict")																				-- install strict.lua to track globals etc.
 require("framework.framework")																	-- framework.
 require("utils.sound")
@@ -27,9 +26,7 @@ Framework:new("game.status") 																	-- create game status object.
 
 Framework.fw.status:reset()
 
-local eFactory = Framework:new("game.enemyFactory") 											-- create an enemy factory (todo: not eventually required)
-
-local manager = Framework:new("game.manager")
+local manager = Framework:new("game.manager") 													-- Create a new game manager and add states.
 
 manager:addManagedState("start",																-- Title Page
 						Framework:new("scene.titleScene"), 
@@ -55,13 +52,14 @@ manager:start("start",{ })
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		02-Aug-2014	0.1 		Initial version of file
+		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************
 
 --[[
 
-2) Player is invincible while moving (is this a good idea ?)
-3) Testing esp. Admob.
+	Change channels ?
+	Testing.
 
 --]]
