@@ -59,7 +59,6 @@ manager:start("start",{ })
 
 --[[
 
-	Change channels ?
 	Testing.
 
 --]]

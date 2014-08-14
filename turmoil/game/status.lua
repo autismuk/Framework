@@ -69,6 +69,13 @@ function StatusObject:setStartLevel(n)
 	self.m_defaultLevel = n 
 end
 
+--//	Set the channel count
+--//	@n 	[number]		new channel count
+
+function StatusObject:setChannelCount(n)
+	self.m_channels = n 
+end 
+
 --- ************************************************************************************************************************************************************************
 --[[
 

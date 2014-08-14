@@ -49,9 +49,12 @@ function titleScene:preOpen(manager,data,resources)
 	scene:new("scene.titleScene.main",data)														-- add title text
 	scene:new("gui.icon.pulsing", { image = "images/go.png", 									-- add pulsing icon.
 					width = 17, x = 87, y = 87, listener = self, message = "start" })
-	scene:new("gui.text.list", { x = 50, y = 65, listener = nil, message = "active" , 			-- add clickable switching text list.
+	scene:new("gui.text.list", { x = 50, y = 63, listener = nil, message = "active" , 			-- add clickable switching text lists
 								 tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },
 								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } ):name("startLevel")
+	scene:new("gui.text.list", { x = 50, y = 77, listener = nil,
+								 tint = { 1,0.8,0.5}, font = { name = "grapple",size = 40 },
+								 items = { "7 Channels","9 Channels","11 Channels","5 Channels"}}):name("channelCount")
 	return scene
 end 
 
@@ -61,6 +64,9 @@ function titleScene:onMessage(sender,message,data)
 	local startLevel = Framework.fw.startLevel:getSelected() 									-- get the start level from the clickable switching list
 	startLevel = math.max(1,(startLevel-1) * 5) 												-- convert to 1,5,10
 	Framework.fw.status:setStartLevel(startLevel) 												-- update the start level value
+	local channelCount = Framework.fw.channelCount:getSelected() 								-- get channelcount index
+	if channelCount == 4 then channelCount = 5 else channelCount = channelCount * 2 + 5 end 	-- convert to an actual number
+	Framework.fw.status:setChannelCount(channelCount) 											-- store it.
 	Framework.fw.status:reset() 																-- reset the game
 	if Framework.fw.enemyFactory ~= nil then Framework.fw.enemyFactory:delete() end  			-- delete any left over factory
 	Framework:new("game.enemyFactory") 															-- create a new factory
