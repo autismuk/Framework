@@ -49,7 +49,7 @@ function titleScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene") 													-- create a new scene
 	scene:new("scene.titleScene.main",data)														-- add title text
 	scene:new("gui.icon.pulsing", { image = "images/go.png", 									-- add pulsing icon.
-					width = 17, x = 87, y = 87, listener = self, message = "start" })
+					width = 14, x = 90, y = 90, listener = self, message = "start" })
 	scene:new("gui.text.list", { x = 50, y = 63, listener = nil, message = "active" , 			-- add clickable switching text lists
 								 tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },key = "startlevel",
 								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } ):name("startLevel")

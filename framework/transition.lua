@@ -42,7 +42,10 @@ function Transitioner:execute(display1,display2,transitionType,transitionTime,no
 	self.m_notifier = notifier
 	self.m_method = notifyMethod
 	self.m_nextPhase = 1 																		-- next phase is phase 1.
-	self:executePhase()
+	self.m_cover = display.newRect(0,0,display.contentWidth,display.contentHeight) 				-- event trap.
+	self.m_cover.anchorX,self.m_cover.anchorY = 0,0 self.m_cover.alpha = 0.01
+	self.m_cover:addEventListener("tap",self)
+	self:executePhase() 																		-- and start.
 end 
 
 --//	Execute the next phase of the transition - 1 = phase out first (not concurrent), 2 phase in second (phase out first if concurrent)
@@ -99,6 +102,7 @@ function Transitioner:setupTransform(displayObject,transformDefinition,executeOn
 	transform.time = self.m_time * 1000 														-- time in milliseconds, not seconds
 	displayObject.isVisible = true 																-- make it visible.
 	displayObject:toFront() 																	-- bring it to the front.
+	self.m_cover:toFront() 																		-- finally bring the event trap to the front.
 	transition.to(displayObject,transform)														-- and do it.
 
 	--print(self.m_nextPhase-1,displayObject,transformDefinition,executeOnCompletion)
@@ -109,12 +113,20 @@ end
 --//	we've done, and null all references.
 
 function Transitioner:exitTransition()
+	self.m_cover:removeEventListener("tap",self) 												-- remove trap.
+	self.m_cover:removeSelf()
 	if self.m_fromDisplay ~= nil then self:resetScene(self.m_fromDisplay) end 					-- reset from scene
 	self:resetScene(self.m_toDisplay) 															-- reset to scene
 	self.m_toDisplay:toFront() 																	-- bring scene to the front
 	self.m_fromDisplay = nil self.m_toDisplay = nil 											-- null stuff out
 	self.m_notifier[self.m_method](self.m_notifier)
 	self.m_notifier = nil 																		-- forget about notifier
+end 
+
+--//	Dispose of events grabbed by the event trap.
+
+function Transitioner:tap(event)
+	return true 
 end 
 
 Transitioner.defaults = { 	alphaStart = 1.0, alphaEnd = 1.0,									-- List of transition default values
