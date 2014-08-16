@@ -183,10 +183,12 @@ function Enemy5:getScore() return 100 end
 
 local Enemy6,SuperClass = Framework:createClass("game.enemy.type6","game.enemybase") 			-- the prize class (can be picked up)
 
+Enemy6.WAIT_TIME = 4 																			-- time before pinging.
+
 function Enemy6:constructor(info)
 	SuperClass.constructor(self,info)															-- superconstructor
 	self.m_hasStarted = false  																	-- set to true when has started pinging
-	self.m_startTime = 4 																		-- when it starts pinging (seconds)
+	self.m_startTime = Enemy6.WAIT_TIME 														-- when it starts pinging (seconds)
 end 
 
 function Enemy6:getSpriteSequence() 
@@ -207,6 +209,10 @@ function Enemy6:onUpdate(deltaTime)
 		self.m_hasStarted = true 																-- if so, mark as such.
 		self.m_sprite:setSequence("smallprize") 												-- only use the small sprite image.
 	end 
+	if self.m_elapsedTime < self.m_startTime then 
+		local speedScalar = 0.5 + 2 * self.m_elapsedTime / self.m_startTime
+		self.m_sprite.timeScale = speedScalar
+	end
 end 
 
 function Enemy6:isShootable() 																	-- can only be shot when in motion.

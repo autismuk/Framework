@@ -21,7 +21,7 @@ function EnemyFactory:constructor(info)
 	self.m_level = Framework.fw.status:getLevel()												-- get current level from status object.
 	self.m_enemyCount = self.m_level * 4 + 10 													-- number of bad guys in each level.
 
-	--self.m_enemyCount = 2 print("Level count fudge in")											-- testing thing.
+	-- self.m_enemyCount = 1 print("Level count fudge in")											-- testing thing.
 
 	for i = 1,EnemyFactory.TYPE_COUNT do self.m_enemyTotals[i] = 0 end 							-- clear individual count
 	for i = 1,self.m_enemyCount do 																-- add them distributed randomly.
@@ -88,7 +88,9 @@ function EnemyFactory:spawn(sceneRef,gameSpace)
 	if not self.m_started then return end 														-- check actually going.
 	if self:isQueueEmpty() then return end 														-- nothing to spawn.
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.
-	--tID = 6 																					-- uncomment this to force a specific enemy type.
+
+	--tID = 6 print("Type fudge in")															-- uncomment this to force a specific enemy type.
+
 	self.m_nextQueueItem = self.m_nextQueueItem + 1 											-- bump the queue.
 	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, type = tID,level = self.m_level }) 	-- spawn one.																					
 	self:playSound("appear")
