@@ -10,6 +10,7 @@
 --- ************************************************************************************************************************************************************************
 
 require("utils.gui")
+require("utils.soundcontrol")
 
 local TitleMain = Framework:createClass("scene.titleScene.main")
 
@@ -19,8 +20,8 @@ local TitleMain = Framework:createClass("scene.titleScene.main")
 function TitleMain:constructor(info)
 	self.m_group = display.newGroup()															-- put everything in a group
 	local txt = display.newText(self.m_group,ApplicationVersion,0,								-- version number bottom left
-													display.contentHeight,native.systemFont,14)
-	txt.anchorX,txt.anchorY = 0,1
+													0,native.systemFont,14)
+	txt.anchorX,txt.anchorY = 0,0
 	display.newBitmapText(self.m_group,"Turmoil",												-- main text
 						display.contentWidth/2,display.contentHeight/5,"grapple",128):setTintColor(1,1,0)
 	display.newBitmapText(self.m_group,"(c) Paul Robson 2014",
@@ -50,11 +51,12 @@ function titleScene:preOpen(manager,data,resources)
 	scene:new("gui.icon.pulsing", { image = "images/go.png", 									-- add pulsing icon.
 					width = 17, x = 87, y = 87, listener = self, message = "start" })
 	scene:new("gui.text.list", { x = 50, y = 63, listener = nil, message = "active" , 			-- add clickable switching text lists
-								 tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },
+								 tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },key = "startlevel",
 								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } ):name("startLevel")
 	scene:new("gui.text.list", { x = 50, y = 77, listener = nil,
-								 tint = { 1,0.8,0.5}, font = { name = "grapple",size = 40 },
+								 tint = { 1,0.8,0.5}, font = { name = "grapple",size = 40 },key = "channelcount",
 								 items = { "7 Channels","9 Channels","11 Channels","5 Channels"}}):name("channelCount")
+	scene:new("audio.control", { r = 173/255,g = 1,b = 47/255 })
 	return scene
 end 
 

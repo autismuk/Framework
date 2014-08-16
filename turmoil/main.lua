@@ -51,7 +51,7 @@ manager:start("start",{ })
 
 		Date 		Version 	Notes
 		---- 		------- 	-----
-		02-Aug-2014	0.1 		Initial version of file
+		02-Aug-14	0.1 		Initial version of file
 		14-Aug-14 	1.0 		Advance to releasable version 1.0
 
 --]]
@@ -59,6 +59,10 @@ manager:start("start",{ })
 
 --[[
 
-	Testing.
+1) Clicking on home immediately after start gives error line fsm.86. Event picked up before pre-open is run.
+   Can also trigger by clicking onlevel space on the way back (gives title.66 error)
+   Events not being locked out by game manager.
+2) Varying ring-collect animation depending on elapsed time.
+3) Testing 
 
 --]]

@@ -9,6 +9,8 @@
 ---
 --- ************************************************************************************************************************************************************************
 
+require("utils.registry")
+
 --- ************************************************************************************************************************************************************************
 --//													Button that sends a message when clicked, uses an image
 --- ************************************************************************************************************************************************************************
@@ -61,7 +63,7 @@ local IconButtonPulse,SuperClass = Framework:createClass("gui.icon.pulsing","gui
 
 function IconButtonPulse:onUpdate(deltaTime)
 	self.m_clock = (self.m_clock or 0) + deltaTime 												-- keep track of time
-	local scale = math.sin(self.m_clock * 3) * 0.2 + 1 											-- work out the pulsing
+	local scale = math.sin(self.m_clock * 3) * 0.1 + 1 											-- work out the pulsing
 	self.m_image.xScale,self.m_image.yScale = scale,scale  										-- and adjust the scale.
 end 
 
@@ -144,10 +146,24 @@ local ActiveTextRotateAbstract,SuperClass = Framework:createClass("gui.text.rota
 --//	@info 	[table]			Constructor information
 
 function ActiveTextRotateAbstract:constructor(info)
+	self.m_storageKey = info.key 																-- get the storage key.
 	self.m_current = 1 																			-- currently displayed object
+	if self.m_storageKey ~= nil then 
+		self.m_storageKey = "activetext.rotator.temp."..info.key 								-- make it a long key.
+		self.m_current = self:readRegistry(self.m_storageKey) or 1 								-- retrieve old state from key.
+	end
 	SuperClass.constructor(self,info) 															-- call the constructor
 	self.m_text:setText(self:getEntry(self.m_current)) 											-- update the current text value
 end 
+
+--//	Dispose of object.
+
+function ActiveTextRotateAbstract:destructor()
+	if self.m_storageKey ~= nil then  															-- if state is saved, write it back.
+		self:writeRegistry(self.m_storageKey,self.m_current)
+	end 
+	SuperClass.destructor(self) 																-- and tidy up
+end
 
 --//	Dummy getEntry() method which should be overridden
 --//	@n 		[number]		Entry number
