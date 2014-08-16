@@ -59,7 +59,6 @@ manager:start("start",{ })
 
 --[[
 
-2) Varying ring-collect animation depending on elapsed time.
 3) Testing 
 
 --]]
