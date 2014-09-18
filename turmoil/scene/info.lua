@@ -32,10 +32,10 @@ function InfoMain:constructor(info)
 						  "grapple",72):setTintColor(1,0.5,0)
 
 	self.m_score = {} 																			-- score digits
-	for i = 1,6 do 
+	for i = 1,7 do 
 		self.m_score[i] = display.newBitmapText(self.m_group, 									-- create each one
 										 "-",
-										 display.contentWidth/2 + i * 36-125,
+										 display.contentWidth/2 + i * 36-125-18,
 										 display.contentHeight*0.55,
 										 "grapple",64):setTintColor(0,1,1)
 		self.m_score[i].yScale = 1.7
@@ -53,8 +53,8 @@ function InfoMain:constructor(info)
 							  "grapple",64):setTintColor(0,1,0.5)
 	end 
 
-	self.m_requiredScore = ("000000" .. Framework.fw.status:getScore()):sub(-6) 				-- final score display
-	self.m_displayedScore = "000000"															-- current display
+	self.m_requiredScore = ("0000000" .. Framework.fw.status:getScore()):sub(-7) 				-- final score display
+	self.m_displayedScore = "0000000"															-- current display
 	self.m_currentDigit = 1 																	-- current digit rolled in
 	self.m_digitTime = 0 																		-- roll in timer.
 
@@ -84,7 +84,7 @@ end
 function InfoMain:getDisplayObjects() return { self.m_group } end
 
 function InfoMain:onUpdate(deltaTime)
-	if self.m_currentDigit > 6 then return end 													-- end if displayed all digits
+	if self.m_currentDigit > 7 then return end 													-- end if displayed all digits
 	self.m_digitTime = self.m_digitTime + deltaTime 											-- bump counter
 	local d = self.m_currentDigit
 	if self.m_digitTime > 0.15 and 																-- time up and right digit displayed
