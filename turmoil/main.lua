@@ -52,14 +52,13 @@ manager:start("start",{ })
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		02-Aug-14	0.1 		Initial version of file
-		14-Aug-14 	1.0 		Advance to releasable version 1.0
+		18-Sep-14 	1.0 		Advance to releasable version 1.0
 
 --]]
 --- ************************************************************************************************************************************************************************
 
 --[[
 
-2) Player can be stuck on extreme edge of screen fetching, some sort of collision occurs when in that mode, and sticks there ?
 4) Testing (build with icons etc.)
 5) Release.
 

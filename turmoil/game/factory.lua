@@ -89,7 +89,7 @@ function EnemyFactory:spawn(sceneRef,gameSpace)
 	if self:isQueueEmpty() then return end 														-- nothing to spawn.
 	local tID = self.m_enemyQueue[self.m_nextQueueItem] 										-- get the next one to spawn.
 
-	--tID = 6 print("Type fudge in")															-- uncomment this to force a specific enemy type.
+	-- tID = 6 print("Type fudge in")															-- uncomment this to force a specific enemy type.
 
 	self.m_nextQueueItem = self.m_nextQueueItem + 1 											-- bump the queue.
 	sceneRef:new("game.enemy.type"..tID,{ gameSpace = gameSpace, type = tID,level = self.m_level }) 	-- spawn one.																					

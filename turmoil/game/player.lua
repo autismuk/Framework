@@ -168,7 +168,7 @@ function Player:onUpdate(deltaTime)
 		self:reposition() 																		-- and redraw.
 	end
 
-	if self.m_shield < 0 then 																	-- cannot be hit when the shield is up.
+	if self.m_shield < 0 and self.m_playerState ~= Player.RETURN_STATE then 					-- cannot be hit when the shield is up, or returning.
 		local channel = self.m_gameSpace:physicalToLogical(self.m_sprite.y) 					-- get the channel
 		if channel ~= nil then 
 			local enemyObject = self.m_gameSpace:fetchObject(math.floor(channel)) 				-- get object in channel.
