@@ -23,9 +23,13 @@ function TitleMain:constructor(info)
 													0,native.systemFont,14)
 	txt.anchorX,txt.anchorY = 0,0
 	display.newBitmapText(self.m_group,"Turmoil",												-- main text
-						display.contentWidth/2,display.contentHeight/5,"grapple",128):setTintColor(1,1,0)
+						display.contentWidth/2,display.contentHeight/6,"grapple",118):setTintColor(1,1,0)
 	display.newBitmapText(self.m_group,"(c) Paul Robson 2014",
-						display.contentWidth/2,display.contentHeight*0.43,"grapple",40):setTintColor(0,1,1)
+						display.contentWidth/2,display.contentHeight*0.37,"grapple",40):setTintColor(0,1,1)
+
+	local highScore = Framework.fw.status:getHighScore()
+	display.newBitmapText(self.m_group,"Best-" .. ("0000000" .. highScore):sub(-7),
+						display.contentWidth/2,display.contentHeight*0.52,"grapple",44):setTintColor(1,0.5,0)
 end 
 
 --// 	Tidy up
@@ -50,10 +54,10 @@ function titleScene:preOpen(manager,data,resources)
 	scene:new("scene.titleScene.main",data)														-- add title text
 	scene:new("gui.icon.pulsing", { image = "images/go.png", 									-- add pulsing icon.
 					width = 14, x = 90, y = 90, listener = self, message = "start" })
-	scene:new("gui.text.list", { x = 50, y = 63, listener = nil, message = "active" , 			-- add clickable switching text lists
+	scene:new("gui.text.list", { x = 50, y = 68, listener = nil, message = "active" , 			-- add clickable switching text lists
 								 tint = { 1,0.8,0.5 },font = { name = "grapple", size = 40 },key = "startlevel",
 								 items = { "Start at Level 1","Start at Level 5","Start at Level 10"} } ):name("startLevel")
-	scene:new("gui.text.list", { x = 50, y = 77, listener = nil,
+	scene:new("gui.text.list", { x = 50, y = 82, listener = nil,
 								 tint = { 1,0.8,0.5}, font = { name = "grapple",size = 40 },key = "channelcount",
 								 items = { "7 Channels","9 Channels","11 Channels","5 Channels"}}):name("channelCount")
 	scene:new("audio.control", { r = 173/255,g = 1,b = 47/255 })

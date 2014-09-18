@@ -59,10 +59,8 @@ manager:start("start",{ })
 
 --[[
 
-1) High score on main screen (non persistent)
 2) Player can be stuck on extreme edge of screen fetching, some sort of collision occurs when in that mode, and sticks there ?
-3) Too many bad guys on higher levels maybe ? Check numbers
-4) Testing.
+4) Testing (build with icons etc.)
 5) Release.
 
 --]]
