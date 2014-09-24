@@ -17,7 +17,6 @@ local Registry = Framework:createClass("system.registry")
 
 function Registry:constructor(info) 
 	self.m_keys = {}
-	print("Registry")
 end 
 
 --//	Destructor - throws object
