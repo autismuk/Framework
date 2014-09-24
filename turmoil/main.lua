@@ -59,7 +59,6 @@ manager:start("start",{ })
 
 --[[
 
-1) Fix AdMob for Turmoil ads.
 4) Testing (build with icons etc.)
 5) Release.
 

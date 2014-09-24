@@ -30,8 +30,10 @@ settings =
 
    	iphone =
     {
+               
         plist =
         {
+                        
             CFBundleIconFiles = {
 	            "Icon.png",
     	        "Icon@2x.png",

@@ -18,6 +18,8 @@ settings =
     {
         plist =
         {
+            CFBundleShortVersionString = "1.0",
+
             CFBundleIconFiles = {
 	            "Icon.png",
     	        "Icon@2x.png",
@@ -36,4 +38,7 @@ settings =
             },
         }
     },
+
+    ",
+    
 }

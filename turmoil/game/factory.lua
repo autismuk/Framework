@@ -19,7 +19,7 @@ EnemyFactory.TYPE_COUNT = 7
 function EnemyFactory:constructor(info)
 	self.m_enemyTotals = {} 																	-- count of enemies to kill of each type.
 	self.m_level = Framework.fw.status:getLevel()												-- get current level from status object.
-	self.m_enemyCount = math.floor(math.min(self.m_level * 3/2 + 10,25)) 						-- number of bad guys in each level.
+	self.m_enemyCount = math.floor(math.min(self.m_level * 2 + 9,32)) 							-- number of bad guys in each level.
 
 	-- self.m_enemyCount = 1 print("Level count fudge in")											-- testing thing.
 
