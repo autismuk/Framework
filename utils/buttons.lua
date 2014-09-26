@@ -1,9 +1,9 @@
 --- ************************************************************************************************************************************************************************
 ---
----				Name : 		soundcontrol.lua
----				Purpose :	Sound controller class
+---				Name : 		buttons.lua
+---				Purpose :	Various Button types - up down left right home and sound.
 ---				Created:	15 August 2014
----				Updated:	15 August 2014
+---				Updated:	26 September 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -11,7 +11,7 @@
 
 require("framework.framework")
 
-local AudioController = Framework:createClass("audio.control") 									
+local AudioController = Framework:createClass("control.audio") 									
 
 AudioController.isSoundEnabled = true 															-- set to true when audio is enabled.
 
@@ -124,6 +124,8 @@ end
 		Date 		Version 	Notes
 		---- 		------- 	-----
 		15-Aug-14	0.1 		Initial version of file
+		26-Sep-14 	0.2 		Generalised (became buttons.lua), audio.control became control.audio and added other buttons and 
+								generalised the code.
 
 --]]
 --- ************************************************************************************************************************************************************************
