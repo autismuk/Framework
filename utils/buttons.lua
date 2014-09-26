@@ -11,18 +11,90 @@
 
 require("framework.framework")
 
-local AudioController = Framework:createClass("control.audio") 									
+--- ************************************************************************************************************************************************************************
+--																Abstract controller base type
+--- ************************************************************************************************************************************************************************
+
+local AbstractController = Framework:createClass("control.abstract")
+
+function AbstractController:constructor(info)
+	self.m_group = display.newGroup()															-- speaker and cross in groups
+	local colour = { info.r or 0,info.g or 1,info.b or 0 }
+	self:draw(colour)
+	if info.width == nil then  																	-- calculate size if not provided
+		self.m_group.xScale =  (display.contentWidth / 12) / 40
+	else 
+		self.m_group.xScale = (info.width * display.contentWidth) / 100 
+	end
+	self.m_scale = self.m_group.xScale 															-- save scale and copy to Y
+	self.m_group.yScale = self.m_group.xScale
+	self.m_group.x,self.m_group.y = 10,display.contentHeight - self.m_group.height-10 			-- calculate position
+	if info.x ~= nil then 
+		self.m_group.x = display.contentWidth * info.x / 100 
+		self.m_group.y = display.contentHeight * info.y / 100 
+	end
+	self.m_group.x = self.m_group.x + self.m_group.width/2 										-- centre so pulses around centre
+	self.m_group.y = self.m_group.y + self.m_group.height/2
+	self.m_group.rotation = info.rotation or 0 													-- rotate accordingly
+	self.m_group:addEventListener("tap",self)													-- add tap listener
+	self.m_owner = info.owner 																	-- remember who to send the messages to.
+	self.m_name = info.name or "button" 														-- what to send
+end 
+
+--//	Tidy up
+
+function AbstractController:destructor()
+	self.m_group:removeEventListener("tap",self)												-- remove tap listener
+	self.m_group:removeSelf()
+	self.m_group = nil
+	self.m_owner = nil
+end 
+
+--//	Get objects
+
+function AbstractController:getDisplayObjects()
+	return { self.m_group }
+end 
+
+function AbstractController:tap(e)
+	print("Tap !",self.m_owner,self.m_name)
+	if self.m_owner ~= nil then 																-- is something listening - it should be :)
+		self:sendMessage(self.m_owner,"iconbutton", { type = self.m_name }) 					-- send it a message saying we have tapped the button.
+	end
+end
+
+--- ************************************************************************************************************************************************************************
+--														Arrow Button (defaults to right)
+--- ************************************************************************************************************************************************************************
+
+local RightArrowButton = Framework:createClass("control.rightarrow","control.abstract")
+
+function RightArrowButton:draw(colour)
+	local s = display.newCircle(self.m_group,40,40)
+	s:setFillColor(colour[1],colour[2],colour[3])
+end 
+
+--- ************************************************************************************************************************************************************************
+--										Audio Controller - speaker on/off which actually handles itself.
+--- ************************************************************************************************************************************************************************
+
+local AudioController = Framework:createClass("control.audio","control.abstract") 									
 
 AudioController.isSoundEnabled = true 															-- set to true when audio is enabled.
 
---//	Create an AudioController object (a speaker with a toggleable cross)
---//	@info 	[table]	constructor inormation 	(x,y,width)
-
 function AudioController:constructor(info)
-	self.m_group = display.newGroup()															-- speaker and cross in groups
+	AbstractController.constructor(self,info)
+	self:setEnabled(AudioController.isSoundEnabled) 											-- status kept between instances.
+end 
+
+function AudioController:destructor()
+	AbstractController.destructor(self)
+	self.m_crossGroup = nil self.m_soundGroup = nil
+end
+
+function AudioController:draw(colour)
 	self.m_soundGroup = display.newGroup()
 	self.m_crossGroup = display.newGroup()
-	local colour = { info.r or 0,info.g or 1,info.b or 0 }
 	self.m_group:insert(self.m_soundGroup) self.m_group:insert(self.m_crossGroup)
 
 	display.newRect(self.m_group,0,0,50,40).alpha = 0.01
@@ -40,24 +112,10 @@ function AudioController:constructor(info)
 	self:addArc(-5,-20,29,40,110,250):setStrokeColor(colour[1],colour[2],colour[3])
 	self:addArc(-5,-15,22,30,110,250):setStrokeColor(colour[1],colour[2],colour[3])
 	self:addArc(-5,-10,15,20,110,250):setStrokeColor(colour[1],colour[2],colour[3])
-	if info.width == nil then  																	-- calculate size if not provided
-		self.m_group.xScale =  (display.contentWidth / 12) / 40
-	else 
-		self.m_group.xScale = (info.width * display.contentWidth) / 100 
-	end
-	self.m_scale = self.m_group.xScale 															-- save scale and copy to Y
-	self.m_group.yScale = self.m_group.xScale
-	self.m_group.x,self.m_group.y = 10,display.contentHeight - self.m_group.height-10 			-- calculate position
-	if info.x ~= nil then 
-		self.m_group.x = display.contentWidth * info.x / 100 
-		self.m_group.y = display.contentHeight * info.y / 100 
-	end
-	self.m_group.x = self.m_group.x + self.m_group.width/2 										-- centre so pulses around centre
-	self.m_group.y = self.m_group.y + self.m_group.height/2
-	self:setEnabled(AudioController.isSoundEnabled) 											-- status kept between instances.
-	self.m_group:addEventListener("tap",self)													-- add tap listener
-
 end 
+
+--//	Create an AudioController object (a speaker with a toggleable cross)
+--//	@info 	[table]	constructor inormation 	(x,y,width)
 
 function AudioController:addArc(x,y,w,h,s,e)
 		local xc,yc,xt,yt,cos,sin = x+w/2,y+h/2,0,0,math.cos,math.sin
@@ -69,20 +127,6 @@ function AudioController:addArc(x,y,w,h,s,e)
 		l.strokeWidth = 3
 		return l
 end
-
---//	Tidy up
-
-function AudioController:destructor()
-	self.m_group:removeEventListener("tap",self)												-- remove tap listener
-	self.m_group:removeSelf()
-	self.m_group = nil self.m_crossGroup = nil self.m_soundGroup = nil
-end 
-
---//	Get objects
-
-function AudioController:getDisplayObjects()
-	return { self.m_group, self.m_line }
-end 
 
 --//	Handle tap event
 --//	@event 	[event]		event data
@@ -118,6 +162,7 @@ function AudioController:onUpdate(deltaTime)
 	scale = scale * self.m_scale
 	self.m_group.xScale,self.m_group.yScale = scale,scale  										-- and adjust the scale.
 end 
+
 --- ************************************************************************************************************************************************************************
 --[[
 
