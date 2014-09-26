@@ -31,14 +31,16 @@ function AbstractController:constructor(info)
 	self.m_group.x,self.m_group.y = 10,display.contentHeight - self.m_group.height-10 			-- calculate position
 	if info.x ~= nil then 
 		self.m_group.x = display.contentWidth * info.x / 100 
+	end 
+	if info.y ~= nil then 
 		self.m_group.y = display.contentHeight * info.y / 100 
 	end
 	self.m_group.x = self.m_group.x + self.m_group.width/2 										-- centre so pulses around centre
 	self.m_group.y = self.m_group.y + self.m_group.height/2
 	self.m_group.rotation = info.rotation or 0 													-- rotate accordingly
 	self.m_group:addEventListener("tap",self)													-- add tap listener
-	self.m_owner = info.owner 																	-- remember who to send the messages to.
-	self.m_name = info.name or "button" 														-- what to send
+	self.m_owner = info.listener 																-- remember who to send the messages to.
+	self.m_name = info.message or "button" 														-- what to send
 end 
 
 --//	Tidy up
@@ -63,6 +65,16 @@ function AbstractController:tap(e)
 	end
 end
 
+--//	Handle update message (requires scene membership)
+--//	@deltaTime 	[number] 	Elapsed time in seconds 
+
+function AbstractController:onUpdate(deltaTime)
+	self.m_clock = (self.m_clock or 0) + deltaTime 												-- keep track of time
+	local scale = math.sin(self.m_clock * 3) * 0.1 + 1 											-- work out the pulsing
+	scale = scale * self.m_scale
+	self.m_group.xScale,self.m_group.yScale = scale,scale  										-- and adjust the scale.
+end 
+
 --- ************************************************************************************************************************************************************************
 --														Arrow Button (defaults to right)
 --- ************************************************************************************************************************************************************************
@@ -70,8 +82,36 @@ end
 local RightArrowButton = Framework:createClass("control.rightarrow","control.abstract")
 
 function RightArrowButton:draw(colour)
-	local s = display.newCircle(self.m_group,40,40)
+	local s = display.newPolygon(self.m_group,
+								 0,0,
+								 { 0,10, 20,10, 20,0, 40,20, 20,40, 20,30, 0,30 }
+					)
 	s:setFillColor(colour[1],colour[2],colour[3])
+end 
+
+--- ************************************************************************************************************************************************************************
+--														Other buttons derived from that
+--- ************************************************************************************************************************************************************************
+
+local DownArrow = Framework:createClass("control.downarrow","control.rightarrow")
+
+function DownArrow:constructor(info)
+	info.rotation = 90
+	RightArrowButton.constructor(self,info)
+end 
+
+local LeftArrow = Framework:createClass("control.leftarrow","control.rightarrow")
+
+function LeftArrow:constructor(info)
+	info.rotation = 180
+	RightArrowButton.constructor(self,info)
+end 
+
+local UpArrow = Framework:createClass("control.uparrow","control.rightarrow")
+
+function UpArrow:constructor(info)
+	info.rotation = 270
+	RightArrowButton.constructor(self,info)
 end 
 
 --- ************************************************************************************************************************************************************************
@@ -153,15 +193,7 @@ function AudioController:setEnabled(soundOn)
 	end 
 end
 
---//	Handle update message (requires scene membership)
---//	@deltaTime 	[number] 	Elapsed time in seconds 
 
-function AudioController:onUpdate(deltaTime)
-	self.m_clock = (self.m_clock or 0) + deltaTime 												-- keep track of time
-	local scale = math.sin(self.m_clock * 3) * 0.1 + 1 											-- work out the pulsing
-	scale = scale * self.m_scale
-	self.m_group.xScale,self.m_group.yScale = scale,scale  										-- and adjust the scale.
-end 
 
 --- ************************************************************************************************************************************************************************
 --[[
