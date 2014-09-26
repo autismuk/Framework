@@ -59,10 +59,10 @@ function AbstractController:getDisplayObjects()
 end 
 
 function AbstractController:tap(e)
-	print("Tap !",self.m_owner,self.m_name)
 	if self.m_owner ~= nil then 																-- is something listening - it should be :)
 		self:sendMessage(self.m_owner,"iconbutton", { type = self.m_name }) 					-- send it a message saying we have tapped the button.
 	end
+	return true
 end
 
 --//	Handle update message (requires scene membership)
@@ -112,6 +112,20 @@ local UpArrow = Framework:createClass("control.uparrow","control.rightarrow")
 function UpArrow:constructor(info)
 	info.rotation = 270
 	RightArrowButton.constructor(self,info)
+end 
+
+--- ************************************************************************************************************************************************************************
+--																	Home Button
+--- ************************************************************************************************************************************************************************
+
+local HomeButton = Framework:createClass("control.home","control.abstract")
+
+function HomeButton:draw(colour)
+	local s = display.newPolygon(self.m_group,
+								 0,0,
+								 { 25,0, 50,20, 40,20, 40,40, 30,40, 30,25, 20,25, 20,40, 10,40, 10,20, 0,20 }
+					)
+	s:setFillColor(colour[1],colour[2],colour[3])
 end 
 
 --- ************************************************************************************************************************************************************************
