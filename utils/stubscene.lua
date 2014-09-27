@@ -23,7 +23,7 @@ function StubSceneDisplay:constructor(info)
 											display.contentWidth,display.contentHeight)
 	background.anchorX,background.anchorY = 0,0 background:setFillColor(0.5,0,0)
 	background.strokeWidth = 16 background:setStrokeColor(1,1,1)
-	local text = display.newText(self.m_group,'Stub:"'..info.name..'"',							-- create titile
+	local text = display.newText(self.m_group,'['..info.name..']',								-- create titile
 											display.contentWidth/2,42,native.systemFont,40)
 	text:setFillColor(1,1,0)
 	local yPos = display.contentHeight / 2 + 40 - 45 * info.count / 2 							-- centre menu
