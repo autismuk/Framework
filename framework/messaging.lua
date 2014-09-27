@@ -3,7 +3,7 @@
 ---				Name : 		messaging.lua
 ---				Purpose :	messaging object (sub part of Framework)
 ---				Created:	16 July 2014
----				Updated:	17 July 2014
+---				Updated:	27 Sept 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -30,14 +30,14 @@ end
 --//	@body 		[table]					anything else you want to send other than the name  (optional)
 --//	@delay 		[number]				delay sending the message this many seconds.
 
-function MessagingClass:sendMessage(target,name,body,delay)
+function MessagingClass:sendMessage(sender,target,name,body,delay)
 	name = name or "" body = body or {} delay = delay or -1 									-- default values.
 	assert(type(target) == "string" or type(target) == "table","Message must be sent to object(s) or a query")
 	assert(type(name) == "string","Message name should be a string")
 	--print(type(body),name)
 	assert(type(body) == "table","Message body should be a table")
 	assert(type(delay) == "number","Delay time should be a number")
-	local newMessage = { sender = self,  														-- from me
+	local newMessage = { sender = sender,  														-- from me
 						 recipient = target, 													-- to this or them
 						 name = name, 															-- called this
 						 body = body, 															-- with this data
@@ -83,11 +83,11 @@ end
 local messagingInstance = Framework:new("system.messaging",{})									-- create an instance of the messaging class.
 
 Framework:addObjectMethod("sendMessage", function(self,target,name,body) 						-- add methods to the mixin list.
-		messagingInstance:sendMessage(target,name,body,0) 										-- both actually call the same method.
+		messagingInstance:sendMessage(self,target,name,body,0) 										-- both actually call the same method.
 	end)
 
 Framework:addObjectMethod("sendMessageLater", function(self,target,name,body,delay)
-		messagingInstance:sendMessage(target,name,body,delay)
+		messagingInstance:sendMessage(self,target,name,body,delay)
 	end)
 
 --- ************************************************************************************************************************************************************************
@@ -97,6 +97,7 @@ Framework:addObjectMethod("sendMessageLater", function(self,target,name,body,del
 		---- 		------- 	-----
 		16-Jul-14	0.1 		Initial version of file
 		14-Aug-14 	1.0 		Advance to releasable version 1.0
+		27-Sep-14 	1.01 		sendMessage 'sender' sending sender as instance of message object.
 
 --]]
 --- ************************************************************************************************************************************************************************
