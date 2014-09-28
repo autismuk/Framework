@@ -22,7 +22,6 @@ function DocumentStore:constructor(info)
     local path = system.pathForFile(self.m_fileName,system.DocumentsDirectory)      -- actual file name
     self.m_documentData = { application = info.appName }                            -- document data
     local file = io.open(path, "r")                                                 -- try to read it
-    print(file,path)
     if file then                                                                    -- if opened okay
          local contents = file:read("*a")                                           -- read it all, decode from JSON
          self.m_documentData = json.decode(contents);

@@ -20,6 +20,7 @@ local AbstractController = Framework:createClass("control.abstract")
 function AbstractController:constructor(info)
 	self.m_group = display.newGroup()															-- speaker and cross in groups
 	local colour = { info.r or 0,info.g or 1,info.b or 0 }
+	display.newRect(self.m_group,0,0,50,40).alpha = 0.01
 	self:draw(colour)
 	if info.width == nil then  																	-- calculate size if not provided
 		self.m_group.xScale =  (display.contentWidth / 12) / 40
@@ -70,7 +71,7 @@ end
 
 function AbstractController:onUpdate(deltaTime)
 	self.m_clock = (self.m_clock or 0) + deltaTime 												-- keep track of time
-	local scale = math.sin(self.m_clock * 3) * 0.1 + 1 											-- work out the pulsing
+	local scale = math.sin(self.m_clock * 3) * 0.05 + 1 										-- work out the pulsing
 	scale = scale * self.m_scale
 	self.m_group.xScale,self.m_group.yScale = scale,scale  										-- and adjust the scale.
 end 
@@ -150,8 +151,6 @@ function AudioController:draw(colour)
 	self.m_soundGroup = display.newGroup()
 	self.m_crossGroup = display.newGroup()
 	self.m_group:insert(self.m_soundGroup) self.m_group:insert(self.m_crossGroup)
-
-	display.newRect(self.m_group,0,0,50,40).alpha = 0.01
 
 	local p = display.newPolygon(self.m_group,0,0, { -15,-10,0,-20,0,20, -15,10 })
 	p.anchorX,p.anchorY = 1,0.5 p:setFillColor(colour[1],colour[2],colour[3])
