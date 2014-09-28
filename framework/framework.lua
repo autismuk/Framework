@@ -3,7 +3,7 @@
 ---				Name : 		framework.lua
 ---				Purpose :	Framework Object
 ---				Created:	15 July 2014
----				Updated:	21 July 2014
+---				Updated:	28 September 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -202,9 +202,10 @@ function Framework:tag(object,tagName,command)
 		end
 	else 
 		assert(self.m_index[tagName] ~= nil,"Object not tagged with "..tagName.." (index)")		-- no tag index.
-		assert(self.m_index[tagName][object] ~= nil,"Object not tagged with "..tagName)			-- check it is tagged with the tag
-		self.m_index[tagName][object] = nil 													-- remove from tag index
-		self.m_indexCount[tagName] = self.m_indexCount[tagName] - 1 							-- decrement the counter 
+		if self.m_index[tagName][object] ~= nil then											-- check it is tagged with the tag
+			self.m_index[tagName][object] = nil 												-- remove from tag index
+			self.m_indexCount[tagName] = self.m_indexCount[tagName] - 1 						-- decrement the counter 
+		end
 	end
 	--print(object,tagName,command)
 end 
@@ -347,6 +348,7 @@ require("framework.transition") 																-- transitioning object.
 		---- 		------- 	-----
 		15-Jul-14	0.1 		Initial version of file
 		14-Aug-14 	1.0 		Advance to releasable version 1.0
+		28-Sep-14 	1.01 		Changed so tags can be removed if aren't there (multiple tagging/detagging)
 
 --]]
 --- ************************************************************************************************************************************************************************
