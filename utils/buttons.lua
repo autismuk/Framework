@@ -20,8 +20,9 @@ local AbstractController = Framework:createClass("control.abstract")
 function AbstractController:constructor(info)
 	self.m_group = display.newGroup()															-- speaker and cross in groups
 	local colour = { info.r or 0,info.g or 1,info.b or 0 }
-	display.newRect(self.m_group,0,0,50,40).alpha = 0.01
-	self:draw(colour)
+	local border = 10 																			-- tactile area surrounding icon.
+	display.newRect(self.m_group,0,0,border*2+50,border*2+40).alpha = 0.01 						-- touch target
+	self:draw(colour) 																			-- draw icon.
 	if info.width == nil then  																	-- calculate size if not provided
 		self.m_group.xScale =  (display.contentWidth / 12) / 40
 	else 
@@ -29,13 +30,13 @@ function AbstractController:constructor(info)
 	end
 	self.m_scale = self.m_group.xScale 															-- save scale and copy to Y
 	self.m_group.yScale = self.m_group.xScale
-	self.m_group.x,self.m_group.y = 10,display.contentHeight - self.m_group.height-10 			-- calculate position
-	if info.x ~= nil then 
-		self.m_group.x = display.contentWidth * info.x / 100 
-	end 
-	if info.y ~= nil then 
-		self.m_group.y = display.contentHeight * info.y / 100 
-	end
+
+	info.x = info.x or 10
+	info.y = info.y or 95
+
+	self.m_group.x = display.contentWidth * info.x / 100 - self.m_group.width / 2
+	self.m_group.y = display.contentHeight * info.y / 100 - self.m_group.height / 2
+
 	self.m_group.x = self.m_group.x + self.m_group.width/2 										-- centre so pulses around centre
 	self.m_group.y = self.m_group.y + self.m_group.height/2
 	self.m_group.rotation = info.rotation or 0 													-- rotate accordingly

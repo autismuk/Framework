@@ -3,7 +3,7 @@
 ---             Name :      document.lua
 ---             Purpose :   Document storage class
 ---             Created:    28 September 2014
----             Updated:    28 September 2014
+---             Updated:    29 September 2014
 ---             Author:     Paul Robson (paul@robsons.org.uk)
 ---             License:    Copyright Paul Robson (c) 2014+
 ---
@@ -12,12 +12,10 @@
 local json = require("json")
 local DocumentStore = Framework:createClass("document.store")
 
---//    Open/Create a document store. info.appName is mandatory and is expected to be a reverse FQDN such as
---//    uk.org.robsons.PhantomSlayed
+--//    Open/Create a document store. The filename is built from the fqdn in the ApplicationDescriptor
 
 function DocumentStore:constructor(info)
-    assert(type(info.appName) == "string")                                          -- expecting (say) uk.org.robsons.turmoil
-    self.m_fileName = info.appName:lower():gsub("%.","_")                           -- make lower case, documents to underscores.
+    self.m_fileName = ApplicationDescription.fqdn:lower():gsub("%.","_")            -- make lower case, documents to underscores.
     self.m_fileName = "corona_psr_" .. self.m_fileName .. ".json"                   -- make it a .json file name.
     local path = system.pathForFile(self.m_fileName,system.DocumentsDirectory)      -- actual file name
     self.m_documentData = { application = info.appName }                            -- document data
@@ -52,6 +50,9 @@ function DocumentStore:update()
     file:write(contents)                                                            -- write file out and close.
     io.close(file)
 end
+
+Framework:new("document.store")                                                     -- create an instance.
+Framework.constructor = nil                                                         -- and cause an error if any others are created.
 
 --- ************************************************************************************************************************************************************************
 --[[
