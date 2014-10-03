@@ -43,17 +43,19 @@ function Advert:constructor(info)
 	if Advert.showCount == 0 then 
 		if Advert.m_isDevice then 																-- if on a real device, show the banner.
 			Ads.show(info.advertType or "banner")
-		else 																					-- otherwise, fake one.
-			Advert.m_fakeAdGroup = display.newGroup()
-			local r = display.newRect(Advert.m_fakeAdGroup,0,0,display.contentWidth,Advert.simulatorHeight)
-			r:setFillColor(0,0,0) r.strokeWidth = 2	r.anchorX = 0 r.anchorY = 0 
-			local t = display.newText(Advert.m_fakeAdGroup,"Your ad goes here ....",2,2,native.systemFont,15)
-			t.anchorX,t.anchorY = 0,0 t:setFillColor(0,1,0) Advert.m_fakeAdGroup.alpha = 0
-			self:addSingleTimer(math.random(1000,2500)/1000)									-- make it appear, pretty much randomly after a second or two
+		else
+			if ApplicationDescription.showDebug then  											-- otherwise, fake one.
+				Advert.m_fakeAdGroup = display.newGroup()
+				local r = display.newRect(Advert.m_fakeAdGroup,0,0,display.contentWidth,Advert.simulatorHeight)
+				r:setFillColor(0,0,0) r.strokeWidth = 2	r.anchorX = 0 r.anchorY = 0 
+				local t = display.newText(Advert.m_fakeAdGroup,"Your ad goes here ....",2,2,native.systemFont,15)
+				t.anchorX,t.anchorY = 0,0 t:setFillColor(0,1,0) Advert.m_fakeAdGroup.alpha = 0
+				self:addSingleTimer(math.random(1000,2500)/1000)								-- make it appear, pretty much randomly after a second or two
+			end
 		end
 		Advert.isSuccessfullyShown = true 														-- setting this flag means we can now legally call getHeight()
 	else 
-		if not Advert.m_isDevice then  
+		if not Advert.m_isDevice and ApplicationDescription.showDebug then  
 			Advert.m_fakeAdGroup:toFront()
 		end
 	end
@@ -79,7 +81,9 @@ function Advert:destructor()
 		if Advert.m_isDevice then 																-- remove the real ad or the fake one.
 			Ads.hide()
 		else 
-			Advert.m_fakeAdGroup:removeSelf() Advert.m_fakeAdGroup = nil 
+			if ApplicationDescription.showDebug then
+				Advert.m_fakeAdGroup:removeSelf() Advert.m_fakeAdGroup = nil 
+			end
 		end
 	end 
 end 

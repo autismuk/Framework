@@ -127,6 +127,7 @@ end
 --//	Put memory information as a little text string at the screen top.
 
 function GameManager:memory()
+	if not ApplicationDescription.showDebug then return end										-- exit if not in debug mode.
 	collectgarbage() 																			-- perform GC
   	local textMem = system.getInfo( "textureMemoryUsed" ) / 1024 								-- get texture memory in kb
   	local msg =  "Mem:"..math.floor(collectgarbage("count")).. "kb Tex:"..math.floor(textMem).."kb" -- create message
