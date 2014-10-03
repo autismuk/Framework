@@ -70,7 +70,7 @@ function onePass()
 	n = math.random(1,objectCount) 																-- pick an object to add or remove a tag from.
 	if objectRefs[n] ~= nil then 																-- actually found an object.
 		local tag = math.random(1,tagCount) 													-- pick a tag.
-		if tagLists[n][tag] ~= nil then 														-- is it tagged with that ?
+		if math.random(2) == 1 then 															-- randomly add/remove it
 			Framework:tag(objectRefs[n],tagName(tag),Framework.REMOVETAG) 						-- remove the tag.
 			tagLists[n][tag] = nil 																-- keep parallel structure up to date.
 		else
@@ -123,7 +123,7 @@ end
 
 math.random(42)
 print("Start.")
-for i = 1,1000 do 
+for i = 1,1000*1000 do 
 	if i % 5000 == 0 then print("Test",i) end
 	onePass()
 end 
