@@ -32,7 +32,7 @@ function AbstractController:constructor(info)
 	self.m_group.yScale = self.m_group.xScale
 
 	info.x = info.x or 10
-	info.y = info.y or 95
+	info.y = info.y or 92
 
 	self.m_group.x = display.contentWidth * info.x / 100 - self.m_group.width / 2
 	self.m_group.y = display.contentHeight * info.y / 100 - self.m_group.height / 2

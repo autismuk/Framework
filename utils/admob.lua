@@ -37,6 +37,7 @@ function Advert:constructor(info)
 		Ads.init(info.provider or "admob",adID) 												-- and initialise the AdMob code.
 	end 
 
+	print("Ad show")
 	if self.m_isDevice then 																	-- if on a real device, show the banner.
 		Ads.show(info.advertType or "banner")
 	else 																						-- otherwise, fake one.
@@ -63,6 +64,7 @@ end
 --//	Tidy up.
 
 function Advert:destructor()
+	print("Ad hide")
 	if self.m_isDevice then 																	-- remove the real ad or the fake one.
 		Ads.hide()
 	else 
