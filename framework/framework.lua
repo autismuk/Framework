@@ -199,7 +199,7 @@ function Framework:tag(object,tagName,command)
 			self.m_indexCount[tagName] = self.m_indexCount[tagName] + 1 						-- bump the counter 
 		end
 	else 
-		if self.m_index[tagName][object] ~= nil then											-- check it is tagged with the tag
+		if self.m_index[tagName] ~= nil and self.m_index[tagName][object] ~= nil then			-- check it is tagged with the tag and that that tag exists
 			self.m_index[tagName][object] = nil 												-- remove from tag index
 			self.m_indexCount[tagName] = self.m_indexCount[tagName] - 1 						-- decrement the counter 
 		end
