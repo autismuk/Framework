@@ -3,7 +3,7 @@
 ---				Name : 		admob.lua
 ---				Purpose :	Admob v2 Object for Framework
 ---				Created:	20 July 2014
----				Updated:	20 July 2014
+---				Updated:	03 Oct 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -21,13 +21,13 @@ local Advert = Framework:createClass("ads.admob")
 --//	@info 	[table]		Constructor information.
 
 function Advert:constructor(info)
-	self.m_isDevice = system.getInfo("environment") == "device"									-- device or simulator.
-	self.m_isAndroid = system.getInfo("platformName") == "Android"								-- running on Android or iOS ?
+	Advert.m_isDevice = system.getInfo("environment") == "device"								-- device or simulator.
+	Advert.m_isAndroid = system.getInfo("platformName") == "Android"							-- running on Android or iOS ?
 
-	if self.m_isDevice and Advert.isInitialised ~= true then 									-- is it a device, and has Ads.* not been initialised
+	if Advert.m_isDevice and Advert.isInitialised ~= true then 									-- is it a device, and has Ads.* not been initialised
 		Advert.isInitialised = true 															-- only initialise it once.
 		local adID 
-		if self.m_isAndroid then 																-- get AppID (Android)
+		if Advert.m_isAndroid then 																-- get AppID (Android)
 			adID = info.android
 		else 																					-- get AppID (iOS)
 			adID = info.ios 
@@ -37,38 +37,50 @@ function Advert:constructor(info)
 		Ads.init(info.provider or "admob",adID) 												-- and initialise the AdMob code.
 	end 
 
-	print("Ad show")
-	if self.m_isDevice then 																	-- if on a real device, show the banner.
-		Ads.show(info.advertType or "banner")
-	else 																						-- otherwise, fake one.
-		self.m_fakeAdGroup = display.newGroup()
-		local r = display.newRect(self.m_fakeAdGroup,0,0,display.contentWidth,Advert.simulatorHeight)
-		r:setFillColor(0,0,0) r.strokeWidth = 2	r.anchorX = 0 r.anchorY = 0 
-		local t = display.newText(self.m_fakeAdGroup,"Your ad goes here ....",2,2,native.systemFont,15)
-		t.anchorX,t.anchorY = 0,0 t:setFillColor(0,1,0) self.m_fakeAdGroup.alpha = 0
-		self:addSingleTimer(math.random(1000,2500)/1000)										-- make it appear, pretty much randomly after a second or two
+	Advert.showCount = Advert.showCount or 0 													-- put default show-count value in.
+
+	--print("Ad show",Advert.showCount)
+	if Advert.showCount == 0 then 
+		if Advert.m_isDevice then 																-- if on a real device, show the banner.
+			Ads.show(info.advertType or "banner")
+		else 																					-- otherwise, fake one.
+			Advert.m_fakeAdGroup = display.newGroup()
+			local r = display.newRect(Advert.m_fakeAdGroup,0,0,display.contentWidth,Advert.simulatorHeight)
+			r:setFillColor(0,0,0) r.strokeWidth = 2	r.anchorX = 0 r.anchorY = 0 
+			local t = display.newText(Advert.m_fakeAdGroup,"Your ad goes here ....",2,2,native.systemFont,15)
+			t.anchorX,t.anchorY = 0,0 t:setFillColor(0,1,0) Advert.m_fakeAdGroup.alpha = 0
+			self:addSingleTimer(math.random(1000,2500)/1000)									-- make it appear, pretty much randomly after a second or two
+		end
+		Advert.isSuccessfullyShown = true 														-- setting this flag means we can now legally call getHeight()
+	else 
+		if not Advert.m_isDevice then  
+			Advert.m_fakeAdGroup:toFront()
+		end
 	end
-	Advert.isSuccessfullyShown = true 															-- setting this flag means we can now legally call getHeight()
+	Advert.showCount = Advert.showCount + 1 													-- increment global count of shows
 end 
 
 function Advert:getDisplayObjects()
-	return { self.m_fakeAdGroup }
+	return { Advert.m_fakeAdGroup }
 end 
 
 --//	This fakes the 'late' arrival of the actual advert, rather than it being put up straight away.
 
 function Advert:onTimer(tag,timerID)
-	self.m_fakeAdGroup.alpha = 1 																-- only one timer, which makes the fake advert visible.
+	Advert.m_fakeAdGroup.alpha = 1 																-- only one timer, which makes the fake advert visible.
 end 
 
 --//	Tidy up.
 
 function Advert:destructor()
-	print("Ad hide")
-	if self.m_isDevice then 																	-- remove the real ad or the fake one.
-		Ads.hide()
-	else 
-		self.m_fakeAdGroup:removeSelf() self.m_fakeAdGroup = nil 
+	Advert.showCount = Advert.showCount - 1 													-- decrement global count of shows
+	-- print("Ad hide",Advert.showCount)
+	if Advert.showCount == 0 then 
+		if Advert.m_isDevice then 																-- remove the real ad or the fake one.
+			Ads.hide()
+		else 
+			Advert.m_fakeAdGroup:removeSelf() Advert.m_fakeAdGroup = nil 
+		end
 	end 
 end 
 
@@ -82,7 +94,7 @@ Advert.simulatorHeight = 42 																	-- arbitrary-ish size chosen for si
 function Advert:getHeight()
 	assert(Advert.isSuccessfullyShown == true,													-- Ads.getHeight() does not work until Ads.show() has been called
 							"getHeight() called before an advert has been shown successfully")
-	if not self.m_isDevice then return Advert.simulatorHeight end 								-- this is an arbitrary value for the simulator
+	if not Advert.m_isDevice then return Advert.simulatorHeight end 								-- this is an arbitrary value for the simulator
 	return Ads.height() 																		-- otherwise use the actual height.
 end 
 
@@ -93,6 +105,10 @@ end
 		---- 		------- 	-----
 		20-Jul-14	0.1 		Initial version of file
 		14-Aug-14 	1.0 		Advance to releasable version 1.0
+		03-Oct-14 	1.1 		Made into a sort of singleton - all its variables are static. This is because there is only one Ads.x instance in Corona, and the
+								effective sequencing in consecutive scenes with ads was show then show, hide on the transition, which meant the 2nd one didn't 
+								display. Hence the counter "Advert.showCount" which tracks shows (constructors) vs hides (destructors).  Effectively when the ads is
+								on the next scene, it doesn't disappear from the screen.  Consideration should be given to making this an actual singleton ?
 
 --]]
 --- ************************************************************************************************************************************************************************
