@@ -197,11 +197,8 @@ function Framework:tag(object,tagName,command)
 		if self.m_index[tagName][object] == nil then 											-- if it is not in there.
 			self.m_index[tagName][object] = object 												-- put it in the tag index
 			self.m_indexCount[tagName] = self.m_indexCount[tagName] + 1 						-- bump the counter 
-		else
-			print("Warning ! Duplicate tag added "..tagName) 									-- already there, warning !
 		end
 	else 
-		assert(self.m_index[tagName] ~= nil,"Object not tagged with "..tagName.." (index)")		-- no tag index.
 		if self.m_index[tagName][object] ~= nil then											-- check it is tagged with the tag
 			self.m_index[tagName][object] = nil 												-- remove from tag index
 			self.m_indexCount[tagName] = self.m_indexCount[tagName] - 1 						-- decrement the counter 
