@@ -3,7 +3,7 @@
 ---				Name : 		admob.lua
 ---				Purpose :	Admob v2 Object for Framework
 ---				Created:	20 July 2014
----				Updated:	03 Oct 2014
+---				Updated:	04 Oct 2014
 ---				Author:		Paul Robson (paul@robsons.org.uk)
 ---				License:	Copyright Paul Robson (c) 2014+
 ---
@@ -17,8 +17,8 @@ local Ads = require("ads")
 
 local Advert = Framework:createClass("ads.admob")
 
---//	Create an advert. Parameters passed are android/ios/universal (Admob AppIDs), advertType, defaults to banner. Must provide the admob app-IDs
---//	@info 	[table]		Constructor information.
+--//	Create an advert. Information is passed in ApplicationDescription global
+--//	@info 	[table]		Constructor information (not used)
 
 function Advert:constructor(info)
 	Advert.m_isDevice = system.getInfo("environment") == "device"								-- device or simulator.
@@ -28,13 +28,12 @@ function Advert:constructor(info)
 		Advert.isInitialised = true 															-- only initialise it once.
 		local adID 
 		if Advert.m_isAndroid then 																-- get AppID (Android)
-			adID = info.android
+			adID = ApplicationDescription.admobIDs.android
 		else 																					-- get AppID (iOS)
-			adID = info.ios 
+			adID = ApplicationDescription.admobIDs.ios
 		end 
-		adID = adID or info.universal 															-- possible universal App ID
 		assert(adID ~= nil,"Warning, App-ID Missing") 											-- check there actually is one.
-		Ads.init(info.provider or "admob",adID) 												-- and initialise the AdMob code.
+		Ads.init("admob",adID) 																	-- and initialise the AdMob code.
 	end 
 
 	Advert.showCount = Advert.showCount or 0 													-- put default show-count value in.
@@ -42,7 +41,7 @@ function Advert:constructor(info)
 	--print("Ad show",Advert.showCount)
 	if Advert.showCount == 0 then 
 		if Advert.m_isDevice then 																-- if on a real device, show the banner.
-			Ads.show(info.advertType or "banner")
+			Ads.show("banner")
 		else
 			if ApplicationDescription.showDebug then  											-- otherwise, fake one.
 				Advert.m_fakeAdGroup = display.newGroup()
@@ -113,6 +112,7 @@ end
 								effective sequencing in consecutive scenes with ads was show then show, hide on the transition, which meant the 2nd one didn't 
 								display. Hence the counter "Advert.showCount" which tracks shows (constructors) vs hides (destructors).  Effectively when the ads is
 								on the next scene, it doesn't disappear from the screen.  Consideration should be given to making this an actual singleton ?
+		04-Oct-14 	1.2 		Moved stuff out of info into ApplicationDescription
 
 --]]
 --- ************************************************************************************************************************************************************************
