@@ -9,21 +9,26 @@
 --- ************************************************************************************************************************************************************************
 
 --- ************************************************************************************************************************************************************************
---//	This class physically builds the scene using the creator function passed in 'info'
+--//	This class physically builds the scene using the constructor function passed in 'info'
 --- ************************************************************************************************************************************************************************
 
 local SimpleSceneConstructor = Framework:createClass("scene.simple.constructor")
 
 function SimpleSceneConstructor:constructor(info)
 	self.m_group = display.newGroup()												-- create group for new gfx
-	info.creator(self.m_group,info.scene,info.manager) 								-- call the creator
+	self.m_info = info 																-- preserve info
+	self.m_storage = {} 															-- storage for simple scene if required
+	info.constructor(self.m_storage,self.m_group,info.scene,info.manager) 			-- call the constructor
 	self.m_group.xScale = display.contentWidth / self.m_group.width 				-- make it fit on the full screen
 	self.m_group.yScale = display.contentHeight / self.m_group.height
 end 
 
 function SimpleSceneConstructor:destructor()
+	if self.m_info.destructor ~= nil then 											-- if destructor exists, call it.
+		self.m_info.destructor(self.m_storage,self.m_group,self.m_info.scene,self.m_info.manager)
+	end
 	self.m_group:removeSelf()														-- destroy and make vanish.
-	self.m_group = nil 
+	self.m_group = nil self.m_info = nil self.m_storage = nil 						-- null everything out.
 end
 
 function SimpleSceneConstructor:getDisplayObjects()
@@ -39,7 +44,7 @@ local SimpleSceneManager = Framework:createClass("scene.simple","game.sceneManag
 function SimpleSceneManager:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")										-- create a new scene.
 	scene:new("scene.simple.constructor", { scene = scene, manager = self, 			-- create the scene, telling it what it needs to know.
-																creator = data.creator })
+																constructor = data.constructor, destructor = data.destructor })
 	return scene
 end 
 
