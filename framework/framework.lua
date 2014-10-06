@@ -141,6 +141,13 @@ function Framework:delete(object)
 	end
 end 
 
+--//	Get the number of currently instantiated objects
+--//	@return 	[number]		Count of objects
+
+function Framework:getInstanceCount()
+	return self.m_indexCount["frameworkobject"]
+end 
+
 --//	Validate a class identifier. It should be a sequence of alphanumeric words, beginning with a letter, seperated by
 --//	full stops.
 --//	@identifier 	[string] 		string to validate

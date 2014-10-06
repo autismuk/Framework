@@ -131,6 +131,7 @@ function GameManager:memory()
 	collectgarbage() 																			-- perform GC
   	local textMem = system.getInfo( "textureMemoryUsed" ) / 1024 								-- get texture memory in kb
   	local msg =  "Mem:"..math.floor(collectgarbage("count")).. "kb Tex:"..math.floor(textMem).."kb" -- create message
+  	msg = msg .. " " .. Framework:getInstanceCount() .. " obj"
   	GameManager.s_textObject.text = msg  														-- update memory text
   	GameManager.s_textObject:toFront() 															-- make sure it is on top.
 end
