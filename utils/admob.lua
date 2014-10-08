@@ -101,6 +101,12 @@ function Advert:getHeight()
 	return Ads.height() 																		-- otherwise use the actual height.
 end 
 
+--//	Gets the height of the banner allowing for the gap at the top of the screen
+
+function Advert:getHeightAfterGap()
+	return self:getHeight()
+end
+
 --- ************************************************************************************************************************************************************************
 --[[
 
