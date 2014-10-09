@@ -17,17 +17,30 @@ local Ads = require("ads")
 
 local AdvertManager = Framework:createClass("ads.admob.manager")
 
+AdvertManager.defaults = { ios = {}, android = {} }												-- these are default admob IDs for banner and interstitial adverts
+AdvertManager.defaults.ios.interstitial = 	  "ca-app-pub-8354094658055499/7057436417" 			-- iOS and Android.
+AdvertManager.defaults.ios.banner = 		  "ca-app-pub-8354094658055499/9860763610"
+AdvertManager.defaults.android.interstitial = "ca-app-pub-8354094658055499/2348035218"
+AdvertManager.defaults.android.banner = 	  "ca-app-pub-8354094658055499/839456881"
+
 function AdvertManager:constructor(info)
 	self.m_isDevice = system.getInfo("environment") == "device"									-- device or simulator.
 	self.m_isAndroid = system.getInfo("platformName") == "Android"								-- running on Android or iOS ?
 
-	if self.m_isDevice then 																	-- if it is a device.
+	local type = ApplicationDescription.advertType 												-- check type
+	assert(type == "banner" or type == "interstitial") 											-- must be banner or interstitial
 
-		if self.m_isAndroid then 																-- get AppID (Android)
-			adID = ApplicationDescription.admobIDs.android
-		else 																					-- get AppID (iOS)
-			adID = ApplicationDescription.admobIDs.ios
+	if self.m_isDevice then 																	-- if it is a device.
+		ApplicationDescription.admobIDs = ApplicationDescription.admobIDs or {} 				-- make sure there is an admobIDs.
+
+		if self.m_isAndroid then 																
+			adID = ApplicationDescription.admobIDs.android 										-- get AppID (Android)
+			adID = adID or AdvertManager.defaults.android[type] 								-- apply default
+		else 																					
+			adID = ApplicationDescription.admobIDs.ios 											-- get AppID (iOS)
+			adID = adID or AdvertManager.defaults.ios[type] 									-- apply default.
 		end 
+		
 		assert(adID ~= nil,"Warning, App-ID Missing") 											-- check there actually is one.
 		Ads.init("admob",adID) 																	-- and initialise the AdMob code.
 
