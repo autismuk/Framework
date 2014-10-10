@@ -184,21 +184,23 @@ local InterstitialScene = Framework:createClass("admob.interstitialscene","game.
 
 function InterstitialScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")													-- create a new, empty, scene.
-	local isLoaded = adManager:isInterstitialLoaded()
+	return scene 																				-- construction is in postOpen()
+end 
+
+function InterstitialScene:postOpen(manager,data,resources)
+	local isLoaded = adManager:isInterstitialLoaded()											-- check if interstitial loaded
+	local scene = self:getScene()																-- access current scene.
 	self:tag("interstitialadvert")
 	--print("[ADMOB] Loaded",isLoaded)
 
-	-- TODO: Repeat time manager.
-
 	if adManager:isPhysicalDevice() and isLoaded then 
-		adManager.m_currentScene = self 														-- save the current scene so 'shown' can call it.
 		Ads.show("interstitial") 																-- show the interstitial scene.
 	else 
 		scene:new("control.rightarrow", { x = 90, y = 5,r = 139/255, g = 69/255, b = 19/255, 	-- add right arrow to go to next scene.
 													listener = self, message = "continue" }) 	-- this is the 'fake' interstitial advert.
 	end 	
-	return scene 
 end 
+
 
 function InterstitialScene:onMessage(sender,message,body)
 
@@ -231,3 +233,4 @@ end
 --- ************************************************************************************************************************************************************************
 
 -- TODO: Move show() into postOpen() ?
+-- TODO: Repeat time manager.
