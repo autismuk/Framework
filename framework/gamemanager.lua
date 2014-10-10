@@ -137,6 +137,7 @@ function GameManager:memory()
 end
 
 Framework:addObjectMethod("performGameEvent", function(self,eventName,eventData)
+	--print("[PGE] local status",GameManager.s_instance.m_isLocked)
 	if GameManager.s_instance.m_isLocked then return false end 									-- cannot transition, as a transition is in progress.
 	GameManager.s_instance.m_isLocked = true 													-- now locked, a transition is in progress.
 	GameManager.s_instance.m_associatedEventData = eventData or {} 								-- save the data associated with the call.

@@ -11,6 +11,8 @@
 
 local Ads = require("ads")
 
+require("utils.buttons")
+
 --- ************************************************************************************************************************************************************************
 --//									Advert object. admob for iOS and Android, provides a fake if running in simulator.
 --- ************************************************************************************************************************************************************************
@@ -23,12 +25,19 @@ AdvertManager.defaults.ios.banner = 		  "ca-app-pub-8354094658055499/9860763610"
 AdvertManager.defaults.android.interstitial = "ca-app-pub-8354094658055499/2348035218"
 AdvertManager.defaults.android.banner = 	  "ca-app-pub-8354094658055499/839456881"
 
+--//	Create the advert manager singleton 
+--//	@info 	[table] 	constructor info (not used)
+
 function AdvertManager:constructor(info)
 	self.m_isDevice = system.getInfo("environment") == "device"									-- device or simulator.
 	self.m_isAndroid = system.getInfo("platformName") == "Android"								-- running on Android or iOS ?
 
 	local type = ApplicationDescription.advertType 												-- check type
 	assert(type == "banner" or type == "interstitial") 											-- must be banner or interstitial
+
+	self.m_showCount = 0 																		-- zero the show count.
+	self.m_isSuccessfullyShown = false 															-- not shown yet.
+	self.m_isLiveInterstitial = false 															-- true if interstitial on a device.
 
 	if self.m_isDevice then 																	-- if it is a device.
 		ApplicationDescription.admobIDs = ApplicationDescription.admobIDs or {} 				-- make sure there is an admobIDs.
@@ -42,16 +51,26 @@ function AdvertManager:constructor(info)
 		end 
 		
 		assert(adID ~= nil,"Warning, App-ID Missing") 											-- check there actually is one.
-		Ads.init("admob",adID) 																	-- and initialise the AdMob code.
+
+		Ads.init("admob",adID,function(event) 													-- and initialise the AdMob code.
+
+			--print("[ADMOB] Listener event",event.phase)
+
+			if event.phase == "shown" then 														-- in the shown phase (e.g. interstitial closed)
+				self:sendMessage("interstitialadvert","next",{})
+			end
+			--print("[ADMOB] Listener exit")
+		end)
 
 		if ApplicationDescription.advertType == "interstitial" then 							-- if this application uses interstitial ads
 			Ads.load("interstitial")															-- start the preloader.
+			self.m_isLiveInterstitial = true 													-- mark as a live interstitial.
 		end
 
 	end 
-	self.m_showCount = 0 																		-- zero the show count.
-	self.m_isSuccessfullyShown = false 															-- not shown yet.
 end 
+
+--//	Close the advert manager singleton
 
 function AdvertManager:destructor()
 	while self.m_showCount > 0 do 															-- keep hiding until the advert has gone away.
@@ -59,6 +78,8 @@ function AdvertManager:destructor()
 	end
 end 
 
+--//	Show an advert (banner only). This keeps a count of shows vs hides and displays the advert when the shows outnumber the hides. This is required
+--//	because scenes are created and opened before the previous scene is destroyed, so consecutive scenes with adverts never actually hide the ad.
 
 function AdvertManager:show()
 	assert(ApplicationDescription.advertType == "banner")										-- this is only allowed for *banners*
@@ -85,6 +106,7 @@ function AdvertManager:show()
 	self.m_showCount = self.m_showCount + 1 													-- increment global count of shows
 end 
 
+--//	Hide an advert (banner only)
 
 function AdvertManager:hide()
 	self.m_showCount = self.m_showCount - 1 													-- decrement global count of shows
@@ -100,19 +122,44 @@ function AdvertManager:hide()
 	end 
 end 
 
+--//	Get the simulated height of an advert (debugging only)
+--//	@return 	[number]		height of advert in display pixels
+
 function AdvertManager:getSimulatorHeight()
-	return 42 * display.contentHeight / 320 
+	return 42 * display.contentHeight / 320 													-- scale for contentHeight
 end 
+
+--//	Test to see if running on real hardware
+--//	@return 	[boolean]		true if running on real hardware.
+
+function AdvertManager:isPhysicalDevice()
+	return self.m_isDevice 
+end 
+
+function AdvertManager:isInterstitialLoaded()
+	local isLoaded = false 																		-- will be true if ads loaded
+	if self:isPhysicalDevice() then 														-- are we on a physical device ?
+		isLoaded = Ads.isLoaded("interstitial")													-- if so, we can check if the ad is loaded.
+	end
+	return isLoaded
+end
 
 local adManager = Framework:new("ads.admob.manager")											-- create an instance.
 AdvertManager.constructor = nil 																-- stop any more being created.
 
+--- ************************************************************************************************************************************************************************
+--//			Creating this object will add it to the current scene. Note this does not behave like other visual objects, because it can't do it.
+--- ************************************************************************************************************************************************************************
 
 local AdvertObject = Framework:createClass("ads.admob")
+
+--//	Constructing it causes 'show'
 
 function AdvertObject:constructor(info)
 	adManager:show()
 end 
+
+--//	Destructing it causes 'hide'.
 
 function AdvertObject:destructor()
 	adManager:hide()
@@ -129,6 +176,41 @@ function AdvertObject:getHeightAfterGap()
 	return self:getHeight()
 end
 
+--- ************************************************************************************************************************************************************************
+--//									This scene is an admob interstitial scene, which goes to 'next' when closed.
+--- ************************************************************************************************************************************************************************
+
+local InterstitialScene = Framework:createClass("admob.interstitialscene","game.sceneManager")
+
+function InterstitialScene:preOpen(manager,data,resources)
+	local scene = Framework:new("game.scene")													-- create a new, empty, scene.
+	local isLoaded = adManager:isInterstitialLoaded()
+	self:tag("interstitialadvert")
+	--print("[ADMOB] Loaded",isLoaded)
+
+	-- TODO: Repeat time manager.
+
+	if adManager:isPhysicalDevice() and isLoaded then 
+		adManager.m_currentScene = self 														-- save the current scene so 'shown' can call it.
+		Ads.show("interstitial") 																-- show the interstitial scene.
+	else 
+		scene:new("control.rightarrow", { x = 90, y = 5,r = 139/255, g = 69/255, b = 19/255, 	-- add right arrow to go to next scene.
+													listener = self, message = "continue" }) 	-- this is the 'fake' interstitial advert.
+	end 	
+	return scene 
+end 
+
+function InterstitialScene:onMessage(sender,message,body)
+
+	--print("[ADMOB] Scene exit message")
+	if adManager:isPhysicalDevice() then 														-- on a real device
+		--print("ADMOB] call hide")
+		Ads.hide()																				-- hide it
+		Ads.load("interstitial") 																-- and reload the next.
+	end
+	self:performGameEvent("next")
+	--print("[ADMOB] Next done.")
+end 
 
 --- ************************************************************************************************************************************************************************
 --[[
@@ -143,6 +225,9 @@ end
 								on the next scene, it doesn't disappear from the screen.  Consideration should be given to making this an actual singleton ?
 		04-Oct-14 	1.2 		Moved stuff out of info into ApplicationDescription
 		09-Oct-14 	2.0 		Now a singleton and a device object
+		10-Oct-14 	2.1 		Got a working Interstitial Scene Object
 
 --]]
 --- ************************************************************************************************************************************************************************
+
+-- TODO: Move show() into postOpen() ?

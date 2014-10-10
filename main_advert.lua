@@ -20,7 +20,7 @@ manager:addManagedState("start",																-- set up scene
 						{ next = "advert" })
 
 manager:addManagedState("advert",																-- set up scene
-						Framework:new("utils.stubscene",{  name = "Scene 2 (AD)",  targets = { next = "next page"} }),
+						Framework:new("admob.interstitialscene",{  name = "Scene 2 (AD)",  targets = { next = "next page"} }),
 						{ next = "end" })
 
 manager:addManagedState("end",																-- set up scene
