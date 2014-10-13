@@ -20,6 +20,7 @@ function TextScene:constructor(info)
 									  info.y or display.contentHeight/2,
 									  info.font,	 											-- mandatory
 									  (info.fontSize or 25) * display.contentWidth/100) 	
+	txt.xScale = info.xScale or 1 txt.yScale = info.yScale or 1 txt.alpha = info.alpha or 1
 	if info.alpha then txt.alpha = info.alpha end 												-- copy alpha, if any
 	if info.tint then txt:setTintColor(info.tint.r,info.tint.g,info.tint.b) end 				-- copy tint, if any	
 	if info.transition then 																	-- if there's a transition.

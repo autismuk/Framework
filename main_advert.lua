@@ -31,7 +31,6 @@ manager:start("start") 																			-- and start.
 
 --[[
 
-		Check defaults work by hacking BrainDrain and putting in hardware platforms
-		Implement interstitial code.
+		Interstitial timing code.
 
 --]]

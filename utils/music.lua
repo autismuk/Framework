@@ -23,6 +23,7 @@ function BackgroundMusicPlayer:constructor(info)
 	if self.m_stream ~= nil then 																-- stream if loaded okay.
 		self.m_channel = audio.play(self.m_stream, { loops = -1, fadein = fadeIn }) 			-- remember channel
 	end
+	self:tag("musicPlayer")																		-- identify it.
 end 
 
 function BackgroundMusicPlayer:onMessage(sender,name,body) 
