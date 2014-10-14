@@ -17,6 +17,7 @@ Framework = {} 																					-- the framework object.
 Framework.copyright = "Framework (C) Paul Robson 2014"											-- copyright message
 
 Framework.m_classes = {} 																		-- class table. Maps class identifier (l/c) to a prototype/factory table.
+
 Framework.m_index = {} 																			-- tag index - Maps tag (l/c) to a table contain object => object values
 Framework.m_indexCount = {} 																	-- tag index count - Maps tag (l/c) to number of tags in that index.
 Framework.m_objectMembers = {} 																	-- members to decorate new objects.
@@ -44,10 +45,12 @@ end
 --//	@className 			[string]			Class identifier.
 --//	@superClass 		[string/table]		Superclass, may be nil.
 --//	@return 			[class,super]		New class prototype, superclass prototype (if any)
+
 function Framework:createClass(className,superClass)
 	className = className:lower() 																-- class name L/C
 	assert(self:validateClassIdentifier(className),className .. " is a bad class identifier") 	-- validate parameters.
-	local newClass = {} 																		-- this is the class
+
+	local newClass = { } 																		-- this is the class
 	if superClass ~= nil then 																	-- if it has a superclass
 		if type(superClass) == "string" then 													-- is the superclass a name ?
 			superClass = superClass:lower() 													-- validate it.		
@@ -146,6 +149,21 @@ end
 
 function Framework:getInstanceCount()
 	return self.m_indexCount["frameworkobject"]
+end 
+
+--//	Dump class counts to console.
+
+function Framework:dump()
+	local count = {}
+	for _,ref in pairs(self.m_index["frameworkobject"]) do 										-- work through all objects.
+		local cName = "unknown"																	-- if we can't find it, default class name
+		for name,cref in pairs(self.m_classes) do 												-- look through classes comparing prototypes to get name
+			if getmetatable(ref) == cref.prototype then cName = name end 
+		end
+		count[cName] = (count[cName] or 0) + 1 													-- bump count for that class name
+	end 
+	for name,total in pairs(count) do print(total .. " x " .. name) end 						-- output the result.
+	print("Total ",self.m_indexCount["frameworkobject"])
 end 
 
 --//	Validate a class identifier. It should be a sequence of alphanumeric words, beginning with a letter, seperated by
