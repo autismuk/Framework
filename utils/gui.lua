@@ -147,7 +147,8 @@ local ActiveTextRotateAbstract,SuperClass = Framework:createClass("gui.text.rota
 
 function ActiveTextRotateAbstract:constructor(info)
 	self.m_storageKey = info.key 																-- get the storage key.
-	self.m_current = 1 																			-- currently displayed object
+	self.m_current = 1 																			-- currently displayed object.
+
 	if self.m_storageKey ~= nil then 
 		self.m_storageKey = "activetext.rotator.temp."..info.key 								-- make it a long key.
 		self.m_current = self:readRegistry(self.m_storageKey) or 1 								-- retrieve old state from key.

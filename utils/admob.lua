@@ -184,11 +184,13 @@ local InterstitialScene = Framework:createClass("admob.interstitialscene","game.
 
 function InterstitialScene:preOpen(manager,data,resources)
 	local scene = Framework:new("game.scene")													-- create a new, empty, scene.
+	self.m_passedData = data
 	return scene 																				-- construction is in postOpen()
 end 
 
 function InterstitialScene:postOpen(manager,data,resources)
 	local isLoaded = adManager:isInterstitialLoaded()											-- check if interstitial loaded
+	InterstitialScene.lastSceneShowed = system.getTimer() 										-- remember last time i/s showed.
 	local scene = self:getScene()																-- access current scene.
 	self:tag("interstitialadvert")
 	--print("[ADMOB] Loaded",isLoaded)
@@ -201,6 +203,9 @@ function InterstitialScene:postOpen(manager,data,resources)
 	end 	
 end 
 
+function InterstitialScene:postClose(manager,data,resources)
+	self.m_passedData = nil 
+end
 
 function InterstitialScene:onMessage(sender,message,body)
 
@@ -210,7 +215,7 @@ function InterstitialScene:onMessage(sender,message,body)
 		Ads.hide()																				-- hide it
 		Ads.load("interstitial") 																-- and reload the next.
 	end
-	self:performGameEvent("next")
+	self:performGameEvent("next",self.m_passedData)
 	--print("[ADMOB] Next done.")
 end 
 
@@ -232,5 +237,4 @@ end
 --]]
 --- ************************************************************************************************************************************************************************
 
--- TODO: Move show() into postOpen() ?
 -- TODO: Repeat time manager.
