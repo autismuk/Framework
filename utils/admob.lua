@@ -220,6 +220,28 @@ function InterstitialScene:onMessage(sender,message,body)
 end 
 
 --- ************************************************************************************************************************************************************************
+--															This class controls whether the interstitial is shown, or not.
+--- ************************************************************************************************************************************************************************
+
+local InterstitialTracker = Framework:createClass("admob.tracker")
+
+function InterstitialTracker:constructor(info) end 
+function InterstitialTracker:destructor() end 
+
+function InterstitialTracker:canShow() 
+
+	-- TODO: timing stuff
+
+
+	if not adManager:isPhysicalDevice() then return true end 									-- you can always show on the simulator.
+	return adManager:isInterstitialLoaded() 													-- show if loaded only on real devices.
+end 
+
+function InterstitialTracker:select(advertEvent,skipAdvertEvent)
+	if self:canShow() then return advertEvent else return skipAdvertEvent end 
+end 
+
+--- ************************************************************************************************************************************************************************
 --[[
 
 		Date 		Version 	Notes
@@ -233,6 +255,7 @@ end
 		04-Oct-14 	1.2 		Moved stuff out of info into ApplicationDescription
 		09-Oct-14 	2.0 		Now a singleton and a device object
 		10-Oct-14 	2.1 		Got a working Interstitial Scene Object
+		16-Oct-14 	2.2 		Added the Interstitial Tracker to decide whether it is shown or not.
 
 --]]
 --- ************************************************************************************************************************************************************************
