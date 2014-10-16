@@ -65,6 +65,7 @@ function AdvertManager:constructor(info)
 		if ApplicationDescription.advertType == "interstitial" then 							-- if this application uses interstitial ads
 			Ads.load("interstitial")															-- start the preloader.
 			self.m_isLiveInterstitial = true 													-- mark as a live interstitial.
+			--print("[ADMOB] Load insterstitial request")
 		end
 
 	end 
@@ -138,7 +139,7 @@ end
 
 function AdvertManager:isInterstitialLoaded()
 	local isLoaded = false 																		-- will be true if ads loaded
-	if self:isPhysicalDevice() then 														-- are we on a physical device ?
+	if self:isPhysicalDevice() then 															-- are we on a physical device ?
 		isLoaded = Ads.isLoaded("interstitial")													-- if so, we can check if the ad is loaded.
 	end
 	return isLoaded
@@ -231,7 +232,7 @@ function InterstitialTracker:destructor() end
 function InterstitialTracker:canShow() 
 
 	-- TODO: timing stuff
-
+	-- print("[ADMOB TRACKER]",adManager:isInterstitialLoaded())
 
 	if not adManager:isPhysicalDevice() then return true end 									-- you can always show on the simulator.
 	return adManager:isInterstitialLoaded() 													-- show if loaded only on real devices.
