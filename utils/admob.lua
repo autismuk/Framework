@@ -226,17 +226,49 @@ end
 
 local InterstitialTracker = Framework:createClass("admob.tracker")
 
-function InterstitialTracker:constructor(info) end 
-function InterstitialTracker:destructor() end 
+--//	Construct a tracker. It has two parameters, rate which is how often it fires, and start which is how long before the first is fired
+--//	These default to 2 minutes and 10 minutes respectively. This is used to limit interstitial fireing
+--//	@info 	[table]	constructor data
+
+function InterstitialTracker:constructor(info) 
+	assert(ApplicationDescription.advertType == "interstitial")									-- if using this type must be interstitial.
+	self.m_rate = info.rate or 10 																-- show only once every ten minutes.
+	self.m_fireTime = self:getMinutes() + (info.start or 2)										-- the next time we will show an interstitial (all time in minutes)
+end 
+
+function InterstitialTracker:destructor() 
+end 
+
+--//	Get elapsed time in minutes
+--//	@return [number]	time in minutes since app started, to nearest 10th.
+
+function InterstitialTracker:getMinutes()
+	return math.floor(system.getTimer() / 1000 / 6) / 10 										-- convert millisecond timer to elapsed minutes (nearest 0.1 minute)
+end 
+
+--//	Check to see if can be shown. Firstly checks timing, then checks if loaded. 
+--//	@return 	[boolean]	true if can show an interstitial now.
 
 function InterstitialTracker:canShow() 
+	local time = self:getMinutes() 																-- get current time.
+	print("[ADMOB TRACKER] Loaded:",adManager:isInterstitialLoaded(),"Time:",time,"Fire time:",self.m_fireTime)
+	if time < self.m_fireTime then return false end 											-- if before fire time, then don't show the interstitial.
 
-	-- TODO: timing stuff
-	-- print("[ADMOB TRACKER]",adManager:isInterstitialLoaded())
-
-	if not adManager:isPhysicalDevice() then return true end 									-- you can always show on the simulator.
-	return adManager:isInterstitialLoaded() 													-- show if loaded only on real devices.
+	local result = adManager:isInterstitialLoaded() 											-- show if loaded only on real devices.
+	if not adManager:isPhysicalDevice() then result = true end 									-- you can always show on the simulator.
+	if result then 
+		self.m_fireTime = time + self.m_rate 													-- update when to show the next one, if it is being shown
+	end
+	return result
 end 
+
+--//	Select one of two events dependent on the tracker. If an interstitial is deliverable, and it is time to do so, return advertEvent which will 
+--//	usually divert to an admob.interstitialscene state, otherwise go to the next. Should normally be setup so the interstitial state goes to the skipAdvertEvent
+--//	target state ; data is passed through into this state so it should be transparent.
+--//
+--//	@advertEvent 		[string]	what to do if tracker is shown,
+--//	@skipAdvertEvent	[string]	what to do if the tracker is not shown.
+--//	@return [string] event.
 
 function InterstitialTracker:select(advertEvent,skipAdvertEvent)
 	if self:canShow() then return advertEvent else return skipAdvertEvent end 
