@@ -32,8 +32,10 @@ function AbstractSwipable:constructor(info)
 	self.m_swipeTracker.anchorX,self.m_swipeTracker.anchorY = 0,0 								-- position and alpha
 	self.m_swipeTracker.alpha = 0.02 self.m_swipeTracker:setFillColor(1,0,1)
 	self.m_swipeTracker:addEventListener("touch",self)											-- and pick up touches.
-	self.m_currentPage = 1
+	self.m_currentPage = info.default or 1 														-- select current page.
 	self.m_canSwipe = false 																	-- set to true when we can swipe
+	self.m_contentGroup.x = -display.contentWidth * (self.m_currentPage-1) 						-- go to the current page.
+	self:sendMessage("swipepagetracker","select",{ page = self.m_currentPage})					-- update page tracker.
 end 
 
 --//	Tidy up
